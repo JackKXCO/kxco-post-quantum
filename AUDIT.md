@@ -111,4 +111,4 @@ All six are reproducible without any cooperation from KXCO. That's the standard 
 
 ---
 
-**Contact:** security@kxco.ai for vulnerability reports. audit@kxco.ai for due-diligence and review requests.
+**Contact:** john@knightsbridgelaw.com, for vulnerability reports and for due-diligence or review requests. One monitored mailbox, not a rota of aliases. Acknowledgement within 2 business days, triage decision within 5. Our coordinated vulnerability disclosure policy, including safe harbour for good-faith research and how we prioritise using SSVC, is published at <https://kxco.ai/security>.
