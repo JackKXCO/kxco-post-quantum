@@ -48,6 +48,44 @@ const recovered = mlKem.decapsulate(ciphertext, kemKeys.secretKey)
 
 `masterSecret` is a `Buffer` or `Uint8Array` with at least 16 bytes of entropy (typically 32–64 bytes from an env var or KMS).
 
+### Context strings (FIPS 204 / FIPS 205)
+
+`sign` and `verify` take an optional context string, at most 255 bytes. A
+signature made under a context does not verify without it, or under a different
+one.
+
+```js
+const sig = mlDsa.sign(secretKey, 'hello', { context: 'kxco-nexus-v1' })
+
+mlDsa.verify(publicKey, 'hello', sig, { context: 'kxco-nexus-v1' })  // true
+mlDsa.verify(publicKey, 'hello', sig)                                // false
+mlDsa.verify(publicKey, 'hello', sig, { context: 'other-v1' })       // false
+```
+
+The parameter is optional and defaults to no context, so every existing call
+site is unaffected. An empty context is identical to omitting it. `slhDsa` takes
+the same option.
+
+**Context separates at the signature level; `keypairFromMaster(master, info)`
+separates at the key level.** They are complementary. Use a context when one key
+legitimately signs for several purposes and you need a signature from one
+purpose to be unusable in another. Use a distinct derived key when the purposes
+should not share a key at all.
+
+Strings are encoded as UTF-8, so the 255-byte limit is bytes and not
+characters. Over-length or wrongly typed input throws (`RangeError` /
+`TypeError`) rather than returning `false`, because that is a caller bug and not
+a failed verification:
+
+```js
+mlDsa.sign(secretKey, 'hello', 'kxco-nexus-v1')  // throws TypeError
+                                                 // (needs { context: ... })
+```
+
+That last case is worth guarding: without the throw it would silently sign with
+*no* context and produce a valid-looking signature carrying none of the intended
+separation.
+
 ---
 
 ## API

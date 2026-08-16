@@ -19,23 +19,49 @@ export function keypairFromMaster(
   info?:  string,
 ): SlhDsaKeypair
 
+/** Maximum context length in bytes (FIPS 205, matching FIPS 204). */
+export const MAX_CONTEXT_BYTES: 255
+
+export interface SignatureOptions {
+  /**
+   * Optional context string, at most 255 bytes. Strings are encoded as UTF-8.
+   * A signature made under a context does not verify without it. An empty
+   * context is identical to omitting it.
+   */
+  context?: Buffer | Uint8Array | string
+}
+
 /**
  * Sign a message under an SLH-DSA-SHA2-192s secret key. Returns the signature
  * as a hex string (16224 bytes = 32448 hex characters).
+ *
+ * @throws {TypeError}  if `opts` is not an options object, or `context` is
+ *                      neither a string nor a Uint8Array
+ * @throws {RangeError} if `context` exceeds 255 bytes
  */
 export function sign(
   secretKey: Buffer | Uint8Array,
-  message:   Buffer | string,
+  message:   Buffer | Uint8Array | string,
+  opts?:     SignatureOptions,
 ): string
 
 /**
  * Verify a hex-encoded SLH-DSA-SHA2-192s signature against a public key +
- * message. Returns `false` on any error (invalid hex, wrong length, mismatch).
+ * message.
+ *
+ * Returns `false` on any cryptographic failure (invalid hex, wrong length,
+ * mismatch, or a missing/incorrect context). Throws only on caller misuse of
+ * `opts`.
+ *
+ * @throws {TypeError}  if `opts` is not an options object, or `context` is
+ *                      neither a string nor a Uint8Array
+ * @throws {RangeError} if `context` exceeds 255 bytes
  */
 export function verify(
   publicKey: Buffer | Uint8Array,
-  message:   Buffer | string,
+  message:   Buffer | Uint8Array | string,
   sigHex:    string,
+  opts?:     SignatureOptions,
 ): boolean
 
 /**

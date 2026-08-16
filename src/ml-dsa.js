@@ -8,6 +8,9 @@
 
 import { ml_dsa65 } from '@noble/post-quantum/ml-dsa.js'
 import { deriveSeed } from './derive.js'
+import { normalizeContext, MAX_CONTEXT_BYTES } from './_context.js'
+
+export { MAX_CONTEXT_BYTES }
 
 const HAS_BUFFER = typeof Buffer !== 'undefined'
 const enc = new TextEncoder()
@@ -50,26 +53,47 @@ export function keypairFromMaster(master, info = 'ml-dsa-65-v1') {
 /**
  * Sign a message. Returns the signature as a hex string.
  *
+ * An optional FIPS 204 section 5.2 context string gives domain separation: a
+ * signature made under a context does not verify without it. Omit it and the
+ * behaviour is exactly as before this parameter existed.
+ *
  * @param {Buffer|Uint8Array} secretKey
  * @param {Buffer|Uint8Array|string} message
+ * @param {{ context?: Uint8Array|Buffer|string }} [opts] at most 255 context bytes
  * @returns {string} hex-encoded signature (6618 chars)
  */
-export function sign(secretKey, message) {
-  const sig = ml_dsa65.sign(toBytes(message), secretKey)
+export function sign(secretKey, message, opts) {
+  const context = normalizeContext(opts)
+  const sig = context === undefined
+    ? ml_dsa65.sign(toBytes(message), secretKey)
+    : ml_dsa65.sign(toBytes(message), secretKey, { context })
   return bytesToHex(sig)
 }
 
 /**
  * Verify a hex-encoded signature.
  *
+ * Pass the same context the signer used. A signature made under a context
+ * returns false here if the context is omitted or differs, which is the point
+ * of it.
+ *
+ * Returns false for any cryptographic failure. Throws only on caller misuse of
+ * `opts` (wrong type, or a context over 255 bytes), because that is a bug
+ * rather than a failed verification and should not be silently swallowed.
+ *
  * @param {Buffer|Uint8Array} publicKey
  * @param {Buffer|Uint8Array|string} message
  * @param {string} sigHex
+ * @param {{ context?: Uint8Array|Buffer|string }} [opts]
  * @returns {boolean}
  */
-export function verify(publicKey, message, sigHex) {
+export function verify(publicKey, message, sigHex, opts) {
+  // Outside the try: misuse must surface, not be swallowed as "invalid".
+  const context = normalizeContext(opts)
   try {
-    return ml_dsa65.verify(hexToBytes(sigHex), toBytes(message), publicKey)
+    return context === undefined
+      ? ml_dsa65.verify(hexToBytes(sigHex), toBytes(message), publicKey)
+      : ml_dsa65.verify(hexToBytes(sigHex), toBytes(message), publicKey, { context })
   } catch {
     return false
   }

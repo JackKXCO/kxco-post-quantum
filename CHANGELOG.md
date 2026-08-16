@@ -1,5 +1,41 @@
 # Changelog
 
+## 1.3.0 - unreleased
+
+Adds FIPS 204 / FIPS 205 context string support. Purely additive: the
+cryptographic surface for every existing call site is byte-for-byte unchanged,
+and all 39 pinned vectors still match.
+
+### Added
+- **Optional `context` on `mlDsa.sign` / `mlDsa.verify`** via a trailing options
+  object, `{ context }`. At most 255 bytes per FIPS 204 section 5.2; strings are
+  encoded as UTF-8. A signature made under a context does not verify without it
+  or under a different one. Closes a real incompleteness relative to FIPS 204:
+  the library previously could not verify a counterparty's signature that used a
+  context.
+- **The same option on `slhDsa.sign` / `slhDsa.verify`**, on the same terms.
+  Added alongside ML-DSA rather than after it, because one signature module
+  accepting an options object while its sibling silently ignored one would be a
+  footgun.
+- `MAX_CONTEXT_BYTES` (255) exported from both modules.
+- `test/context.test.js`, 26 tests, including cross-verification against
+  third-party ML-DSA-65 signatures produced by OpenSSL through Python
+  `cryptography`, covering five context shapes: short, single-byte, the 255-byte
+  maximum, binary, and multi-byte UTF-8.
+
+### Notes
+- **No behaviour change without the new argument.** Omitting `opts` takes the
+  identical code path as before. An empty context is collapsed to no context,
+  which is what FIPS 204 specifies and what was verified empirically.
+- **Misuse throws rather than returning `false`.** A context over 255 bytes, a
+  wrongly typed context, or a bare value passed where an options object belongs
+  raises `RangeError` / `TypeError`. These are caller bugs, not failed
+  verifications, and swallowing them would hide a signature that silently
+  carried no domain separation. No existing call site passes the argument, so
+  nothing can regress.
+- Works identically on `@noble/post-quantum` 0.6.1 and 0.7.0, verified on both,
+  so this release is independent of the 0.7.0 upgrade.
+
 ## 1.2.1 — 2026-07-22
 
 Metadata alignment. No code changes; cryptographic surface is byte-for-byte

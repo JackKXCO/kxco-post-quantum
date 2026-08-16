@@ -15,6 +15,9 @@
 
 import { slh_dsa_sha2_192s } from '@noble/post-quantum/slh-dsa.js'
 import { deriveSeed } from './derive.js'
+import { normalizeContext, MAX_CONTEXT_BYTES } from './_context.js'
+
+export { MAX_CONTEXT_BYTES }
 
 const HAS_BUFFER = typeof Buffer !== 'undefined'
 const enc = new TextEncoder()
@@ -60,26 +63,41 @@ export function keypairFromMaster(master, info = 'slh-dsa-sha2-192s-v1') {
 /**
  * Sign a message. Returns the signature as a hex string.
  *
+ * Accepts the same optional context string as ml-dsa.js (FIPS 205 allows it on
+ * the same terms as FIPS 204, at most 255 bytes). Omit it and the behaviour is
+ * exactly as before this parameter existed.
+ *
  * @param {Buffer|Uint8Array} secretKey
  * @param {Buffer|Uint8Array|string} message
+ * @param {{ context?: Uint8Array|Buffer|string }} [opts] at most 255 context bytes
  * @returns {string} hex-encoded signature (32448 chars)
  */
-export function sign(secretKey, message) {
-  const sig = slh_dsa_sha2_192s.sign(toBytes(message), secretKey)
+export function sign(secretKey, message, opts) {
+  const context = normalizeContext(opts)
+  const sig = context === undefined
+    ? slh_dsa_sha2_192s.sign(toBytes(message), secretKey)
+    : slh_dsa_sha2_192s.sign(toBytes(message), secretKey, { context })
   return bytesToHex(sig)
 }
 
 /**
  * Verify a hex-encoded signature.
  *
+ * Pass the same context the signer used. Returns false for any cryptographic
+ * failure; throws only on caller misuse of `opts`.
+ *
  * @param {Buffer|Uint8Array} publicKey
  * @param {Buffer|Uint8Array|string} message
  * @param {string} sigHex
+ * @param {{ context?: Uint8Array|Buffer|string }} [opts]
  * @returns {boolean}
  */
-export function verify(publicKey, message, sigHex) {
+export function verify(publicKey, message, sigHex, opts) {
+  const context = normalizeContext(opts)
   try {
-    return slh_dsa_sha2_192s.verify(hexToBytes(sigHex), toBytes(message), publicKey)
+    return context === undefined
+      ? slh_dsa_sha2_192s.verify(hexToBytes(sigHex), toBytes(message), publicKey)
+      : slh_dsa_sha2_192s.verify(hexToBytes(sigHex), toBytes(message), publicKey, { context })
   } catch {
     return false
   }

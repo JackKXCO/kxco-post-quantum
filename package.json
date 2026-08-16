@@ -1,6 +1,6 @@
 {
   "name": "kxco-post-quantum",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "description": "ML-DSA-65, ML-KEM-768 and SLH-DSA-SHA2-192s primitives with key fingerprinting. The base layer for all kxco-pq-* packages.",
   "keywords": [
     "post-quantum",
@@ -23,7 +23,6 @@
     "deterministic-keys",
     "fingerprint",
     "replay-protection",
-    "constant-time",
     "hybrid-signing",
     "non-repudiation"
   ],
@@ -41,10 +40,10 @@
   "funding": "https://kxco.ai",
   "repository": {
     "type": "git",
-    "url": "https://github.com/JackKXCO/kxco-post-quantum.git"
+    "url": "https://github.com/KnightsbridgeAIQ/kxco-post-quantum.git"
   },
   "bugs": {
-    "url": "https://github.com/JackKXCO/kxco-post-quantum/issues"
+    "url": "https://github.com/KnightsbridgeAIQ/kxco-post-quantum/issues"
   },
   "type": "module",
   "sideEffects": false,
@@ -91,11 +90,11 @@
     "node": ">=20.19"
   },
   "dependencies": {
-    "@noble/hashes": "^2.2.0",
-    "@noble/post-quantum": "^0.6.1"
+    "@noble/hashes": "2.3.0",
+    "@noble/post-quantum": "0.7.0"
   },
   "scripts": {
-    "test": "node --test test/basic.test.js && node --test test/browser-smoke.test.js && node test/run-vectors.js",
+    "test": "node --test test/basic.test.js && node --test test/context.test.js && node --test test/browser-smoke.test.js && node test/run-vectors.js",
     "test:vectors": "node test/run-vectors.js",
     "generate:vectors": "node test/generate-vectors.js > test/vectors.json",
     "bench": "node bench/bench.js"
