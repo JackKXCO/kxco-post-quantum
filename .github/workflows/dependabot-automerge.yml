@@ -11,16 +11,30 @@ jobs:
     if: github.event.pull_request.user.login == 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
-      - name: Refuse major version bumps
+      - name: Refuse breaking version bumps
         env:
           TITLE: ${{ github.event.pull_request.title }}
         run: |
           vers=$(echo "$TITLE" | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -2)
           count=$(echo "$vers" | grep -c . || true)
           if [ "$count" -ne 2 ]; then echo "cannot parse versions - leaving for human review"; exit 1; fi
-          from=$(echo "$vers" | sed -n 1p | cut -d. -f1)
-          to=$(echo "$vers" | sed -n 2p | cut -d. -f1)
-          if [ "$from" != "$to" ]; then echo "major bump ($from -> $to) - leaving for human review"; exit 1; fi
+          from=$(echo "$vers" | sed -n 1p)
+          to=$(echo "$vers" | sed -n 2p)
+          fromMajor=$(echo "$from" | cut -d. -f1); toMajor=$(echo "$to" | cut -d. -f1)
+          if [ "$fromMajor" != "$toMajor" ]; then
+            echo "major bump ($from -> $to) - leaving for human review"; exit 1
+          fi
+          # Under semver a 0.x minor bump may break, and comparing only the major
+          # component treats 0.6.1 -> 0.7.0 as routine. That is not routine here:
+          # the principal dependency is 0.x, and @noble/post-quantum changed its
+          # sign/verify argument order within 0.6.x. That bump must be reviewed by
+          # a person, not merged because the leading zero matched.
+          if [ "$fromMajor" = "0" ]; then
+            fromMinor=$(echo "$from" | cut -d. -f2); toMinor=$(echo "$to" | cut -d. -f2)
+            if [ "$fromMinor" != "$toMinor" ]; then
+              echo "0.x minor bump ($from -> $to) is breaking-capable - leaving for human review"; exit 1
+            fi
+          fi
       - name: Enable auto-merge (merges when required checks pass)
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
