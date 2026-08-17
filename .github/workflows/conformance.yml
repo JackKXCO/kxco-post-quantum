@@ -49,10 +49,14 @@ jobs:
           - name: key generation and ML-KEM/ML-DSA signatures
             slug: fast
             timeout: 45
+            pushCap: 3
             sets: ML-KEM-keyGen-FIPS203,ML-KEM-encapDecap-FIPS203,ML-DSA-keyGen-FIPS204,ML-DSA-sigGen-FIPS204,ML-DSA-sigVer-FIPS204,SLH-DSA-keyGen-FIPS205
           - name: SLH-DSA signatures
             slug: slh-signatures
             timeout: 300
+            # One case per group, not three: SLH-DSA signing is slow enough that
+            # a per-push cap of 3 would put a ~30 minute job on every push.
+            pushCap: 1
             sets: SLH-DSA-sigGen-FIPS205,SLH-DSA-sigVer-FIPS205
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
@@ -72,7 +76,7 @@ jobs:
           if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             node conformance/run-acvp.mjs --set '${{ matrix.group.sets }}' --json "$REPORT"
           else
-            node conformance/run-acvp.mjs --set '${{ matrix.group.sets }}' --max-per-group 3 --json "$REPORT"
+            node conformance/run-acvp.mjs --set '${{ matrix.group.sets }}' --max-per-group ${{ matrix.group.pushCap }} --json "$REPORT"
           fi
 
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
