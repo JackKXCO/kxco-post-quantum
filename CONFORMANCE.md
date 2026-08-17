@@ -78,8 +78,11 @@ rather than signing.
 
 This is the library being stricter than the vector file, and it is counted
 separately rather than folded into a pass total, because a skip is not a pass.
-The full list with per-case reasons is in the generated report at
-`conformance/results/acvp.json`.
+Every skip is listed with its reason in the generated reports, which CI writes as
+`conformance/results/acvp-fast.json` and
+`conformance/results/acvp-slh-signatures.json`. The SLH-DSA signature sets run as
+their own job because a full pass of them takes over an hour, so a single
+combined job would time out.
 
 ---
 

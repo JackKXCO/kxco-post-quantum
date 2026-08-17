@@ -6,7 +6,7 @@
 // recorded as skipped with a reason rather than silently dropped: a skipped
 // group is a gap in the claim, and the report says so.
 //
-// Usage:  node conformance/run-acvp.mjs [--set NAME] [--json PATH] [--quiet]
+// Usage:  node conformance/run-acvp.mjs [--set NAME[,NAME...]] [--json PATH] [--quiet]
 //                                      [--max-per-group N]
 //
 // --max-per-group caps how many test cases are taken from each ACVP group. The
@@ -32,7 +32,12 @@ const HERE = dirname(fileURLToPath(import.meta.url))
 const pkg = JSON.parse(readFileSync(join(HERE, '..', 'package.json'), 'utf8'))
 
 const args = process.argv.slice(2)
-const only = args.includes('--set') ? args[args.indexOf('--set') + 1] : null
+// --set takes one name or a comma-separated list, so a caller can run a group of
+// sets into a single report. The SLH-DSA signature sets cost roughly two orders
+// of magnitude more than the rest, which is why they are worth running apart.
+const only = args.includes('--set')
+  ? args[args.indexOf('--set') + 1].split(',').map((s) => s.trim()).filter(Boolean)
+  : null
 const jsonOut = args.includes('--json') ? args[args.indexOf('--json') + 1] : null
 const quiet = args.includes('--quiet')
 const maxPerGroup = args.includes('--max-per-group')
@@ -370,7 +375,7 @@ const RUNNERS = {
 // ----------------------------------------------------------------------- main
 
 const source = acvpSource()
-const sets = only ? [only] : Object.keys(RUNNERS)
+const sets = only ?? Object.keys(RUNNERS)
 const report = {
   subject: { package: pkg.name, version: pkg.version },
   backend: pkg.dependencies,

@@ -13,9 +13,15 @@ name: conformance
 # conformance/interop/peers-lock.json. A silently rewritten upstream fails the
 # job rather than changing the result.
 #
-# The SLH-DSA slow parameter sets sign in seconds per operation, so the
-# scheduled run does a full pass and per-push runs subsample. The report records
-# which of the two it was.
+# The SLH-DSA signature sets cost roughly two orders of magnitude more than
+# everything else: a full SLH-DSA-sigGen pass alone measured 76 minutes on a
+# developer machine. They therefore run as their own job, in parallel with the
+# cheap sets, with a timeout sized to that measurement rather than to hope. A
+# single combined job would exceed its timeout on the weekly full run.
+#
+# Per-push runs subsample with --max-per-group; scheduled runs do a full pass.
+# The generated report records which of the two it was, so a subsampled run is
+# never mistaken for a full one.
 #
 # All third-party actions are pinned by 40-char commit SHA.
 
@@ -33,9 +39,21 @@ permissions:
 
 jobs:
   acvp:
-    name: NIST ACVP vectors
+    name: ACVP ${{ matrix.group.name }}
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: ${{ matrix.group.timeout }}
+    strategy:
+      fail-fast: false
+      matrix:
+        group:
+          - name: key generation and ML-KEM/ML-DSA signatures
+            slug: fast
+            timeout: 45
+            sets: ML-KEM-keyGen-FIPS203,ML-KEM-encapDecap-FIPS203,ML-DSA-keyGen-FIPS204,ML-DSA-sigGen-FIPS204,ML-DSA-sigVer-FIPS204,SLH-DSA-keyGen-FIPS205
+          - name: SLH-DSA signatures
+            slug: slh-signatures
+            timeout: 300
+            sets: SLH-DSA-sigGen-FIPS205,SLH-DSA-sigVer-FIPS205
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
@@ -50,22 +68,26 @@ jobs:
 
       - name: Run ACVP vectors
         run: |
+          REPORT=conformance/results/acvp-${{ matrix.group.slug }}.json
           if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            node conformance/run-acvp.mjs --json conformance/results/acvp.json
+            node conformance/run-acvp.mjs --set '${{ matrix.group.sets }}' --json "$REPORT"
           else
-            node conformance/run-acvp.mjs --max-per-group 3 --json conformance/results/acvp.json
+            node conformance/run-acvp.mjs --set '${{ matrix.group.sets }}' --max-per-group 3 --json "$REPORT"
           fi
 
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         if: always()
         with:
-          name: acvp-report
-          path: conformance/results/acvp.json
+          name: acvp-report-${{ matrix.group.slug }}
+          path: conformance/results/acvp-${{ matrix.group.slug }}.json
 
   interop:
     name: Cross-implementation interop
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    # A full matrix measured well under 30 minutes locally; the headroom is for a
+    # slower runner, because a timeout here reads as failed interop rather than
+    # as a slow machine.
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
 
