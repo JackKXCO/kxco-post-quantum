@@ -1,0 +1,101 @@
+name: conformance
+
+# Regenerates the published conformance evidence: NIST ACVP vectors for FIPS
+# 203/204/205, and the cross-implementation interoperability matrix against
+# Bouncy Castle (Java) and dilithium-py / kyber-py (Python).
+#
+# This runs on every push and weekly, so CONFORMANCE.md describes what the code
+# does now rather than what it did on the day someone ran the harness by hand.
+# The reports are uploaded as artifacts on every run.
+#
+# ACVP vectors are pinned by commit and verified against the SHA-256 digests in
+# conformance/acvp-lock.json; the interop peers are pinned in
+# conformance/interop/peers-lock.json. A silently rewritten upstream fails the
+# job rather than changing the result.
+#
+# The SLH-DSA slow parameter sets sign in seconds per operation, so the
+# scheduled run does a full pass and per-push runs subsample. The report records
+# which of the two it was.
+#
+# All third-party actions are pinned by 40-char commit SHA.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '17 4 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  acvp:
+    name: NIST ACVP vectors
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: '22'
+
+      - run: npm ci
+
+      - name: Fetch and verify pinned ACVP vectors
+        run: node conformance/fetch-vectors.mjs
+
+      - name: Run ACVP vectors
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            node conformance/run-acvp.mjs --json conformance/results/acvp.json
+          else
+            node conformance/run-acvp.mjs --max-per-group 3 --json conformance/results/acvp.json
+          fi
+
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v6.0.0
+        if: always()
+        with:
+          name: acvp-report
+          path: conformance/results/acvp.json
+
+  interop:
+    name: Cross-implementation interop
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: '22'
+
+      - uses: actions/setup-java@dded0888837ed1f4f45a3b9c316d1e6ff5049c26 # v5.0.0
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: actions/setup-python@2e3e4b15a884dd0e429dad9b26a5b04c3172ca4c # v6.0.0
+        with:
+          python-version: '3.12'
+
+      - run: npm ci
+
+      - name: Install pinned Python interop peers
+        run: |
+          python -m pip install --disable-pip-version-check \
+            $(node -e "console.log(require('./conformance/interop/peers-lock.json').python.requirements.join(' '))")
+
+      - name: Run interop matrix
+        env:
+          PYTHON: python
+        run: node conformance/interop/run-interop.mjs --json conformance/results/interop.json
+
+      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v6.0.0
+        if: always()
+        with:
+          name: interop-report
+          path: conformance/results/interop.json

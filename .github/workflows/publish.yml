@@ -5,9 +5,18 @@ name: publish
 #
 # Auth path: npm Trusted Publishing via GitHub Actions OIDC.
 # Registered at https://www.npmjs.com/package/kxco-post-quantum/access
-# binding org=JackKXCO, repo=kxco-post-quantum, workflow=publish.yml.
+# binding org=KnightsbridgeAIQ, repo=kxco-post-quantum, workflow=publish.yml.
 # No NPM_TOKEN secret. No NPM_OTP. Nothing rotates, nothing leaks.
 # Provenance is minted automatically by the OIDC publish.
+#
+# The repositories moved from JackKXCO to KnightsbridgeAIQ. Until the npm
+# Trusted Publishing binding is repointed at the new org, this workflow cannot
+# authenticate, and publishing by hand from a workstation produces a release
+# with NO provenance attestation. Verify with:
+#
+#   npm view kxco-post-quantum --json | grep -A5 attestations
+#
+# A release with no attestations block was not published through this path.
 #
 # All third-party actions are pinned by 40-char commit SHA.
 
@@ -53,5 +62,18 @@ jobs:
       - name: Run tests
         run: npm test
 
+      - name: Generate CycloneDX SBOM
+        # npm generates this itself, so the SBOM describes the tree that was
+        # actually installed for this build rather than a re-resolved one.
+        run: |
+          npm sbom --sbom-format cyclonedx --sbom-type library > sbom.cyclonedx.json
+          node -e "const s=require('./sbom.cyclonedx.json');console.log('components:',s.components.length)"
+
       - name: Publish (Trusted Publishing + provenance via OIDC)
         run: npm publish --provenance --access public
+
+      - name: Attach SBOM to the release artifacts
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v6.0.0
+        with:
+          name: sbom-${{ github.event.inputs.ref || github.ref_name }}
+          path: sbom.cyclonedx.json

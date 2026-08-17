@@ -1,0 +1,36 @@
+{
+  "source": {
+    "repo": "usnistgov/ACVP-Server",
+    "commit": "975de31eb83d87039ec88934fdc47d8c312b892d",
+    "path": "gen-val/json-files",
+    "note": "NIST's own ACVP demo/sample vector files for FIPS 203, 204 and 205."
+  },
+  "sets": [
+    "ML-KEM-keyGen-FIPS203",
+    "ML-KEM-encapDecap-FIPS203",
+    "ML-DSA-keyGen-FIPS204",
+    "ML-DSA-sigGen-FIPS204",
+    "ML-DSA-sigVer-FIPS204",
+    "SLH-DSA-keyGen-FIPS205",
+    "SLH-DSA-sigGen-FIPS205",
+    "SLH-DSA-sigVer-FIPS205"
+  ],
+  "digests": {
+    "ML-KEM-keyGen-FIPS203/prompt.json": "d235b20413d62c294d1141ae4a1fc3febe02809713f39864e0157b4eba28b767",
+    "ML-KEM-keyGen-FIPS203/expectedResults.json": "0cafd3f90a15ded7507aed6944d3275c538a11ef46855494b55d20d03473817a",
+    "ML-KEM-encapDecap-FIPS203/prompt.json": "b1e851a2fadec0196ce57a8cbe0465642fb5ce50e187a76cefa4bedd487782b7",
+    "ML-KEM-encapDecap-FIPS203/expectedResults.json": "10271c647e6d142fc4ddc8b7963ea0b1fbb11f0ac058b57c70930259b48c392f",
+    "ML-DSA-keyGen-FIPS204/prompt.json": "55a7c04a6c55f60a11482f77b5256782faf0c4061824db6c327b78a0fd5a26f5",
+    "ML-DSA-keyGen-FIPS204/expectedResults.json": "774f4196d1041c9cda8bc4eabcb9fff1019dbef620ec01f6525c3378bce07619",
+    "ML-DSA-sigGen-FIPS204/prompt.json": "5a528bd687e2c2db78c60211a9617ce6270a90313be4ba1e6723018c90fb2c5b",
+    "ML-DSA-sigGen-FIPS204/expectedResults.json": "1b3d38210091aeceacd48dcf334187dfebbb45ece436079807bd055ee79ee1ff",
+    "ML-DSA-sigVer-FIPS204/prompt.json": "c5b2581fa8b59fa39650ab2d7c0d3c6c07b3641332977168cad8170dc09fec6b",
+    "ML-DSA-sigVer-FIPS204/expectedResults.json": "bcdb928d4bffd904ee9b2b6b0da4dce81e76ef0aa022c6c39dd10cef8a6c280d",
+    "SLH-DSA-keyGen-FIPS205/prompt.json": "4d55b1bb5e3a19497b0a1d11d6e62b5cd9754f4f15ae8c5cfd3f4072b60aaa74",
+    "SLH-DSA-keyGen-FIPS205/expectedResults.json": "c6f41d5b22231f1e53c414a72950b612deec3f62299989f3663e242f84d5bc3f",
+    "SLH-DSA-sigGen-FIPS205/prompt.json": "3dbb7265b6e014e904d5574f80adaa2d47a38e7052fa40aa492ce4f3d35fc259",
+    "SLH-DSA-sigGen-FIPS205/expectedResults.json": "7fdfe1d8805fca6dbb1599a2b93eca1f326233fe7f4625fe0feeb41d6a44d4cf",
+    "SLH-DSA-sigVer-FIPS205/prompt.json": "7b2c0fdde428ffd37a5ddaec8ef0e203ab36dd6bbd718a79f05b2583929f820b",
+    "SLH-DSA-sigVer-FIPS205/expectedResults.json": "4bf4b1e038590900b311d8ad7db941caae5f8404fc6cb40b68b9a23930dd8b50"
+  }
+}

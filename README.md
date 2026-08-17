@@ -4,9 +4,17 @@ Post-quantum cryptography primitives for the KXCO stack.
 
 [![npm](https://img.shields.io/npm/v/kxco-post-quantum)](https://www.npmjs.com/package/kxco-post-quantum)
 [![CI](https://github.com/KnightsbridgeAIQ/kxco-post-quantum/actions/workflows/ci.yml/badge.svg)](https://github.com/KnightsbridgeAIQ/kxco-post-quantum/actions/workflows/ci.yml)
+[![conformance](https://github.com/KnightsbridgeAIQ/kxco-post-quantum/actions/workflows/conformance.yml/badge.svg)](https://github.com/KnightsbridgeAIQ/kxco-post-quantum/actions/workflows/conformance.yml)
 [![license](https://img.shields.io/badge/license-Apache--2.0-blue)](./LICENSE)
 
-ML-DSA-65 (FIPS 204) and SLH-DSA-SHA2-192s (FIPS 205) signatures, ML-KEM-768 (FIPS 203) key encapsulation, and key fingerprinting utilities. Wraps [`@noble/post-quantum`](https://github.com/paulmillr/noble-post-quantum) — the NIST reference implementation. All other `kxco-pq-*` packages depend on this one.
+ML-DSA-65 (FIPS 204) and SLH-DSA-SHA2-192s (FIPS 205) signatures, ML-KEM-768 (FIPS 203) key encapsulation, and key fingerprinting utilities. Wraps [`@noble/post-quantum`](https://github.com/paulmillr/noble-post-quantum). All other `kxco-pq-*` packages depend on this one.
+
+**Evidence, not adjectives:**
+
+- [CONFORMANCE.md](./CONFORMANCE.md) — NIST ACVP vectors for FIPS 203/204/205, and a cross-implementation interop matrix against Bouncy Castle and two pure-Python implementations. 134 interop checks, both directions, with negative controls. Reproducible: `npm run conformance:acvp`, `npm run conformance:interop`.
+- [THREAT-MODEL.md](./THREAT-MODEL.md) — what this defends against and what it does not. Read the side-channel section before deciding where a signing key lives.
+- [MIGRATION.md](./MIGRATION.md) — moving an RSA or ECDSA system across, and moving between versions of this package.
+- [SECURITY.md](./SECURITY.md) — reporting, and release integrity.
 
 ---
 

@@ -1,0 +1,744 @@
+{
+  "subject": {
+    "package": "kxco-post-quantum",
+    "version": "1.3.0"
+  },
+  "backend": {
+    "@noble/hashes": "2.3.0",
+    "@noble/post-quantum": "0.7.0"
+  },
+  "runtime": {
+    "node": "v26.1.0",
+    "platform": "win32-x64"
+  },
+  "peers": {
+    "bouncycastle": {
+      "available": true,
+      "name": "Bouncy Castle bcprov",
+      "language": "Java",
+      "version": "",
+      "java": "17.0.20"
+    },
+    "python": {
+      "available": true,
+      "name": "dilithium-py + kyber-py",
+      "language": "Python",
+      "algorithms": [
+        "ML-DSA-44",
+        "ML-DSA-65",
+        "ML-DSA-87",
+        "ML-KEM-1024",
+        "ML-KEM-512",
+        "ML-KEM-768"
+      ],
+      "python": "3.12.10"
+    }
+  },
+  "rows": [
+    {
+      "peer": "bouncycastle",
+      "alg": "ML-DSA-44",
+      "path": "backend",
+      "checks": {
+        "keys": {
+          "ok": true,
+          "detail": "ours 5ea1c838bd5a3a35f1ef1782 theirs 5ea1c838bd5a3a35f1ef1782"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes": {
+          "ok": true,
+          "detail": "deterministic signatures differ (ours 4b4a92ec74d4c067aaaa, theirs 4b4a92ec74d4c067aaaa)"
+        },
+        "tamper": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        },
+        "ours>theirs/ctx": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours/ctx": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes/ctx": {
+          "ok": true,
+          "detail": "deterministic signatures differ (ours f8d83fa9553ec8b89dc9, theirs f8d83fa9553ec8b89dc9)"
+        },
+        "tamper/ctx": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        }
+      }
+    },
+    {
+      "peer": "bouncycastle",
+      "alg": "ML-DSA-65",
+      "path": "wrapper",
+      "checks": {
+        "keys": {
+          "ok": true,
+          "detail": "ours b8c765e4f8ae497e40a38745 theirs b8c765e4f8ae497e40a38745"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes": {
+          "ok": null,
+          "detail": "not applicable: the wrapper signs hedged, so signatures are not reproducible"
+        },
+        "tamper": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        },
+        "ours>theirs/ctx": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours/ctx": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes/ctx": {
+          "ok": null,
+          "detail": "not applicable: the wrapper signs hedged, so signatures are not reproducible"
+        },
+        "tamper/ctx": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        }
+      }
+    },
+    {
+      "peer": "bouncycastle",
+      "alg": "ML-DSA-65",
+      "path": "backend",
+      "checks": {
+        "keys": {
+          "ok": true,
+          "detail": "ours b8c765e4f8ae497e40a38745 theirs b8c765e4f8ae497e40a38745"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes": {
+          "ok": true,
+          "detail": "deterministic signatures differ (ours d27840805d344c6674fe, theirs d27840805d344c6674fe)"
+        },
+        "tamper": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        },
+        "ours>theirs/ctx": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours/ctx": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes/ctx": {
+          "ok": true,
+          "detail": "deterministic signatures differ (ours 854e69040ca1a185ac9a, theirs 854e69040ca1a185ac9a)"
+        },
+        "tamper/ctx": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        }
+      }
+    },
+    {
+      "peer": "bouncycastle",
+      "alg": "ML-DSA-87",
+      "path": "backend",
+      "checks": {
+        "keys": {
+          "ok": true,
+          "detail": "ours 486c0d1114ddad23b5873a89 theirs 486c0d1114ddad23b5873a89"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes": {
+          "ok": true,
+          "detail": "deterministic signatures differ (ours ec922cf9523a612174e2, theirs ec922cf9523a612174e2)"
+        },
+        "tamper": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        },
+        "ours>theirs/ctx": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours/ctx": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes/ctx": {
+          "ok": true,
+          "detail": "deterministic signatures differ (ours 834026ca82037ea156bd, theirs 834026ca82037ea156bd)"
+        },
+        "tamper/ctx": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        }
+      }
+    },
+    {
+      "peer": "bouncycastle",
+      "alg": "ML-KEM-512",
+      "path": "backend",
+      "checks": {
+        "keys": {
+          "ok": true,
+          "detail": "derived encapsulation keys differ"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "shared secrets differ"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we recovered a different shared secret than the peer sent"
+        },
+        "reject": {
+          "ok": true,
+          "detail": "peer returned the real shared secret for a corrupted ciphertext"
+        }
+      }
+    },
+    {
+      "peer": "bouncycastle",
+      "alg": "ML-KEM-768",
+      "path": "wrapper",
+      "checks": {
+        "keys": {
+          "ok": true,
+          "detail": "derived encapsulation keys differ"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "shared secrets differ"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we recovered a different shared secret than the peer sent"
+        },
+        "reject": {
+          "ok": true,
+          "detail": "peer returned the real shared secret for a corrupted ciphertext"
+        }
+      }
+    },
+    {
+      "peer": "bouncycastle",
+      "alg": "ML-KEM-768",
+      "path": "backend",
+      "checks": {
+        "keys": {
+          "ok": true,
+          "detail": "derived encapsulation keys differ"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "shared secrets differ"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we recovered a different shared secret than the peer sent"
+        },
+        "reject": {
+          "ok": true,
+          "detail": "peer returned the real shared secret for a corrupted ciphertext"
+        }
+      }
+    },
+    {
+      "peer": "bouncycastle",
+      "alg": "ML-KEM-1024",
+      "path": "backend",
+      "checks": {
+        "keys": {
+          "ok": true,
+          "detail": "derived encapsulation keys differ"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "shared secrets differ"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we recovered a different shared secret than the peer sent"
+        },
+        "reject": {
+          "ok": true,
+          "detail": "peer returned the real shared secret for a corrupted ciphertext"
+        }
+      }
+    },
+    {
+      "peer": "bouncycastle",
+      "alg": "SLH-DSA-SHA2-128f",
+      "path": "backend",
+      "checks": {
+        "keys": {
+          "ok": true,
+          "detail": "ours 8b1d3f649e30360cf2dc3236 theirs 8b1d3f649e30360cf2dc3236"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes": {
+          "ok": true,
+          "detail": "deterministic signatures differ (ours 8952786e6b41b83cfabc, theirs 8952786e6b41b83cfabc)"
+        },
+        "tamper": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        },
+        "ours>theirs/ctx": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours/ctx": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes/ctx": {
+          "ok": true,
+          "detail": "deterministic signatures differ (ours 5b871154fe23d152f622, theirs 5b871154fe23d152f622)"
+        },
+        "tamper/ctx": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        }
+      }
+    },
+    {
+      "peer": "bouncycastle",
+      "alg": "SLH-DSA-SHA2-192s",
+      "path": "wrapper",
+      "checks": {
+        "keys": {
+          "ok": true,
+          "detail": "ours e4bd34551d6a85ca217468fe theirs e4bd34551d6a85ca217468fe"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes": {
+          "ok": null,
+          "detail": "not applicable: the wrapper signs hedged, so signatures are not reproducible"
+        },
+        "tamper": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        },
+        "ours>theirs/ctx": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours/ctx": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes/ctx": {
+          "ok": null,
+          "detail": "not applicable: the wrapper signs hedged, so signatures are not reproducible"
+        },
+        "tamper/ctx": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        }
+      }
+    },
+    {
+      "peer": "bouncycastle",
+      "alg": "SLH-DSA-SHA2-192s",
+      "path": "backend",
+      "checks": {
+        "keys": {
+          "ok": true,
+          "detail": "ours e4bd34551d6a85ca217468fe theirs e4bd34551d6a85ca217468fe"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes": {
+          "ok": true,
+          "detail": "deterministic signatures differ (ours 63338d76b553bbdf3aa5, theirs 63338d76b553bbdf3aa5)"
+        },
+        "tamper": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        },
+        "ours>theirs/ctx": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours/ctx": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes/ctx": {
+          "ok": true,
+          "detail": "deterministic signatures differ (ours 2c78a6c0fe93195c2da7, theirs 2c78a6c0fe93195c2da7)"
+        },
+        "tamper/ctx": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        }
+      }
+    },
+    {
+      "peer": "bouncycastle",
+      "alg": "SLH-DSA-SHAKE-256f",
+      "path": "backend",
+      "checks": {
+        "keys": {
+          "ok": true,
+          "detail": "ours 0ef235c5087c008234f233f4 theirs 0ef235c5087c008234f233f4"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes": {
+          "ok": true,
+          "detail": "deterministic signatures differ (ours 5d57a441662071c89fab, theirs 5d57a441662071c89fab)"
+        },
+        "tamper": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        },
+        "ours>theirs/ctx": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours/ctx": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes/ctx": {
+          "ok": true,
+          "detail": "deterministic signatures differ (ours 46a6ec48e840246f7fb4, theirs 46a6ec48e840246f7fb4)"
+        },
+        "tamper/ctx": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        }
+      }
+    },
+    {
+      "peer": "python",
+      "alg": "ML-DSA-44",
+      "path": "backend",
+      "checks": {
+        "keys": {
+          "ok": true,
+          "detail": "ours 5ea1c838bd5a3a35f1ef1782 theirs 5ea1c838bd5a3a35f1ef1782"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes": {
+          "ok": true,
+          "detail": "deterministic signatures differ (ours 4b4a92ec74d4c067aaaa, theirs 4b4a92ec74d4c067aaaa)"
+        },
+        "tamper": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        },
+        "ours>theirs/ctx": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours/ctx": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes/ctx": {
+          "ok": true,
+          "detail": "deterministic signatures differ (ours f8d83fa9553ec8b89dc9, theirs f8d83fa9553ec8b89dc9)"
+        },
+        "tamper/ctx": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        }
+      }
+    },
+    {
+      "peer": "python",
+      "alg": "ML-DSA-65",
+      "path": "wrapper",
+      "checks": {
+        "keys": {
+          "ok": true,
+          "detail": "ours b8c765e4f8ae497e40a38745 theirs b8c765e4f8ae497e40a38745"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes": {
+          "ok": null,
+          "detail": "not applicable: the wrapper signs hedged, so signatures are not reproducible"
+        },
+        "tamper": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        },
+        "ours>theirs/ctx": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours/ctx": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes/ctx": {
+          "ok": null,
+          "detail": "not applicable: the wrapper signs hedged, so signatures are not reproducible"
+        },
+        "tamper/ctx": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        }
+      }
+    },
+    {
+      "peer": "python",
+      "alg": "ML-DSA-65",
+      "path": "backend",
+      "checks": {
+        "keys": {
+          "ok": true,
+          "detail": "ours b8c765e4f8ae497e40a38745 theirs b8c765e4f8ae497e40a38745"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes": {
+          "ok": true,
+          "detail": "deterministic signatures differ (ours d27840805d344c6674fe, theirs d27840805d344c6674fe)"
+        },
+        "tamper": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        },
+        "ours>theirs/ctx": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours/ctx": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes/ctx": {
+          "ok": true,
+          "detail": "deterministic signatures differ (ours 854e69040ca1a185ac9a, theirs 854e69040ca1a185ac9a)"
+        },
+        "tamper/ctx": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        }
+      }
+    },
+    {
+      "peer": "python",
+      "alg": "ML-DSA-87",
+      "path": "backend",
+      "checks": {
+        "keys": {
+          "ok": true,
+          "detail": "ours 486c0d1114ddad23b5873a89 theirs 486c0d1114ddad23b5873a89"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes": {
+          "ok": true,
+          "detail": "deterministic signatures differ (ours ec922cf9523a612174e2, theirs ec922cf9523a612174e2)"
+        },
+        "tamper": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        },
+        "ours>theirs/ctx": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours/ctx": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes/ctx": {
+          "ok": true,
+          "detail": "deterministic signatures differ (ours 834026ca82037ea156bd, theirs 834026ca82037ea156bd)"
+        },
+        "tamper/ctx": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        }
+      }
+    },
+    {
+      "peer": "python",
+      "alg": "ML-KEM-512",
+      "path": "backend",
+      "checks": {
+        "keys": {
+          "ok": true,
+          "detail": "derived encapsulation keys differ"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "shared secrets differ"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we recovered a different shared secret than the peer sent"
+        },
+        "reject": {
+          "ok": true,
+          "detail": "peer returned the real shared secret for a corrupted ciphertext"
+        }
+      }
+    },
+    {
+      "peer": "python",
+      "alg": "ML-KEM-768",
+      "path": "wrapper",
+      "checks": {
+        "keys": {
+          "ok": true,
+          "detail": "derived encapsulation keys differ"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "shared secrets differ"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we recovered a different shared secret than the peer sent"
+        },
+        "reject": {
+          "ok": true,
+          "detail": "peer returned the real shared secret for a corrupted ciphertext"
+        }
+      }
+    },
+    {
+      "peer": "python",
+      "alg": "ML-KEM-768",
+      "path": "backend",
+      "checks": {
+        "keys": {
+          "ok": true,
+          "detail": "derived encapsulation keys differ"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "shared secrets differ"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we recovered a different shared secret than the peer sent"
+        },
+        "reject": {
+          "ok": true,
+          "detail": "peer returned the real shared secret for a corrupted ciphertext"
+        }
+      }
+    },
+    {
+      "peer": "python",
+      "alg": "ML-KEM-1024",
+      "path": "backend",
+      "checks": {
+        "keys": {
+          "ok": true,
+          "detail": "derived encapsulation keys differ"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "shared secrets differ"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we recovered a different shared secret than the peer sent"
+        },
+        "reject": {
+          "ok": true,
+          "detail": "peer returned the real shared secret for a corrupted ciphertext"
+        }
+      }
+    }
+  ],
+  "totals": {
+    "passed": 134,
+    "failed": 0,
+    "inconclusive": 6
+  }
+}

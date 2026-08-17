@@ -97,7 +97,11 @@
     "test": "node --test test/basic.test.js && node --test test/context.test.js && node --test test/browser-smoke.test.js && node test/run-vectors.js",
     "test:vectors": "node test/run-vectors.js",
     "generate:vectors": "node test/generate-vectors.js > test/vectors.json",
-    "bench": "node bench/bench.js"
+    "bench": "node bench/bench.js",
+    "conformance:fetch": "node conformance/fetch-vectors.mjs",
+    "conformance:acvp": "node conformance/run-acvp.mjs --json conformance/results/acvp.json",
+    "conformance:interop": "node conformance/interop/run-interop.mjs --json conformance/results/interop.json",
+    "sbom": "npm sbom --sbom-format cyclonedx --sbom-type library"
   },
   "publishConfig": {
     "provenance": true,

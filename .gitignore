@@ -2,3 +2,10 @@ node_modules/
 .npmrc
 *.log
 .DS_Store
+
+# Conformance evidence caches. The pinned inputs live in acvp-lock.json and
+# peers-lock.json; the fetched vectors and peer jars are reproducible from those
+# and are far too large to track.
+conformance/.acvp-cache/
+conformance/interop/.peer-cache/
+sbom.cyclonedx.json

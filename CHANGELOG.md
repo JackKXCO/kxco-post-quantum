@@ -1,6 +1,58 @@
 # Changelog
 
-## 1.3.0 - unreleased
+## Unreleased
+
+Published conformance and interoperability evidence. No runtime change: nothing
+under `src/` is touched, the dependency set is unchanged, and all 39 pinned
+vectors still match. This release makes checkable what was previously only
+asserted.
+
+### Added
+- **`conformance/`, a NIST ACVP harness** for FIPS 203, 204 and 205, covering
+  every parameter set NIST publishes vectors for: ML-KEM-512/768/1024,
+  ML-DSA-44/65/87 and all twelve SLH-DSA sets. The signature sets cover the
+  external and internal interfaces, pure and pre-hashed, external-mu, and
+  deterministic and randomized signing. Vectors are pinned by upstream commit
+  and per-file SHA-256 in `conformance/acvp-lock.json`, so a rewritten upstream
+  file fails the fetch instead of quietly changing the result.
+- **`conformance/interop/`, a cross-implementation matrix** against Bouncy
+  Castle (Java) and dilithium-py / kyber-py (Python), neither of which shares
+  code with our backend. Every check runs in both directions, and includes
+  negative controls: a tampered signature that the peer must reject, and a
+  corrupted ML-KEM ciphertext that must decapsulate to an unrelated secret.
+  Without those, a peer that always returned true would pass the whole matrix.
+- **`CONFORMANCE.md`** reporting both, including what the evidence does not
+  cover: no side-channel claim, no FIPS 140-3 validation, no CNSA 2.0
+  assertion, no protocol-level encoding claim.
+- **`THREAT-MODEL.md`** stating the security boundary. In particular it states
+  plainly that constant-time execution cannot be established from inside
+  JavaScript, that timing, cache and power attackers are therefore out of
+  scope, and what to do instead when a key needs to withstand them.
+- **`MIGRATION.md`** covering the add-then-remove path off RSA or ECDSA, and
+  version-to-version upgrades.
+- **`.github/workflows/conformance.yml`** running both harnesses on every push
+  and in full weekly, so the reports describe current behaviour rather than the
+  day someone ran them by hand.
+- **A CycloneDX SBOM generated during publish**, from the tree that was actually
+  installed for the build, and attached to the release artifacts.
+- Scripts: `conformance:fetch`, `conformance:acvp`, `conformance:interop`, `sbom`.
+
+### Notes
+- **The pre-hash skips in the ACVP report are the library being stricter than
+  NIST's sample files, not a coverage gap.** The backend refuses a pre-hash
+  whose collision strength is below the parameter set's security category;
+  NIST's vectors pair every approved hash with every parameter set. Those cases
+  are counted as skipped, never as passed.
+- **Hedged signing means wrapper signatures are not reproducible.** `sign` draws
+  fresh randomness per signature, which FIPS 204 permits and recommends, so the
+  byte-equality check does not apply on the wrapper path. It is asserted on the
+  backend path for the same parameter sets. This is reported rather than hidden.
+- **Provenance:** a release published from a workstation instead of through
+  `publish.yml` carries no npm attestation. The Trusted Publishing binding still
+  names the old `JackKXCO` org after the move to `KnightsbridgeAIQ` and needs
+  repointing before the OIDC path can work. See the comment in `publish.yml`.
+
+## 1.3.0
 
 Adds FIPS 204 / FIPS 205 context string support. Purely additive: the
 cryptographic surface for every existing call site is byte-for-byte unchanged,
