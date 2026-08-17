@@ -44,8 +44,27 @@ function sparseClone() {
   git(['config', 'core.sparseCheckout', 'true'], CACHE)
   git(['sparse-checkout', 'init', '--cone'], CACHE)
   git(['sparse-checkout', 'set', ...lock.sets.map((s) => `${lock.source.path}/${s}`)], CACHE)
-  // Blobless partial clone of the single pinned commit: no history, no other paths.
-  git(['fetch', '--depth', '1', '--filter=blob:none', 'origin', lock.source.commit], CACHE)
+
+  // `git clone --filter` records these two settings; hand-rolling init + remote
+  // add + fetch does not, and without them a checkout of a blobless commit has
+  // no registered promisor to fetch missing blobs from. Setting them explicitly
+  // is what makes the partial fetch below safe to check out.
+  git(['config', 'remote.origin.promisor', 'true'], CACHE)
+  git(['config', 'remote.origin.partialclonefilter', 'blob:none'], CACHE)
+
+  // Blobless partial fetch of the single pinned commit: no history, no other
+  // paths. Falls back to a plain shallow fetch if the server or the local git
+  // will not do a partial one, because the vectors matter and the transfer
+  // saving does not.
+  try {
+    git(['fetch', '--depth', '1', '--filter=blob:none', 'origin', lock.source.commit], CACHE)
+  } catch {
+    console.warn('partial fetch failed, retrying without --filter')
+    git(['config', '--unset', 'remote.origin.promisor'], CACHE)
+    git(['config', '--unset', 'remote.origin.partialclonefilter'], CACHE)
+    git(['fetch', '--depth', '1', 'origin', lock.source.commit], CACHE)
+  }
+
   git(['checkout', '--quiet', 'FETCH_HEAD'], CACHE)
 
   const head = git(['rev-parse', 'HEAD'], CACHE).trim()

@@ -45,16 +45,24 @@ jobs:
         with:
           ref: ${{ github.event.inputs.ref || github.ref }}
 
-      - name: Setup Node 20 with npm registry
+      - name: Setup Node 22 with npm registry
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
-          node-version: '20'
+          node-version: '22'
           registry-url: 'https://registry.npmjs.org'
 
-      - name: Upgrade npm CLI to >=11.5.1
-        # Node 20 ships npm 10.x. Trusted Publishing's OIDC integration was
-        # added in npm 11.5.1 — older CLI versions fall through to a 404 PUT.
-        run: npm install -g npm@latest
+      - name: Upgrade npm CLI to the 11.x line
+        # Trusted Publishing's OIDC integration arrived in npm 11.5.1, and the
+        # npm bundled with the runner's Node is older, so it must be upgraded or
+        # the publish falls through to a 404 PUT.
+        #
+        # Pinned to the 11.x line rather than @latest. This step previously
+        # installed npm@latest, which broke the moment npm 12 shipped: 12.x
+        # requires Node ^22.22 || ^24.15 || >=26, so on the Node 20 this job used
+        # to pin it failed with EBADENGINE and the release never happened. An
+        # unpinned tool install is a scheduled outage; 11.x supports
+        # ^20.17 || >=22.9 and will not drop Node 22 under us.
+        run: npm install -g npm@11
 
       - name: Install dependencies
         run: npm ci
@@ -62,17 +70,25 @@ jobs:
       - name: Run tests
         run: npm test
 
+      - name: Publish (Trusted Publishing + provenance via OIDC)
+        run: npm publish --provenance --access public
+
+      # The SBOM runs AFTER the publish, and cannot fail the job. It is a useful
+      # artefact, not a release gate. Generating it first meant an unrelated
+      # problem here -- a stray line on stdout, or a flag changing under
+      # `npm@latest`, which is deliberately unpinned above -- would block the
+      # release itself. A missing SBOM is worth an amber run; a blocked publish
+      # is not.
       - name: Generate CycloneDX SBOM
+        continue-on-error: true
         # npm generates this itself, so the SBOM describes the tree that was
         # actually installed for this build rather than a re-resolved one.
         run: |
           npm sbom --sbom-format cyclonedx --sbom-type library > sbom.cyclonedx.json
           node -e "const s=require('./sbom.cyclonedx.json');console.log('components:',s.components.length)"
 
-      - name: Publish (Trusted Publishing + provenance via OIDC)
-        run: npm publish --provenance --access public
-
       - name: Attach SBOM to the release artifacts
+        continue-on-error: true
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: sbom-${{ github.event.inputs.ref || github.ref_name }}
