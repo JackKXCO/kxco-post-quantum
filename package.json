@@ -94,6 +94,9 @@
     "src",
     "README.md",
     "LICENSE",
+    "CONFORMANCE.md",
+    "THREAT-MODEL.md",
+    "MIGRATION.md",
     "SECURITY.md",
     "CHANGELOG.md"
   ],
