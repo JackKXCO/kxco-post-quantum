@@ -14,6 +14,7 @@
   "peers": {
     "bouncycastle": {
       "available": true,
+      "pinned": "org.bouncycastle:bcprov-jdk18on:1.85.2",
       "name": "Bouncy Castle bcprov",
       "language": "Java",
       "version": "",
@@ -21,6 +22,10 @@
     },
     "python": {
       "available": true,
+      "pinned": [
+        "dilithium-py==1.4.0",
+        "kyber-py==1.2.0"
+      ],
       "name": "dilithium-py + kyber-py",
       "language": "Python",
       "algorithms": [
@@ -167,6 +172,49 @@
     {
       "peer": "bouncycastle",
       "alg": "ML-DSA-87",
+      "path": "wrapper",
+      "checks": {
+        "keys": {
+          "ok": true,
+          "detail": "ours 486c0d1114ddad23b5873a89 theirs 486c0d1114ddad23b5873a89"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes": {
+          "ok": null,
+          "detail": "not applicable: the wrapper signs hedged, so signatures are not reproducible"
+        },
+        "tamper": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        },
+        "ours>theirs/ctx": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours/ctx": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes/ctx": {
+          "ok": null,
+          "detail": "not applicable: the wrapper signs hedged, so signatures are not reproducible"
+        },
+        "tamper/ctx": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        }
+      }
+    },
+    {
+      "peer": "bouncycastle",
+      "alg": "ML-DSA-87",
       "path": "backend",
       "checks": {
         "keys": {
@@ -257,6 +305,29 @@
       "peer": "bouncycastle",
       "alg": "ML-KEM-768",
       "path": "backend",
+      "checks": {
+        "keys": {
+          "ok": true,
+          "detail": "derived encapsulation keys differ"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "shared secrets differ"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we recovered a different shared secret than the peer sent"
+        },
+        "reject": {
+          "ok": true,
+          "detail": "peer returned the real shared secret for a corrupted ciphertext"
+        }
+      }
+    },
+    {
+      "peer": "bouncycastle",
+      "alg": "ML-KEM-1024",
+      "path": "wrapper",
       "checks": {
         "keys": {
           "ok": true,
@@ -603,6 +674,49 @@
     {
       "peer": "python",
       "alg": "ML-DSA-87",
+      "path": "wrapper",
+      "checks": {
+        "keys": {
+          "ok": true,
+          "detail": "ours 486c0d1114ddad23b5873a89 theirs 486c0d1114ddad23b5873a89"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes": {
+          "ok": null,
+          "detail": "not applicable: the wrapper signs hedged, so signatures are not reproducible"
+        },
+        "tamper": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        },
+        "ours>theirs/ctx": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours/ctx": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes/ctx": {
+          "ok": null,
+          "detail": "not applicable: the wrapper signs hedged, so signatures are not reproducible"
+        },
+        "tamper/ctx": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        }
+      }
+    },
+    {
+      "peer": "python",
+      "alg": "ML-DSA-87",
       "path": "backend",
       "checks": {
         "keys": {
@@ -715,6 +829,29 @@
     {
       "peer": "python",
       "alg": "ML-KEM-1024",
+      "path": "wrapper",
+      "checks": {
+        "keys": {
+          "ok": true,
+          "detail": "derived encapsulation keys differ"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "shared secrets differ"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we recovered a different shared secret than the peer sent"
+        },
+        "reject": {
+          "ok": true,
+          "detail": "peer returned the real shared secret for a corrupted ciphertext"
+        }
+      }
+    },
+    {
+      "peer": "python",
+      "alg": "ML-KEM-1024",
       "path": "backend",
       "checks": {
         "keys": {
@@ -737,8 +874,8 @@
     }
   ],
   "totals": {
-    "passed": 134,
+    "passed": 156,
     "failed": 0,
-    "inconclusive": 6
+    "inconclusive": 10
   }
 }

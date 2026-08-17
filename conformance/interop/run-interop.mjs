@@ -41,6 +41,8 @@ import * as slhBackend from '@noble/post-quantum/slh-dsa.js'
 import * as mlDsa from '../../src/ml-dsa.js'
 import * as mlKem from '../../src/ml-kem.js'
 import * as slhDsa from '../../src/slh-dsa.js'
+import * as mlDsa87 from '../../src/ml-dsa-87.js'
+import * as mlKem1024 from '../../src/ml-kem-1024.js'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const pkg = JSON.parse(readFileSync(join(HERE, '..', '..', 'package.json'), 'utf8'))
@@ -63,10 +65,10 @@ const CACHE = join(HERE, '.peer-cache')
 const SETS = [
   { alg: 'ML-DSA-44', kind: 'sig', prim: ml_dsa44, seedLen: 32 },
   { alg: 'ML-DSA-65', kind: 'sig', prim: ml_dsa65, seedLen: 32, wrapper: mlDsa },
-  { alg: 'ML-DSA-87', kind: 'sig', prim: ml_dsa87, seedLen: 32 },
+  { alg: 'ML-DSA-87', kind: 'sig', prim: ml_dsa87, seedLen: 32, wrapper: mlDsa87 },
   { alg: 'ML-KEM-512', kind: 'kem', prim: ml_kem512, seedLen: 64 },
   { alg: 'ML-KEM-768', kind: 'kem', prim: ml_kem768, seedLen: 64, wrapper: mlKem },
-  { alg: 'ML-KEM-1024', kind: 'kem', prim: ml_kem1024, seedLen: 64 },
+  { alg: 'ML-KEM-1024', kind: 'kem', prim: ml_kem1024, seedLen: 64, wrapper: mlKem1024 },
   { alg: 'SLH-DSA-SHA2-128f', kind: 'sig', prim: slhBackend.slh_dsa_sha2_128f, seedLen: 48 },
   { alg: 'SLH-DSA-SHA2-192s', kind: 'sig', prim: slhBackend.slh_dsa_sha2_192s, seedLen: 72, wrapper: slhDsa },
   { alg: 'SLH-DSA-SHAKE-256f', kind: 'sig', prim: slhBackend.slh_dsa_shake_256f, seedLen: 96 },

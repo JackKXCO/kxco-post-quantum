@@ -8,6 +8,30 @@ vectors still match. This release makes checkable what was previously only
 asserted.
 
 ### Added
+- **`mlDsa87` (ML-DSA-87) and `mlKem1024` (ML-KEM-1024)**, Security Category 5,
+  as new modules with the same API as their Category 3 counterparts. Purely
+  additive: no existing module, export or call path changes, and the KXCO
+  default stays Category 3. Subpath exports `./ml-dsa-87` and `./ml-kem-1024`.
+  Both are exercised by the ACVP harness and the interop matrix through their
+  wrapper path, not only as primitives.
+
+  Default derivation info differs from the Category 3 modules
+  (`ml-dsa-87-v1`, `ml-kem-1024-v1`), so one master yields unrelated keys per
+  parameter set rather than colliding, and `test/category5.test.js` asserts that
+  a signature from one set does not verify under the other in either direction.
+
+  **Supporting these sets is not a CNSA 2.0 compliance claim.** CNSA 2.0 names
+  both, and compliance is a property of a deployment rather than of an available
+  function: the KXCO estate signs at Category 3, including Armature L1 from
+  block 0 and every issued KXCO ID, none of which these modules change. The
+  accurate sentence is "supports ML-DSA-87 and ML-KEM-1024". This is stated in
+  both module headers, both type declarations, the README, MIGRATION.md and
+  CONFORMANCE.md, because it is the claim most likely to drift.
+
+  Sizes, since they are the real migration cost: ML-DSA-87 public key 2592 and
+  signature 4627 bytes, against 1952 and 3309 at ML-DSA-65. ML-KEM-1024 public
+  key and ciphertext 1568 bytes each, against 1184 and 1088. The ML-KEM shared
+  secret stays 32 bytes at both sets, so downstream key derivation is unaffected.
 - **`conformance/`, a NIST ACVP harness** for FIPS 203, 204 and 205, covering
   every parameter set NIST publishes vectors for: ML-KEM-512/768/1024,
   ML-DSA-44/65/87 and all twelve SLH-DSA sets. The signature sets cover the

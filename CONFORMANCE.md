@@ -33,7 +33,7 @@ commit `975de31eb83d87039ec88934fdc47d8c312b892d`, pinned with per-file SHA-256
 digests in [conformance/acvp-lock.json](conformance/acvp-lock.json). A rewritten
 upstream file fails the fetch rather than silently changing the result.
 
-Every parameter set NIST publishes vectors for is exercised, not only the three
+Every parameter set NIST publishes vectors for is exercised, not only the five
 this package wraps in its own helpers.
 
 | Vector set | Tests | Passed | Failed | Skipped |
@@ -89,11 +89,15 @@ Peers, both pinned in
 | `bouncycastle` | `org.bouncycastle:bcprov-jdk18on:1.85.2`, SHA-256 pinned | Java | ML-DSA, ML-KEM, SLH-DSA |
 | `python` | `dilithium-py==1.4.0`, `kyber-py==1.2.0` | Python | ML-DSA, ML-KEM |
 
+SLH-DSA is covered by Bouncy Castle only, because no maintained pure-Python
+implementation was available to pin. That is a narrower base than the other two
+families and is stated rather than averaged away.
+
 Neither shares code with this package's backend. Bouncy Castle is a widely
 deployed independent implementation; the Python pair are independent
 spec-derived implementations.
 
-**Result: 134 checks passed, 0 failed, 6 not applicable, across 20 rows.**
+**Result: 156 checks passed, 0 failed, 10 not applicable, across 24 rows.**
 
 Per row, in both directions:
 
@@ -119,14 +123,17 @@ Each parameter set this package publishes a helper for is run twice: once
 through that helper (`wrapper`) and once through the primitive (`backend`), so
 the evidence covers the published API and not only its dependency.
 
-### The six not-applicable checks
+### The ten not-applicable checks
 
-`bytes` on the three `wrapper` rows, in each of two context modes. This package's
+`bytes` on the five `wrapper` rows, in each of two context modes. This package's
 `sign` is hedged: it draws fresh randomness per signature, which FIPS 204 permits
 and recommends, so its output is deliberately not reproducible. Byte equality is
 asserted on the `backend` rows for the same parameter sets, so determinism is
 still evidenced everywhere it is meaningful. Reasoning is in
 [THREAT-MODEL.md](THREAT-MODEL.md).
+
+The five wrapper rows are the five parameter sets this package publishes helpers
+for: ML-DSA-65, ML-DSA-87, ML-KEM-768, ML-KEM-1024 and SLH-DSA-SHA2-192s.
 
 ---
 
@@ -141,9 +148,16 @@ marketing.
 - **No FIPS 140-3 validation.** This is algorithm-level conformance against
   NIST's vectors, run by us. It is not CAVP or CMVP validation, and it is not
   equivalent to either. No certificate number is claimed because none exists.
-- **No CNSA 2.0 assertion.** CNSA 2.0 names ML-KEM-1024 and ML-DSA-87. The
-  primitives pass NIST's vectors for both, but the package's own helpers wrap
-  ML-KEM-768, ML-DSA-65 and SLH-DSA-SHA2-192s, so no CNSA 2.0 claim is made.
+- **No CNSA 2.0 assertion.** CNSA 2.0 names ML-KEM-1024 and ML-DSA-87. This
+  package supports both: they pass NIST's vectors above, they interoperate in
+  the matrix above, and `mlDsa87` and `mlKem1024` are published helpers. That is
+  a support claim, not a compliance claim, and the distinction is not
+  decorative. CNSA 2.0 compliance is a property of a deployment, not of an
+  available function. The KXCO estate signs at Category 3 with ML-DSA-65,
+  including Armature L1 from block 0 and every issued KXCO ID, none of which
+  these modules change. The accurate sentences are "NIST FIPS 203/204/205
+  conformant" and "supports ML-DSA-87 and ML-KEM-1024". Anything stronger,
+  including "CNSA 2.0 ready", would be an overclaim.
 - **Protocol-level interop is not covered here.** Key and signature bytes
   interoperate. Certificate and message encodings, X.509, CMS, COSE, JOSE and
   TLS group negotiation are separate surfaces and no claim is made about them.

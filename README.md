@@ -7,7 +7,7 @@ Post-quantum cryptography primitives for the KXCO stack.
 [![conformance](https://github.com/KnightsbridgeAIQ/kxco-post-quantum/actions/workflows/conformance.yml/badge.svg)](https://github.com/KnightsbridgeAIQ/kxco-post-quantum/actions/workflows/conformance.yml)
 [![license](https://img.shields.io/badge/license-Apache--2.0-blue)](./LICENSE)
 
-ML-DSA-65 (FIPS 204) and SLH-DSA-SHA2-192s (FIPS 205) signatures, ML-KEM-768 (FIPS 203) key encapsulation, and key fingerprinting utilities. Wraps [`@noble/post-quantum`](https://github.com/paulmillr/noble-post-quantum). All other `kxco-pq-*` packages depend on this one.
+ML-DSA-65 (FIPS 204) and SLH-DSA-SHA2-192s (FIPS 205) signatures, ML-KEM-768 (FIPS 203) key encapsulation, and key fingerprinting utilities. Category 5 sets ML-DSA-87 and ML-KEM-1024 are also available. Wraps [`@noble/post-quantum`](https://github.com/paulmillr/noble-post-quantum). All other `kxco-pq-*` packages depend on this one.
 
 **Evidence, not adjectives:**
 
@@ -55,6 +55,35 @@ const recovered = mlKem.decapsulate(ciphertext, kemKeys.secretKey)
 ```
 
 `masterSecret` is a `Buffer` or `Uint8Array` with at least 16 bytes of entropy (typically 32–64 bytes from an env var or KMS).
+
+### Category 5 parameter sets
+
+`mlDsa87` (ML-DSA-87) and `mlKem1024` (ML-KEM-1024) have the same API as `mlDsa`
+and `mlKem`, one security category higher. Reach for them when a counterparty
+specifies Category 5 or names the parameter set. The KXCO default stays
+Category 3.
+
+```js
+import { mlDsa87, mlKem1024 } from 'kxco-post-quantum'
+
+const { publicKey, secretKey } = mlDsa87.keypairFromMaster(masterSecret, 'signing-v1')
+const sig = mlDsa87.sign(secretKey, 'hello')      // 4627 bytes, 9254 hex chars
+mlDsa87.verify(publicKey, 'hello', sig)           // true
+```
+
+| | Category 3 (default) | Category 5 |
+|---|---|---|
+| Signatures | `mlDsa` — pk 1952, sig 3309 | `mlDsa87` — pk 2592, sig 4627 |
+| Key encapsulation | `mlKem` — pk 1184, ct 1088 | `mlKem1024` — pk 1568, ct 1568 |
+
+The two sets do not mix, deliberately. Default derivation info differs, so one
+master yields unrelated keys for each; and a signature from one set does not
+verify under the other. Sizes are the migration cost, so check any fixed-width
+signature or key field before mixing sets in one system.
+
+**CNSA 2.0 names ML-DSA-87 and ML-KEM-1024, and supporting them is not a CNSA
+2.0 compliance claim.** Compliance is a property of a deployment, not of an
+available function. See [CONFORMANCE.md](./CONFORMANCE.md).
 
 ### Context strings (FIPS 204 / FIPS 205)
 

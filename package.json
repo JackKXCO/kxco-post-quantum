@@ -24,7 +24,10 @@
     "fingerprint",
     "replay-protection",
     "hybrid-signing",
-    "non-repudiation"
+    "non-repudiation",
+    "ml-dsa-87",
+    "ml-kem-1024",
+    "category-5"
   ],
   "license": "Apache-2.0",
   "author": "Shayne Heffernan and John Heffernan",
@@ -58,9 +61,17 @@
       "types": "./src/ml-dsa.d.ts",
       "import": "./src/ml-dsa.js"
     },
+    "./ml-dsa-87": {
+      "types": "./src/ml-dsa-87.d.ts",
+      "import": "./src/ml-dsa-87.js"
+    },
     "./ml-kem": {
       "types": "./src/ml-kem.d.ts",
       "import": "./src/ml-kem.js"
+    },
+    "./ml-kem-1024": {
+      "types": "./src/ml-kem-1024.d.ts",
+      "import": "./src/ml-kem-1024.js"
     },
     "./slh-dsa": {
       "types": "./src/slh-dsa.d.ts",
@@ -94,7 +105,7 @@
     "@noble/post-quantum": "0.7.0"
   },
   "scripts": {
-    "test": "node --test test/basic.test.js && node --test test/context.test.js && node --test test/browser-smoke.test.js && node test/run-vectors.js",
+    "test": "node --test test/basic.test.js && node --test test/context.test.js && node --test test/category5.test.js && node --test test/browser-smoke.test.js && node test/run-vectors.js",
     "test:vectors": "node test/run-vectors.js",
     "generate:vectors": "node test/generate-vectors.js > test/vectors.json",
     "bench": "node bench/bench.js",
