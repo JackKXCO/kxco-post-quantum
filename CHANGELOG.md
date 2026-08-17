@@ -1,11 +1,14 @@
 # Changelog
 
-## Unreleased
+## 1.4.0
 
-Published conformance and interoperability evidence. No runtime change: nothing
-under `src/` is touched, the dependency set is unchanged, and all 39 pinned
-vectors still match. This release makes checkable what was previously only
-asserted.
+Adds the Security Category 5 parameter sets, and publishes conformance and
+interoperability evidence for everything the package computes.
+
+Additive throughout. Two new modules appear under `src/`, and no existing module,
+export, default or call path changes: the dependency set is unchanged, the
+default parameter sets stay at Category 3, and all 39 pinned vectors still match
+bit-for-bit. Nothing here can alter the behaviour of an existing call site.
 
 ### Added
 - **`mlDsa87` (ML-DSA-87) and `mlKem1024` (ML-KEM-1024)**, Security Category 5,
@@ -56,7 +59,10 @@ asserted.
   version-to-version upgrades.
 - **`.github/workflows/conformance.yml`** running both harnesses on every push
   and in full weekly, so the reports describe current behaviour rather than the
-  day someone ran them by hand.
+  day someone ran them by hand. The SLH-DSA signature sets run as a separate job
+  because a full pass of them takes over an hour, and per-push runs subsample
+  with a per-group cap, which the generated report records so a subsampled run
+  cannot be mistaken for a full one.
 - **A CycloneDX SBOM generated during publish**, from the tree that was actually
   installed for the build, and attached to the release artifacts.
 - Scripts: `conformance:fetch`, `conformance:acvp`, `conformance:interop`, `sbom`.
