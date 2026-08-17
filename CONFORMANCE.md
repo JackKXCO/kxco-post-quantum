@@ -44,14 +44,18 @@ this package wraps in its own helpers.
 | ML-DSA-sigGen (FIPS 204) | 360 | 316 | 0 | 44 |
 | ML-DSA-sigVer (FIPS 204) | 180 | 157 | 0 | 23 |
 | SLH-DSA-keyGen (FIPS 205) | 120 | 120 | 0 | 0 |
+| SLH-DSA-sigGen (FIPS 205) | 624 | 472 | 0 | 152 |
 | SLH-DSA-sigVer (FIPS 205) | 504 | 413 | 0 | 91 |
+| **Total** | **2103** | **1793** | **0** | **310** |
 
-**SLH-DSA-sigGen (FIPS 205), 624 tests, is exercised by the harness but is not
-in the table above.** Signing with the twelve SLH-DSA sets takes hours, so the
-figure comes from the weekly full CI pass rather than from a hand-run local one.
-Run it yourself with `node conformance/run-acvp.mjs --set SLH-DSA-sigGen-FIPS205`,
-or subsample with `--max-per-group 3`. It is called out rather than omitted
-because a table that quietly drops the expensive set would overstate coverage.
+A full pass takes hours, almost all of it SLH-DSA signing with the slow
+parameter sets. CI subsamples per push with `--max-per-group` and runs the full
+suite weekly; the generated report records which of the two it was, so a
+subsampled run is never mistaken for a full one. To reproduce one expensive set
+on its own: `node conformance/run-acvp.mjs --set SLH-DSA-sigGen-FIPS205`. The
+generated report for that full run is committed at
+[conformance/results/acvp-slh-dsa-siggen.json](conformance/results/acvp-slh-dsa-siggen.json),
+with each skip and its reason.
 
 Parameter sets covered: ML-KEM-512/768/1024, ML-DSA-44/65/87, and all twelve
 SLH-DSA sets (SHA2 and SHAKE, 128/192/256, f and s).

@@ -56,7 +56,7 @@ jobs:
             node conformance/run-acvp.mjs --max-per-group 3 --json conformance/results/acvp.json
           fi
 
-      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v6.0.0
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         if: always()
         with:
           name: acvp-report
@@ -73,12 +73,12 @@ jobs:
         with:
           node-version: '22'
 
-      - uses: actions/setup-java@dded0888837ed1f4f45a3b9c316d1e6ff5049c26 # v5.0.0
+      - uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5.0.0
         with:
           distribution: temurin
           java-version: '17'
 
-      - uses: actions/setup-python@2e3e4b15a884dd0e429dad9b26a5b04c3172ca4c # v6.0.0
+      - uses: actions/setup-python@e797f83bcb11b83ae66e0230d6156d7c80228e7c # v6.0.0
         with:
           python-version: '3.12'
 
@@ -94,7 +94,7 @@ jobs:
           PYTHON: python
         run: node conformance/interop/run-interop.mjs --json conformance/results/interop.json
 
-      - uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v6.0.0
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         if: always()
         with:
           name: interop-report

@@ -74,16 +74,16 @@ const SETS = [
   { alg: 'SLH-DSA-SHAKE-256f', kind: 'sig', prim: slhBackend.slh_dsa_shake_256f, seedLen: 96 },
 ]
 
+// Keys are addressed by seed throughout, not by encoded private key: the
+// seed-form encoding differs between libraries while the seed itself is fixed by
+// FIPS 203 / FIPS 204, so it is the portable handle.
 const PEERS = {
   bouncycastle: {
-    supports: (alg) => true,
-    // Bouncy Castle's ML-KEM seed-form private key is the 64-byte (d, z) seed,
-    // same as ours, so the seed is portable between the two.
-    kemSeedIsPortable: true,
+    supports: () => true,
   },
   python: {
+    // No maintained pure-Python SLH-DSA implementation was available to pin.
     supports: (alg) => alg.startsWith('ML-'),
-    kemSeedIsPortable: true,
   },
 }
 
@@ -119,6 +119,7 @@ class Peer {
   start() {
     this.proc = spawn(this.cmd, this.args, { stdio: ['pipe', 'pipe', 'pipe'] })
     this.stderr = ''
+    this.closed = false
     this.proc.stderr.on('data', (d) => {
       this.stderr += d.toString()
     })
@@ -130,28 +131,70 @@ class Peer {
         this.buffer = this.buffer.slice(nl + 1)
         if (!line) continue
         const msg = JSON.parse(line)
-        const resolve = this.pending.get(msg.id)
-        if (resolve) {
+        const waiter = this.pending.get(msg.id)
+        if (waiter) {
           this.pending.delete(msg.id)
-          resolve(msg)
+          waiter.resolve(msg)
         }
       }
     })
-    this.exited = new Promise((resolve) => this.proc.on('close', resolve))
+
+    // A peer that dies takes every in-flight request with it. Failing those
+    // immediately, with the peer's stderr attached, turns a silent stall per
+    // request into an error that says what happened.
+    //
+    // The stdin handler is not redundant with the others: writing to a dead
+    // peer's stdin raises EPIPE on the stream, an unhandled 'error' event that
+    // takes the whole run down before 'close' can report anything useful.
+    this.exited = new Promise((resolve) => {
+      this.proc.on('close', (code) => this.#die(new Error(`exited (code ${code})`), resolve, code))
+      this.proc.on('error', (err) => this.#die(err, resolve))
+      this.proc.stdin.on('error', (err) => this.#die(err, resolve))
+    })
   }
 
+  #die(err, resolveExit, code = -1) {
+    this.closed = true
+    const tail = this.stderr ? `\n${this.stderr.trim().split('\n').slice(-12).join('\n')}` : ''
+    const why = `${this.name}: ${err.message}${tail}`
+    for (const [, waiter] of this.pending) waiter.reject(new Error(why))
+    this.pending.clear()
+    resolveExit(code)
+  }
+
+  /**
+   * Send one request and await the reply.
+   *
+   * Never rejects. A transport failure (dead peer, timeout, broken pipe) is
+   * reported in the same `{ ok: false, error }` shape a peer uses for its own
+   * failures, so every caller handles both through one path and one dead peer
+   * degrades the affected rows instead of aborting the whole matrix.
+   */
   request(req) {
+    const where = `${req.op}/${req.alg ?? ''}`
+    if (this.closed) {
+      return Promise.resolve({ ok: false, error: `${this.name} is no longer running (${where})` })
+    }
     const id = this.nextId++
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       const timer = setTimeout(
-        () => reject(new Error(`${this.name} timed out on ${req.op}/${req.alg ?? ''}`)),
+        () => resolve({ ok: false, error: `${this.name} timed out on ${where}` }),
         180_000
       )
-      this.pending.set(id, (msg) => {
+      const settle = (msg) => {
         clearTimeout(timer)
         resolve(msg)
+      }
+      this.pending.set(id, {
+        resolve: settle,
+        reject: (err) => settle({ ok: false, error: `${err.message} (${where})` }),
       })
-      this.proc.stdin.write(`${JSON.stringify({ id, ...req })}\n`)
+      try {
+        this.proc.stdin.write(`${JSON.stringify({ id, ...req })}\n`)
+      } catch (err) {
+        this.pending.delete(id)
+        settle({ ok: false, error: `${this.name}: ${err.message} (${where})` })
+      }
     })
   }
 
@@ -268,7 +311,7 @@ async function runSignatureSet(peerName, peer, set, path) {
   checks.keys = theirs.ok
     ? {
         ok: hex(local.publicKey) === theirs.publicKey,
-        detail: theirs.ok ? `ours ${hex(local.publicKey).slice(0, 24)} theirs ${String(theirs.publicKey).slice(0, 24)}` : '',
+        detail: `ours ${hex(local.publicKey).slice(0, 24)} theirs ${String(theirs.publicKey).slice(0, 24)}`,
       }
     : { ok: false, detail: theirs.error }
 
@@ -277,9 +320,9 @@ async function runSignatureSet(peerName, peer, set, path) {
     return
   }
 
-  // Contexts are exercised because FIPS 204 §5.2 and FIPS 205 §10.2 fold the
-  // context string into the signed message; a peer that ignores it silently
-  // produces signatures that only verify against itself.
+  // Contexts are exercised because FIPS 204 §5.2, and the equivalent in FIPS
+  // 205, fold the context string into the signed message; a peer that ignores it
+  // silently produces signatures that only verify against itself.
   for (const [suffix, ctx] of [['', Buffer.alloc(0)], ['/ctx', context]]) {
     const ourSig = localSign(set, path, local.secretKey, message, ctx)
 
@@ -412,6 +455,10 @@ async function runKemSet(peerName, peer, set, path) {
 }
 
 // ----------------------------------------------------------------------- main
+
+if (onlyPeer && !PEERS[onlyPeer]) {
+  throw new Error(`unknown peer: ${onlyPeer} (known: ${Object.keys(PEERS).join(', ')})`)
+}
 
 for (const [name, meta] of Object.entries(PEERS)) {
   if (onlyPeer && name !== onlyPeer) continue

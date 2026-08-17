@@ -58,7 +58,7 @@ public final class BouncyCastlePeer {
                 out.put("ok", "false");
                 out.put("error", err.getClass().getSimpleName() + ": " + err.getMessage());
             }
-            System.out.println(writeJson(out, req.get("id")));
+            System.out.println(writeJson(out));
             System.out.flush();
         }
     }
@@ -290,7 +290,7 @@ public final class BouncyCastlePeer {
         return out;
     }
 
-    private static String writeJson(Map<String, String> map, String id) {
+    private static String writeJson(Map<String, String> map) {
         StringBuilder sb = new StringBuilder("{");
         boolean first = true;
         for (Map.Entry<String, String> e : map.entrySet()) {

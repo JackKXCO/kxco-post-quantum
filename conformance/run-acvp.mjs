@@ -68,8 +68,9 @@ const SLH = {
   'SLH-DSA-SHAKE-256f': slh.slh_dsa_shake_256f,
 }
 
-// ACVP names the pre-hash function; FIPS 204 §5.4 and FIPS 205 §10.2 fix the
-// OID from that name, and the backend derives the OID from the hash object.
+// ACVP names the pre-hash function; the HashML-DSA (FIPS 204 §5.4) and
+// pre-hash SLH-DSA variants fix the OID from that name, and the backend derives
+// the OID from the hash object.
 const HASHES = {
   'SHA2-224': sha224,
   'SHA2-256': sha256,
@@ -344,7 +345,8 @@ function runSlhKeyGen(tally, { prompt, expectedById }) {
     }
     for (const t of g.tests) {
       const exp = expectedById.get(`${g.tgId}:${t.tcId}`)
-      // FIPS 205 §9.1 slh_keygen_internal takes (SK.seed, SK.prf, PK.seed).
+      // FIPS 205 key generation takes (SK.seed, SK.prf, PK.seed) in that order;
+      // the backend seed is their concatenation.
       const seed = Uint8Array.from([...bytes(t.skSeed), ...bytes(t.skPrf), ...bytes(t.pkSeed)])
       const k = alg.keygen(seed)
       if (hex(k.publicKey) !== exp.pk) tally.fail(g.parameterSet, g.tgId, t.tcId, 'pk mismatch')

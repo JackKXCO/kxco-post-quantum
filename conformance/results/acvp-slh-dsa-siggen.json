@@ -1,0 +1,180 @@
+{
+  "subject": {
+    "package": "kxco-post-quantum",
+    "version": "1.3.0"
+  },
+  "backend": {
+    "@noble/hashes": "2.3.0",
+    "@noble/post-quantum": "0.7.0"
+  },
+  "runtime": {
+    "node": "v26.1.0",
+    "platform": "win32-x64"
+  },
+  "acvp": {
+    "repo": "usnistgov/ACVP-Server",
+    "commit": "975de31eb83d87039ec88934fdc47d8c312b892d",
+    "path": "gen-val/json-files",
+    "note": "NIST's own ACVP demo/sample vector files for FIPS 203, 204 and 205."
+  },
+  "sampling": {
+    "full": true
+  },
+  "sets": [
+    {
+      "set": "SLH-DSA-sigGen-FIPS205",
+      "total": 624,
+      "passed": 472,
+      "failed": 0,
+      "skipped": 152,
+      "byParameterSet": {
+        "SLH-DSA-SHA2-128f": {
+          "passed": 46,
+          "failed": 0,
+          "skipped": 6
+        },
+        "SLH-DSA-SHA2-192f": {
+          "passed": 38,
+          "failed": 0,
+          "skipped": 14
+        },
+        "SLH-DSA-SHA2-256f": {
+          "passed": 34,
+          "failed": 0,
+          "skipped": 18
+        },
+        "SLH-DSA-SHAKE-128f": {
+          "passed": 46,
+          "failed": 0,
+          "skipped": 6
+        },
+        "SLH-DSA-SHAKE-192f": {
+          "passed": 38,
+          "failed": 0,
+          "skipped": 14
+        },
+        "SLH-DSA-SHAKE-256f": {
+          "passed": 34,
+          "failed": 0,
+          "skipped": 18
+        },
+        "SLH-DSA-SHA2-128s": {
+          "passed": 46,
+          "failed": 0,
+          "skipped": 6
+        },
+        "SLH-DSA-SHA2-192s": {
+          "passed": 38,
+          "failed": 0,
+          "skipped": 14
+        },
+        "SLH-DSA-SHA2-256s": {
+          "passed": 34,
+          "failed": 0,
+          "skipped": 18
+        },
+        "SLH-DSA-SHAKE-128s": {
+          "passed": 46,
+          "failed": 0,
+          "skipped": 6
+        },
+        "SLH-DSA-SHAKE-192s": {
+          "passed": 38,
+          "failed": 0,
+          "skipped": 14
+        },
+        "SLH-DSA-SHAKE-256s": {
+          "passed": 34,
+          "failed": 0,
+          "skipped": 18
+        }
+      },
+      "skipReasons": {
+        "SHA2-512/224 refused for SLH-DSA-SHA2-128f: Pre-hash security strength too low: 112, required: 128": 2,
+        "SHA3-224 refused for SLH-DSA-SHA2-128f: Pre-hash security strength too low: 112, required: 128": 2,
+        "SHA2-224 refused for SLH-DSA-SHA2-128f: Pre-hash security strength too low: 112, required: 128": 2,
+        "SHA2-512/256 refused for SLH-DSA-SHA2-192f: Pre-hash security strength too low: 128, required: 192": 2,
+        "SHA2-256 refused for SLH-DSA-SHA2-192f: Pre-hash security strength too low: 128, required: 192": 2,
+        "SHA3-224 refused for SLH-DSA-SHA2-192f: Pre-hash security strength too low: 112, required: 192": 2,
+        "SHA2-512/224 refused for SLH-DSA-SHA2-192f: Pre-hash security strength too low: 112, required: 192": 2,
+        "SHA3-256 refused for SLH-DSA-SHA2-192f: Pre-hash security strength too low: 128, required: 192": 2,
+        "SHAKE-128 refused for SLH-DSA-SHA2-192f: Pre-hash security strength too low: 128, required: 192": 2,
+        "SHA2-224 refused for SLH-DSA-SHA2-192f: Pre-hash security strength too low: 112, required: 192": 2,
+        "SHA3-384 refused for SLH-DSA-SHA2-256f: Pre-hash security strength too low: 192, required: 256": 2,
+        "SHA2-224 refused for SLH-DSA-SHA2-256f: Pre-hash security strength too low: 112, required: 256": 2,
+        "SHA2-512/256 refused for SLH-DSA-SHA2-256f: Pre-hash security strength too low: 128, required: 256": 2,
+        "SHA3-224 refused for SLH-DSA-SHA2-256f: Pre-hash security strength too low: 112, required: 256": 2,
+        "SHA3-256 refused for SLH-DSA-SHA2-256f: Pre-hash security strength too low: 128, required: 256": 2,
+        "SHA2-256 refused for SLH-DSA-SHA2-256f: Pre-hash security strength too low: 128, required: 256": 2,
+        "SHA2-512/224 refused for SLH-DSA-SHA2-256f: Pre-hash security strength too low: 112, required: 256": 2,
+        "SHAKE-128 refused for SLH-DSA-SHA2-256f: Pre-hash security strength too low: 128, required: 256": 2,
+        "SHA2-384 refused for SLH-DSA-SHA2-256f: Pre-hash security strength too low: 192, required: 256": 2,
+        "SHA2-512/224 refused for SLH-DSA-SHAKE-128f: Pre-hash security strength too low: 112, required: 128": 2,
+        "SHA3-224 refused for SLH-DSA-SHAKE-128f: Pre-hash security strength too low: 112, required: 128": 2,
+        "SHA2-224 refused for SLH-DSA-SHAKE-128f: Pre-hash security strength too low: 112, required: 128": 2,
+        "SHA3-224 refused for SLH-DSA-SHAKE-192f: Pre-hash security strength too low: 112, required: 192": 2,
+        "SHA2-512/256 refused for SLH-DSA-SHAKE-192f: Pre-hash security strength too low: 128, required: 192": 2,
+        "SHA2-224 refused for SLH-DSA-SHAKE-192f: Pre-hash security strength too low: 112, required: 192": 2,
+        "SHA2-512/224 refused for SLH-DSA-SHAKE-192f: Pre-hash security strength too low: 112, required: 192": 2,
+        "SHAKE-128 refused for SLH-DSA-SHAKE-192f: Pre-hash security strength too low: 128, required: 192": 2,
+        "SHA2-256 refused for SLH-DSA-SHAKE-192f: Pre-hash security strength too low: 128, required: 192": 2,
+        "SHA3-256 refused for SLH-DSA-SHAKE-192f: Pre-hash security strength too low: 128, required: 192": 2,
+        "SHA3-384 refused for SLH-DSA-SHAKE-256f: Pre-hash security strength too low: 192, required: 256": 2,
+        "SHAKE-128 refused for SLH-DSA-SHAKE-256f: Pre-hash security strength too low: 128, required: 256": 2,
+        "SHA2-384 refused for SLH-DSA-SHAKE-256f: Pre-hash security strength too low: 192, required: 256": 2,
+        "SHA2-224 refused for SLH-DSA-SHAKE-256f: Pre-hash security strength too low: 112, required: 256": 2,
+        "SHA2-512/256 refused for SLH-DSA-SHAKE-256f: Pre-hash security strength too low: 128, required: 256": 2,
+        "SHA3-224 refused for SLH-DSA-SHAKE-256f: Pre-hash security strength too low: 112, required: 256": 2,
+        "SHA3-256 refused for SLH-DSA-SHAKE-256f: Pre-hash security strength too low: 128, required: 256": 2,
+        "SHA2-256 refused for SLH-DSA-SHAKE-256f: Pre-hash security strength too low: 128, required: 256": 2,
+        "SHA2-512/224 refused for SLH-DSA-SHAKE-256f: Pre-hash security strength too low: 112, required: 256": 2,
+        "SHA2-224 refused for SLH-DSA-SHA2-128s: Pre-hash security strength too low: 112, required: 128": 2,
+        "SHA2-512/224 refused for SLH-DSA-SHA2-128s: Pre-hash security strength too low: 112, required: 128": 2,
+        "SHA3-224 refused for SLH-DSA-SHA2-128s: Pre-hash security strength too low: 112, required: 128": 2,
+        "SHA2-512/224 refused for SLH-DSA-SHA2-192s: Pre-hash security strength too low: 112, required: 192": 2,
+        "SHAKE-128 refused for SLH-DSA-SHA2-192s: Pre-hash security strength too low: 128, required: 192": 2,
+        "SHA2-256 refused for SLH-DSA-SHA2-192s: Pre-hash security strength too low: 128, required: 192": 2,
+        "SHA2-224 refused for SLH-DSA-SHA2-192s: Pre-hash security strength too low: 112, required: 192": 2,
+        "SHA3-224 refused for SLH-DSA-SHA2-192s: Pre-hash security strength too low: 112, required: 192": 2,
+        "SHA2-512/256 refused for SLH-DSA-SHA2-192s: Pre-hash security strength too low: 128, required: 192": 2,
+        "SHA3-256 refused for SLH-DSA-SHA2-192s: Pre-hash security strength too low: 128, required: 192": 2,
+        "SHA3-384 refused for SLH-DSA-SHA2-256s: Pre-hash security strength too low: 192, required: 256": 2,
+        "SHA3-224 refused for SLH-DSA-SHA2-256s: Pre-hash security strength too low: 112, required: 256": 2,
+        "SHA2-256 refused for SLH-DSA-SHA2-256s: Pre-hash security strength too low: 128, required: 256": 2,
+        "SHAKE-128 refused for SLH-DSA-SHA2-256s: Pre-hash security strength too low: 128, required: 256": 2,
+        "SHA2-384 refused for SLH-DSA-SHA2-256s: Pre-hash security strength too low: 192, required: 256": 2,
+        "SHA2-512/224 refused for SLH-DSA-SHA2-256s: Pre-hash security strength too low: 112, required: 256": 2,
+        "SHA2-224 refused for SLH-DSA-SHA2-256s: Pre-hash security strength too low: 112, required: 256": 2,
+        "SHA3-256 refused for SLH-DSA-SHA2-256s: Pre-hash security strength too low: 128, required: 256": 2,
+        "SHA2-512/256 refused for SLH-DSA-SHA2-256s: Pre-hash security strength too low: 128, required: 256": 2,
+        "SHA2-512/224 refused for SLH-DSA-SHAKE-128s: Pre-hash security strength too low: 112, required: 128": 2,
+        "SHA3-224 refused for SLH-DSA-SHAKE-128s: Pre-hash security strength too low: 112, required: 128": 2,
+        "SHA2-224 refused for SLH-DSA-SHAKE-128s: Pre-hash security strength too low: 112, required: 128": 2,
+        "SHA2-224 refused for SLH-DSA-SHAKE-192s: Pre-hash security strength too low: 112, required: 192": 2,
+        "SHA2-512/256 refused for SLH-DSA-SHAKE-192s: Pre-hash security strength too low: 128, required: 192": 2,
+        "SHA3-256 refused for SLH-DSA-SHAKE-192s: Pre-hash security strength too low: 128, required: 192": 2,
+        "SHA2-256 refused for SLH-DSA-SHAKE-192s: Pre-hash security strength too low: 128, required: 192": 2,
+        "SHAKE-128 refused for SLH-DSA-SHAKE-192s: Pre-hash security strength too low: 128, required: 192": 2,
+        "SHA2-512/224 refused for SLH-DSA-SHAKE-192s: Pre-hash security strength too low: 112, required: 192": 2,
+        "SHA3-224 refused for SLH-DSA-SHAKE-192s: Pre-hash security strength too low: 112, required: 192": 2,
+        "SHA2-512/256 refused for SLH-DSA-SHAKE-256s: Pre-hash security strength too low: 128, required: 256": 2,
+        "SHA3-224 refused for SLH-DSA-SHAKE-256s: Pre-hash security strength too low: 112, required: 256": 2,
+        "SHA2-384 refused for SLH-DSA-SHAKE-256s: Pre-hash security strength too low: 192, required: 256": 2,
+        "SHA2-224 refused for SLH-DSA-SHAKE-256s: Pre-hash security strength too low: 112, required: 256": 2,
+        "SHA2-512/224 refused for SLH-DSA-SHAKE-256s: Pre-hash security strength too low: 112, required: 256": 2,
+        "SHA3-256 refused for SLH-DSA-SHAKE-256s: Pre-hash security strength too low: 128, required: 256": 2,
+        "SHA2-256 refused for SLH-DSA-SHAKE-256s: Pre-hash security strength too low: 128, required: 256": 2,
+        "SHA3-384 refused for SLH-DSA-SHAKE-256s: Pre-hash security strength too low: 192, required: 256": 2,
+        "SHAKE-128 refused for SLH-DSA-SHAKE-256s: Pre-hash security strength too low: 128, required: 256": 2
+      },
+      "failures": [],
+      "durationMs": 4555231
+    }
+  ],
+  "totals": {
+    "total": 624,
+    "passed": 472,
+    "failed": 0,
+    "skipped": 152
+  }
+}
