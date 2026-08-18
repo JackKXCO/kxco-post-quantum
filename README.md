@@ -11,10 +11,11 @@ ML-DSA-65 (FIPS 204) and SLH-DSA-SHA2-192s (FIPS 205) signatures, ML-KEM-768 (FI
 
 **Evidence, not adjectives:**
 
-- [CONFORMANCE.md](./CONFORMANCE.md) — NIST ACVP vectors for FIPS 203/204/205, and a cross-implementation interop matrix against Bouncy Castle and two pure-Python implementations. 134 interop checks, both directions, with negative controls. Reproducible: `npm run conformance:acvp`, `npm run conformance:interop`.
-- [THREAT-MODEL.md](./THREAT-MODEL.md) — what this defends against and what it does not. Read the side-channel section before deciding where a signing key lives.
-- [MIGRATION.md](./MIGRATION.md) — moving an RSA or ECDSA system across, and moving between versions of this package.
-- [SECURITY.md](./SECURITY.md) — reporting, and release integrity.
+- [CONFORMANCE.md](./CONFORMANCE.md): NIST ACVP vectors for FIPS 203/204/205 (2,103 tests, 0 failed), and a cross-implementation interop matrix against Bouncy Castle and two pure-Python implementations (156 checks, 0 failed, both directions, with negative controls). Reproducible: `npm run conformance:acvp`, `npm run conformance:interop`.
+- [BENCHMARKS.md](./BENCHMARKS.md): per-algorithm latency at p95/p99, plus memory. Two figures worth designing around: ML-DSA signing has a 4.5x tail between median and p99, and SLH-DSA-SHA2-192s signs in about 6.8 seconds.
+- [THREAT-MODEL.md](./THREAT-MODEL.md): what this defends against and what it does not. Read the side-channel section before deciding where a signing key lives.
+- [MIGRATION.md](./MIGRATION.md): moving an RSA or ECDSA system across, and moving between versions of this package.
+- [SECURITY.md](./SECURITY.md): reporting, and release integrity.
 
 ---
 

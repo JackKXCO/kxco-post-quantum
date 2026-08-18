@@ -95,6 +95,7 @@
     "README.md",
     "LICENSE",
     "CONFORMANCE.md",
+    "BENCHMARKS.md",
     "THREAT-MODEL.md",
     "MIGRATION.md",
     "SECURITY.md",
@@ -115,7 +116,8 @@
     "conformance:fetch": "node conformance/fetch-vectors.mjs",
     "conformance:acvp": "node conformance/run-acvp.mjs --json conformance/results/acvp.json",
     "conformance:interop": "node conformance/interop/run-interop.mjs --json conformance/results/interop.json",
-    "sbom": "npm sbom --sbom-format cyclonedx --sbom-type library"
+    "sbom": "npm sbom --sbom-format cyclonedx --sbom-type library",
+    "bench:primitives": "node --expose-gc bench/primitives.mjs --iterations 100 --json bench/results/primitives.json"
   },
   "publishConfig": {
     "provenance": true,
