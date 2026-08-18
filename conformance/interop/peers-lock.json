@@ -5,7 +5,11 @@
     "sha256": "986b0fb92ec10e0c66b43e036ce0077e6150cfaecd1db9fb92b56672e157afe5"
   },
   "python": {
-    "requirements": ["dilithium-py==1.4.0", "kyber-py==1.2.0"],
-    "note": "Pure-Python FIPS 204 / FIPS 203 implementations. Version pins are checked at run time; update them here deliberately, not silently."
+    "requirements": [
+      "dilithium-py==1.4.0",
+      "kyber-py==1.2.0",
+      "pycryptodome==3.23.0"
+    ],
+    "note": "Pure-Python FIPS 204 / FIPS 203 implementations. pycryptodome is required by kyber-py's seeded DRBG; without it kyber-py warns on stdout. Version pins are checked at run time; update them here deliberately, not silently."
   }
 }

@@ -13,6 +13,14 @@ stdout. Byte fields are lowercase hex. See ../run-interop.mjs.
 import json
 import sys
 
+# Protocol responses go on stdout, so nothing else may. kyber-py prints a
+# pycryptodome import warning to stdout when that package is absent, which lands
+# mid-stream and makes the orchestrator's JSON.parse fail, taking the whole run
+# down. Claim the real stdout here and point sys.stdout at stderr, so any library
+# that prints is harmless.
+_OUT = sys.stdout
+sys.stdout = sys.stderr
+
 from dilithium_py.ml_dsa import ML_DSA_44, ML_DSA_65, ML_DSA_87
 from kyber_py.ml_kem import ML_KEM_512, ML_KEM_768, ML_KEM_1024
 
@@ -109,8 +117,8 @@ def main():
             out = {"id": req.get("id"), "ok": True, **handle(req)}
         except Exception as err:  # a peer failure is a result, not a crash
             out = {"id": req.get("id"), "ok": False, "error": f"{type(err).__name__}: {err}"}
-        sys.stdout.write(json.dumps(out) + "\n")
-        sys.stdout.flush()
+        _OUT.write(json.dumps(out) + "\n")
+        _OUT.flush()
 
 
 if __name__ == "__main__":

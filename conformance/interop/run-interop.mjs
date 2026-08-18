@@ -130,7 +130,16 @@ class Peer {
         const line = this.buffer.slice(0, nl).trim()
         this.buffer = this.buffer.slice(nl + 1)
         if (!line) continue
-        const msg = JSON.parse(line)
+        // A peer that prints to stdout would otherwise crash the run here. Its
+        // output is not protocol, so note it and carry on rather than dying.
+        let msg
+        try {
+          msg = JSON.parse(line)
+        } catch {
+          this.stderr += `[non-protocol stdout] ${line}
+`
+          continue
+        }
         const waiter = this.pending.get(msg.id)
         if (waiter) {
           this.pending.delete(msg.id)
