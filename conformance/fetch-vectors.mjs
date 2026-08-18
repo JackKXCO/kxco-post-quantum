@@ -41,6 +41,14 @@ function sparseClone() {
 
   git(['init', '--quiet'], CACHE)
   git(['remote', 'add', 'origin', `https://github.com/${lock.source.repo}.git`], CACHE)
+
+  // Check the vectors out byte-for-byte as upstream stores them. Without this,
+  // git on Windows rewrites LF to CRLF on checkout, every digest in
+  // acvp-lock.json differs from the same fetch on Linux, and the lockfile
+  // becomes a platform fingerprint rather than an integrity check. It is the
+  // upstream bytes we are pinning, so no translation is wanted.
+  git(['config', 'core.autocrlf', 'false'], CACHE)
+  git(['config', 'core.eol', 'lf'], CACHE)
   git(['config', 'core.sparseCheckout', 'true'], CACHE)
   git(['sparse-checkout', 'init', '--cone'], CACHE)
   git(['sparse-checkout', 'set', ...lock.sets.map((s) => `${lock.source.path}/${s}`)], CACHE)
