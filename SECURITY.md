@@ -36,6 +36,28 @@ Out of scope (report upstream to https://github.com/paulmillr/noble-post-quantum
 - HMAC-SHA-256
 - HKDF-SHA-512 (RFC 5869)
 
+## Dependency policy
+Both runtime dependencies are pinned to an exact version, never a range:
+`@noble/post-quantum` and `@noble/hashes`. A range would let the code that runs
+the cryptography change without a release of this package, which is not a
+property we are willing to give up for convenience. Every GitHub Action in our
+workflows is pinned by 40-character commit SHA for the same reason.
+
+Updates are proposed, never automatic. Dependabot opens pull requests weekly for
+both npm and GitHub Actions, and Dependabot security updates are enabled at the
+repository level so an advisory does not wait for the Monday run. The
+configuration is in [.github/dependabot.yml](.github/dependabot.yml).
+
+A dependency bump is not merged on the strength of a green test run alone. A
+change to `@noble/post-quantum` is a change to the primitives themselves, so it
+is gated on the full conformance evidence regenerating clean: the NIST ACVP
+vectors and the cross-implementation interoperability matrix, both described in
+[CONFORMANCE.md](CONFORMANCE.md).
+
+Each release publishes a CycloneDX SBOM as a GitHub Release asset, at
+`releases/download/<tag>/sbom.cyclonedx.json`, generated from the tree that was
+actually installed for that build.
+
 ## Disclosure
 We follow coordinated disclosure with a 90-day default window.
 For actively-exploited issues we ship a patch release within 48 hours.
