@@ -85,15 +85,19 @@ Milliseconds. 100 iterations except where the `n` column says otherwise.
 
 **Two numbers to design around.**
 
-**ML-DSA signing has a long tail.** ML-DSA-65 signs in 11 ms at the median and
-51 ms at p99, a factor of 4.5. Rejection sampling means an unlucky signature does
-several more rounds. Size request budgets from p99, not the median.
+**ML-DSA signing has a long tail, on both backends.** ML-DSA-65 signs in 8.1 ms
+at the median and 40.8 ms at p99 in JavaScript, a factor of 5.1. On OpenSSL it is
+1.3 ms and 4.6 ms, a factor of 3.5. Rejection sampling means an unlucky signature
+does several more rounds, and no backend removes that. Size request budgets from
+p99, not the median, and from the p99 of the backend you will actually run.
 
-**SLH-DSA-SHA2-192s signs in about 6.8 seconds.** That is the set `slhDsa` wraps,
-and it is not a per-request operation. It suits infrequent, high-value signatures
-such as firmware or root attestations. Verification is cheap, around 5 ms, so an
-SLH-DSA signature is expensive to make and cheap to check. The `f` variants trade
-signature size for signing speed: SHA2-128f signs in 151 ms.
+**SLH-DSA-SHA2-192s signs in seconds, not milliseconds:** about 4.3 s in
+JavaScript and 1.7 s on OpenSSL. That is the set `slhDsa` wraps, and on either
+backend it is not a per-request operation. It suits infrequent, high-value
+signatures such as firmware or root attestations. Verification is cheap, 7.5 ms
+and 1.3 ms respectively, so an SLH-DSA signature is expensive to make and cheap
+to check. The `f` variants trade signature size for signing speed: SHA2-128f
+signs in 98 ms in JavaScript and 69 ms on OpenSSL.
 
 ## Key encapsulation
 
@@ -155,11 +159,12 @@ collection timing, not evidence that the larger parameter set allocates less.
 
 - **One machine, one run.** Node v26.1.0 on win32-x64. Absolute numbers move with
   hardware and runtime; the ratios between operations are the portable part.
-- **Not a cross-vendor comparison.** Nothing here was measured against another
-  implementation, so it says nothing about how this compares to a native or
-  hardware-backed stack. It will be slower than both.
+- **Not a cross-vendor comparison.** The two backends here are both ours to
+  ship, so the comparison above is between two paths through this package, not
+  between this package and someone else's. It says nothing about how either
+  compares to a hardware-backed stack.
 - **Reduced samples where marked.** SLH-DSA slow variants take 3 to 20 samples
-  rather than 100, because 100 signatures at 6.8 seconds each is not a benchmark,
+  rather than 100, because 100 signatures at seconds each is not a benchmark,
   it is an afternoon. Where n is small, p95 and p99 collapse onto the maximum and
   are reported that way rather than dressed up.
 - **Not a side-channel measurement.** Timing here is throughput, gathered without

@@ -18,6 +18,17 @@ updates:
     commit-message:
       prefix: deps
       include: scope
+    # @noble/post-quantum 0.7.1 fails nine NIST ACVP SLH-DSA verification
+    # vectors that 0.7.0 passes, returning false where the vectors require true,
+    # so a package running it can reject a valid signature. Shipped in 1.5.1 and
+    # reverted in 1.5.2. Reported upstream. Reproduce with:
+    #   node conformance/run-acvp.mjs --set SLH-DSA-sigVer-FIPS205 --max-per-group 3
+    # This blocks that one version only. 0.7.2 and later will still be proposed,
+    # and should be accepted once the vectors pass again. The ACVP job would
+    # catch it regardless; this stops the pull request being opened at all.
+    ignore:
+      - dependency-name: "@noble/post-quantum"
+        versions: ["0.7.1"]
 
   # Pin updates for the actions used in our workflows. Dependabot will open
   # PRs proposing newer commit SHAs for actions/checkout etc, so we never

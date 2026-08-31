@@ -7,15 +7,18 @@ Post-quantum cryptography primitives for the KXCO stack.
 [![conformance](https://github.com/KnightsbridgeAIQ/kxco-post-quantum/actions/workflows/conformance.yml/badge.svg)](https://github.com/KnightsbridgeAIQ/kxco-post-quantum/actions/workflows/conformance.yml)
 [![license](https://img.shields.io/badge/license-Apache--2.0-blue)](./LICENSE)
 
-ML-DSA-65 (FIPS 204) and SLH-DSA-SHA2-192s (FIPS 205) signatures, ML-KEM-768 (FIPS 203) key encapsulation, and key fingerprinting utilities. Category 5 sets ML-DSA-87 and ML-KEM-1024 are also available. Wraps [`@noble/post-quantum`](https://github.com/paulmillr/noble-post-quantum). All other `kxco-pq-*` packages depend on this one.
+ML-DSA-65 (FIPS 204) and SLH-DSA-SHA2-192s (FIPS 205) signatures, ML-KEM-768 (FIPS 203) key encapsulation, and key fingerprinting utilities. Category 5 sets ML-DSA-87 and ML-KEM-1024 are also available. All other `kxco-pq-*` packages depend on this one.
+
+**On Node 24 and later the primitives run in OpenSSL 3.5**, not in JavaScript. Older Node and browsers use [`@noble/post-quantum`](https://github.com/paulmillr/noble-post-quantum). The two are interchangeable on the wire, which is checked rather than assumed: the interoperability matrix runs in full against both, and every report records which one produced it.
 
 **Evidence, not adjectives:**
 
 - [CONFORMANCE.md](./CONFORMANCE.md): NIST ACVP vectors for FIPS 203/204/205 (2,103 tests, 0 failed), and a cross-implementation interop matrix against liboqs, Bouncy Castle and two pure-Python implementations (225 checks, 0 failed, both directions, with negative controls), run against both backends. Reproducible: `npm run conformance:acvp`, `npm run conformance:interop`.
-- [BENCHMARKS.md](./BENCHMARKS.md): per-algorithm latency at p95/p99, plus memory. Two figures worth designing around: ML-DSA signing has a 4.5x tail between median and p99, and SLH-DSA-SHA2-192s signs in about 6.8 seconds.
+- [BENCHMARKS.md](./BENCHMARKS.md): per-algorithm latency at p95/p99 on both backends and on x86-64 and arm64, plus memory. Two figures worth designing around: ML-DSA signing keeps a rejection-sampling tail on either backend (5.1x median-to-p99 in JavaScript, 3.5x on OpenSSL), and SLH-DSA-SHA2-192s signs in seconds rather than milliseconds (4.3 s and 1.7 s).
 - [THREAT-MODEL.md](./THREAT-MODEL.md): what this defends against and what it does not. Read the side-channel section before deciding where a signing key lives.
 - [MIGRATION.md](./MIGRATION.md): moving an RSA or ECDSA system across, and moving between versions of this package.
-- [SECURITY.md](./SECURITY.md): reporting, and release integrity.
+- [SECURITY.md](./SECURITY.md): reporting, release integrity, and the dependency policy.
+- **Every release is reproducible and attested.** The published tarball rebuilds bit-for-bit from its own tag, verified in CI on every run, and each release carries a SLSA provenance attestation plus a CycloneDX SBOM at a permanent unauthenticated URL. A provenance attestation says a build happened in CI; the reproducible build says the artefact is the source. They are different claims and both are checkable without asking us for anything.
 
 ---
 
