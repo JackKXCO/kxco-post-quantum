@@ -31,12 +31,22 @@
 
 import { ml_kem1024 } from '@noble/post-quantum/ml-kem.js'
 import { deriveSeed } from './derive.js'
+import { native } from '#native'
 
 const HAS_BUFFER = typeof Buffer !== 'undefined'
 
 function wrap(bytes) {
   return HAS_BUFFER ? Buffer.from(bytes) : bytes
 }
+
+// Where the runtime provides the FIPS primitives through OpenSSL (Node 24 and
+// later) they are used in place of the JavaScript backend. Everywhere else,
+// including every browser, `native` is null and nothing about this module
+// changes. The two backends are checked against each other for this parameter
+// set in both directions by the interoperability matrix.
+const NATIVE_ALG = 'ML-KEM-1024'
+const usesNative = () =>
+  native !== null && native.supports(NATIVE_ALG)
 
 /**
  * Generate an ML-KEM-1024 keypair from a master + domain-separation info.
@@ -63,7 +73,9 @@ export function keypairFromMaster(master, info = 'ml-kem-1024-v1') {
  * @returns {{ ciphertext: Buffer|Uint8Array, cipherText: Buffer|Uint8Array, sharedSecret: Buffer|Uint8Array }}
  */
 export function encapsulate(publicKey) {
-  const r = ml_kem1024.encapsulate(publicKey)
+  const r = usesNative()
+    ? native.encapsulate(NATIVE_ALG, publicKey)
+    : ml_kem1024.encapsulate(publicKey)
   const ct = wrap(r.cipherText ?? r.ciphertext)
   return {
     ciphertext:   ct,
@@ -84,6 +96,9 @@ export function encapsulate(publicKey) {
  * @returns {Buffer|Uint8Array} shared secret (32 bytes)
  */
 export function decapsulate(ciphertext, secretKey) {
+  if (usesNative()) {
+    return wrap(native.decapsulate(NATIVE_ALG, ciphertext, secretKey))
+  }
   return wrap(ml_kem1024.decapsulate(ciphertext, secretKey))
 }
 

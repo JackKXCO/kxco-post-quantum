@@ -31,6 +31,7 @@
 import { ml_dsa87 } from '@noble/post-quantum/ml-dsa.js'
 import { deriveSeed } from './derive.js'
 import { normalizeContext, MAX_CONTEXT_BYTES } from './_context.js'
+import { native } from '#native'
 
 export { MAX_CONTEXT_BYTES }
 
@@ -56,6 +57,15 @@ function bytesToHex(bytes) {
 function wrap(bytes) {
   return HAS_BUFFER ? Buffer.from(bytes) : bytes
 }
+
+// Where the runtime provides the FIPS primitives through OpenSSL (Node 24 and
+// later) they are used in place of the JavaScript backend. Everywhere else,
+// including every browser, `native` is null and nothing about this module
+// changes. The two backends are checked against each other for this parameter
+// set in both directions by the interoperability matrix.
+const NATIVE_ALG = 'ML-DSA-87'
+const usesNative = (context) =>
+  context === undefined && native !== null && native.supports(NATIVE_ALG)
 
 /**
  * Generate an ML-DSA-87 keypair from a master + domain-separation info.
@@ -88,6 +98,9 @@ export function keypairFromMaster(master, info = 'ml-dsa-87-v1') {
  */
 export function sign(secretKey, message, opts) {
   const context = normalizeContext(opts)
+  if (usesNative(context)) {
+    return bytesToHex(native.sign(NATIVE_ALG, secretKey, toBytes(message)))
+  }
   const sig = context === undefined
     ? ml_dsa87.sign(toBytes(message), secretKey)
     : ml_dsa87.sign(toBytes(message), secretKey, { context })
@@ -116,6 +129,9 @@ export function verify(publicKey, message, sigHex, opts) {
   // Outside the try: misuse must surface, not be swallowed as "invalid".
   const context = normalizeContext(opts)
   try {
+    if (usesNative(context)) {
+      return native.verify(NATIVE_ALG, publicKey, toBytes(message), hexToBytes(sigHex))
+    }
     return context === undefined
       ? ml_dsa87.verify(hexToBytes(sigHex), toBytes(message), publicKey)
       : ml_dsa87.verify(hexToBytes(sigHex), toBytes(message), publicKey, { context })

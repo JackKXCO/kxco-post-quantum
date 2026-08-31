@@ -16,6 +16,7 @@
 import { slh_dsa_sha2_192s } from '@noble/post-quantum/slh-dsa.js'
 import { deriveSeed } from './derive.js'
 import { normalizeContext, MAX_CONTEXT_BYTES } from './_context.js'
+import { native } from '#native'
 
 export { MAX_CONTEXT_BYTES }
 
@@ -44,6 +45,15 @@ function wrap(bytes) {
 
 // Seed length for SLH-DSA-SHA2-192s keygen (FIPS 205: SK.seed || SK.prf || PK.seed).
 const SEED_BYTES = slh_dsa_sha2_192s.lengths.seed
+
+// Where the runtime provides the FIPS primitives through OpenSSL (Node 24 and
+// later) they are used in place of the JavaScript backend. Everywhere else,
+// including every browser, `native` is null and nothing about this module
+// changes. The two backends are checked against each other for this parameter
+// set in both directions by the interoperability matrix.
+const NATIVE_ALG = 'SLH-DSA-SHA2-192s'
+const usesNative = (context) =>
+  context === undefined && native !== null && native.supports(NATIVE_ALG)
 
 /**
  * Generate an SLH-DSA-SHA2-192s keypair from a master + domain-separation info.
@@ -74,6 +84,9 @@ export function keypairFromMaster(master, info = 'slh-dsa-sha2-192s-v1') {
  */
 export function sign(secretKey, message, opts) {
   const context = normalizeContext(opts)
+  if (usesNative(context)) {
+    return bytesToHex(native.sign(NATIVE_ALG, secretKey, toBytes(message)))
+  }
   const sig = context === undefined
     ? slh_dsa_sha2_192s.sign(toBytes(message), secretKey)
     : slh_dsa_sha2_192s.sign(toBytes(message), secretKey, { context })
@@ -95,6 +108,9 @@ export function sign(secretKey, message, opts) {
 export function verify(publicKey, message, sigHex, opts) {
   const context = normalizeContext(opts)
   try {
+    if (usesNative(context)) {
+      return native.verify(NATIVE_ALG, publicKey, toBytes(message), hexToBytes(sigHex))
+    }
     return context === undefined
       ? slh_dsa_sha2_192s.verify(hexToBytes(sigHex), toBytes(message), publicKey)
       : slh_dsa_sha2_192s.verify(hexToBytes(sigHex), toBytes(message), publicKey, { context })

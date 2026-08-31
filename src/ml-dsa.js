@@ -9,8 +9,23 @@
 import { ml_dsa65 } from '@noble/post-quantum/ml-dsa.js'
 import { deriveSeed } from './derive.js'
 import { normalizeContext, MAX_CONTEXT_BYTES } from './_context.js'
+import { native } from '#native'
 
 export { MAX_CONTEXT_BYTES }
+
+// Where the runtime provides the FIPS 204 primitives through OpenSSL (Node 24
+// and later) they are used in place of the JavaScript backend. Everywhere else,
+// including every browser, `native` is null and nothing about this module
+// changes. The two backends are checked against each other for every parameter
+// set in both directions by the interoperability matrix, so this is a swap
+// between two implementations known to agree, not an assumption that they do.
+//
+// A context string forces the JavaScript path: Node's sign and verify take no
+// context argument, and signing without the caller's context would produce a
+// signature that verifies against nothing.
+const NATIVE_ALG = 'ML-DSA-65'
+const usesNative = (context) =>
+  context === undefined && native !== null && native.supports(NATIVE_ALG)
 
 const HAS_BUFFER = typeof Buffer !== 'undefined'
 const enc = new TextEncoder()
@@ -64,6 +79,9 @@ export function keypairFromMaster(master, info = 'ml-dsa-65-v1') {
  */
 export function sign(secretKey, message, opts) {
   const context = normalizeContext(opts)
+  if (usesNative(context)) {
+    return bytesToHex(native.sign(NATIVE_ALG, secretKey, toBytes(message)))
+  }
   const sig = context === undefined
     ? ml_dsa65.sign(toBytes(message), secretKey)
     : ml_dsa65.sign(toBytes(message), secretKey, { context })
@@ -91,6 +109,9 @@ export function verify(publicKey, message, sigHex, opts) {
   // Outside the try: misuse must surface, not be swallowed as "invalid".
   const context = normalizeContext(opts)
   try {
+    if (usesNative(context)) {
+      return native.verify(NATIVE_ALG, publicKey, toBytes(message), hexToBytes(sigHex))
+    }
     return context === undefined
       ? ml_dsa65.verify(hexToBytes(sigHex), toBytes(message), publicKey)
       : ml_dsa65.verify(hexToBytes(sigHex), toBytes(message), publicKey, { context })
