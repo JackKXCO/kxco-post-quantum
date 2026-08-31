@@ -1,6 +1,6 @@
 {
   "name": "kxco-post-quantum",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "ML-DSA-65, ML-KEM-768 and SLH-DSA-SHA2-192s primitives with key fingerprinting. The base layer for all kxco-pq-* packages.",
   "keywords": [
     "post-quantum",
@@ -112,7 +112,7 @@
   },
   "dependencies": {
     "@noble/hashes": "2.3.0",
-    "@noble/post-quantum": "0.7.0"
+    "@noble/post-quantum": "0.7.1"
   },
   "scripts": {
     "test": "node --test test/basic.test.js && node --test test/context.test.js && node --test test/category5.test.js && node --test test/browser-smoke.test.js && node test/run-vectors.js",

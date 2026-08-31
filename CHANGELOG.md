@@ -1,5 +1,29 @@
 # Changelog
 
+## 1.5.1
+
+Dependency bump: `@noble/post-quantum` 0.7.0 to **0.7.1**, published 2026-08-27.
+Exact pin as always, never a range.
+
+Worth taking rather than waiting for the scheduled Dependabot run, because one of
+its changes touches how this package calls it: 0.7.1 snapshots options on entry
+so a caller's object cannot be mutated afterwards. Every FIPS 204 context string
+this package passes goes in as an options object, so that hardening is directly
+on our path.
+
+It also adds a WebCrypto wrapper for ML-KEM upstream. Nothing here uses it yet,
+but it is worth knowing that the backend is converging on the same thing this
+package did in 1.5.0: use the platform's implementation where the platform has
+one.
+
+Verified before merging, on all three runtimes: 39 pinned vectors bit-for-bit and
+53 tests on Node 20 and 22 (the JavaScript path, where this bump actually
+applies) and on Node 24+ (the OpenSSL path).
+
+AUDIT.md carries the new pin and its integrity hash. The conservative bound is
+unchanged and restated: the maintainer's self-audit covers 0.6.1, we ship 0.7.1,
+so **the version we ship is covered by no audit at all**.
+
 ## 1.5.0
 
 **The FIPS primitives now run in OpenSSL where the runtime has them.** On Node 24
