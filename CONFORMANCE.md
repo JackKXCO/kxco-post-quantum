@@ -187,6 +187,62 @@ Everything else is exercised against liboqs, in both directions, including FIPS
 
 ---
 
+## 3. Edge cases
+
+Passing vectors in the middle of the range says nothing about the ends. These are
+run by `npm test` on every supported runtime, so they cover both backends:
+OpenSSL on Node 24 and later, JavaScript on Node 20 and 22.
+
+| Case | Asserted |
+|---|---|
+| Zero-length message | signs and verifies, and does **not** verify against a one-byte message |
+| Empty vs absent context | both verify, and normalise identically |
+| Context of exactly 255 bytes | accepted; one flipped byte in it fails verification |
+| Context of 256 bytes | **throws**, rather than returning false |
+| Malformed signature | empty, odd-length hex, non-hex, one byte short, one byte long, all zeroes, all ones: all return false, none throw |
+| Wrong-size public key | empty, short, long, all zeroes: all return false, none throw |
+| Signature under another key | false |
+| One-megabyte message | verifies, and a flip in the **final** byte is detected |
+| Corrupted ML-KEM ciphertext | returns an unrelated secret of the correct length, not an error |
+| Repeated encapsulation | ciphertext and secret both differ |
+| Key derivation | deterministic from the same master, different for a different info string |
+
+Two of those deserve their reasoning stated, because the behaviour is a choice:
+
+**A cryptographic failure returns false; caller misuse throws.** A wrong key or a
+corrupted signature answers the question "is this valid" with no, and no is a
+value. A 256-byte context is a bug in the calling code, and returning false there
+would let a program that can never verify anything look like a program that is
+merely receiving bad signatures.
+
+**The one-megabyte case is not a size limit test.** It flips the last byte and
+requires that verification fails. An implementation that hashed only a prefix
+would pass every other case in this suite.
+
+## 4. Object identifiers
+
+The NIST OIDs each parameter set is published under. These are not transcribed
+from a registry: they are read back out of the SubjectPublicKeyInfo that OpenSSL
+3.5 produces for each algorithm, by walking the DER rather than scanning it, so
+they are the identifiers this package actually interoperates on.
+
+| Parameter set | OID |
+|---|---|
+| ML-DSA-44 | 2.16.840.1.101.3.4.3.17 |
+| ML-DSA-65 | 2.16.840.1.101.3.4.3.18 |
+| ML-DSA-87 | 2.16.840.1.101.3.4.3.19 |
+| ML-KEM-512 | 2.16.840.1.101.3.4.4.1 |
+| ML-KEM-768 | 2.16.840.1.101.3.4.4.2 |
+| ML-KEM-1024 | 2.16.840.1.101.3.4.4.3 |
+| SLH-DSA-SHA2-128f | 2.16.840.1.101.3.4.3.21 |
+| SLH-DSA-SHA2-192s | 2.16.840.1.101.3.4.3.22 |
+| SLH-DSA-SHAKE-256f | 2.16.840.1.101.3.4.3.31 |
+
+Keys cross the boundary to OpenSSL as SPKI for public keys and PKCS8 for private
+keys, both carrying these identifiers, which is what makes the two backends
+interchangeable with each other and with any X.509 or CMS consumer that speaks
+the same encodings.
+
 ## What this evidence does not cover
 
 Stated plainly, because a conformance report that only lists what passed is

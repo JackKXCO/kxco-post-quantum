@@ -115,7 +115,7 @@
     "@noble/post-quantum": "0.7.1"
   },
   "scripts": {
-    "test": "node --test test/basic.test.js && node --test test/context.test.js && node --test test/category5.test.js && node --test test/browser-smoke.test.js && node test/run-vectors.js",
+    "test": "node --test test/basic.test.js && node --test test/context.test.js && node --test test/category5.test.js && node --test test/edge-cases.test.js && node --test test/browser-smoke.test.js && node test/run-vectors.js",
     "test:vectors": "node test/run-vectors.js",
     "generate:vectors": "node test/generate-vectors.js > test/vectors.json",
     "bench": "node bench/bench.js",
