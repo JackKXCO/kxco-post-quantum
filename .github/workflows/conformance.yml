@@ -85,6 +85,48 @@ jobs:
           name: acvp-report-${{ matrix.group.slug }}
           path: conformance/results/acvp-${{ matrix.group.slug }}.json
 
+  reproduce:
+    # Rebuild the published tarball from its own tag and require a bit-for-bit
+    # match against what the registry is serving. A provenance attestation says
+    # a build happened in CI; this says the artefact is the source, which is a
+    # different claim and the one a reader can check for themselves.
+    #
+    # Line endings are the trap. A checkout on a machine configured for CRLF
+    # produces a different tarball from the same commit, so this must run on a
+    # LF checkout. That is a property of the checkout, not of the build.
+    name: Reproducible build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: '22'
+
+      - name: Upgrade npm CLI to the 11.x line
+        run: npm install -g npm@11
+
+      - name: Rebuild the published version from its tag and compare
+        run: |
+          set -euo pipefail
+          NAME=kxco-post-quantum
+          VERSION=$(npm view "$NAME" version)
+          echo "verifying $NAME@$VERSION"
+
+          PUBLISHED=$(npm view "$NAME@$VERSION" dist.integrity)
+
+          git clone --quiet --depth 1 --branch "v$VERSION"             "https://github.com/${GITHUB_REPOSITORY}.git" /tmp/src
+          cd /tmp/src
+          npm ci --silent
+          REBUILT=$(npm pack --json | node -e             'let s="";process.stdin.on("data",d=>s+=d).on("end",()=>console.log(JSON.parse(s)[0].integrity))')
+
+          echo "published: $PUBLISHED"
+          echo "rebuilt  : $REBUILT"
+          if [ "$PUBLISHED" != "$REBUILT" ]; then
+            echo "::error::the published tarball does not reproduce from its tag"
+            exit 1
+          fi
+          echo "match: the published tarball reproduces from source"
+
   bench:
     # Two architectures, on real hardware. Emulated ARM would produce numbers
     # that look like measurements and are not: QEMU timings say more about the

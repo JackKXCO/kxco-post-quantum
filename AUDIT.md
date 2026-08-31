@@ -10,9 +10,9 @@ If you are doing institutional due diligence, read this end-to-end before the RE
 
 ## 1. Upstream audit posture
 
-**`@noble/post-quantum@0.7.1`**, the underlying NIST primitives we wrap, has **not** been independently audited by a third party.
+**`@noble/post-quantum@0.7.0`**, the underlying NIST primitives we wrap, has **not** been independently audited by a third party.
 
-> **Correction (v1.4.0, updated v1.5.1):** this section previously stated that we pin `0.6.1`, "the exact version covered by the maintainer's own self-audit." That is no longer true and the claim has been withdrawn. We now ship **`0.7.1`**, published 2026-08-27. The maintainer's self-audit covers **`0.6.1`**. **The version we ship is not covered by any audit, self- or third-party.** We ship it because it reproduces all 39 pinned vectors bit-for-bit and interoperates with liboqs, Bouncy Castle and two Python implementations in both directions, but that is our own regression and conformance evidence, not an audit. Stated here as the conservative bound.
+> **Correction (v1.4.0, updated v1.5.2):** this section previously stated that we pin `0.6.1`, "the exact version covered by the maintainer's own self-audit." That is no longer true and the claim has been withdrawn. We ship **`0.7.0`**. We briefly shipped `0.7.1` in v1.5.1 and reverted it in v1.5.2: it fails nine NIST ACVP SLH-DSA verification vectors that `0.7.0` passes, returning false where the vectors require true. See CHANGELOG. The maintainer's self-audit covers **`0.6.1`**. **The version we ship is not covered by any audit, self- or third-party.** We ship it because it reproduces all 39 pinned vectors bit-for-bit and interoperates with liboqs, Bouncy Castle and two Python implementations in both directions, but that is our own regression and conformance evidence, not an audit. Stated here as the conservative bound.
 
 | Review | Year | Scope | Source |
 |---|---|---|---|
@@ -27,8 +27,8 @@ When you `npm install kxco-post-quantum`, the upstream `@noble/post-quantum` cod
 The exact upstream we pin:
 
 ```
-@noble/post-quantum@0.7.1
-integrity: sha512-+P9981IiAnVh+rmcubozzVwrEy3XsN/tMhTnvsjV9VDaYpOnNCqWqKo2FLWxbu92YHfjGIlE5XnW175UK+ln+Q==
+@noble/post-quantum@0.7.0
+integrity: sha512-IH2tpuGV4vBMdpCCua2BN7EuUICtmGp6DlBMNBYAYcL6QQ7eHt85GjLyD7ZT6Qx/xgIPIMqsSLDGvYqOm8Vqag==
 ```
 
 ## 2. What has NOT been audited (this wrapper)

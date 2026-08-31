@@ -85,10 +85,13 @@ What that does and does not buy:
 - It **does** remove the structural impossibility. The reasoning above was that
   the property could not be established from inside the language at all. On the
   OpenSSL path it can, in principle, be established.
-- It **does not** amount to a constant-time claim from us. We have published no
-  timing measurements of either backend, and OpenSSL's post-quantum
-  implementations carry their own side-channel posture which is theirs to state,
-  not ours to assert on their behalf.
+- It **does not** amount to a constant-time claim from us. We have since
+  published timing measurements of both backends, reported at the end of this
+  document, and they detect nothing at their resolution. That is a bound, not a
+  clearance: a null result from a wall-clock test is weaker evidence than the
+  JavaScript backend's own statement that it does not defend against side
+  channels. OpenSSL's post-quantum side-channel posture is likewise theirs to
+  state, not ours to assert on their behalf.
 - It **does not** apply to Node 20 or 22, to browsers, or to any runtime without
   those primitives. Those keep the JavaScript backend and everything above
   applies to them unchanged.
@@ -207,6 +210,31 @@ falsifiable rather than permanent by assertion.
 - Published timing measurements under a statistical test such as dudect would
   turn "no claim" into a measured bound. Absence of a detected leak is not
   absence of a leak, and any such result would be reported that way.
+
+  **This one is now done, and the result is reported exactly that way.**
+  `bench/timing.mjs` runs a dudect-style Welch t-test on interleaved
+  fixed-versus-random secret key timings, and `npm run bench:timing`
+  reproduces it. At 3,000 iterations per class:
+
+  | Backend | ML-DSA-65 sign | ML-KEM-768 decapsulate |
+  |---|---:|---:|
+  | OpenSSL (Node 24+) | t = 0.027 | t = -0.93 |
+  | JavaScript (Node 22) | t = 0.454 | t = -0.658 |
+
+  dudect's convention treats \|t\| > 10 as a detected leak. Nothing here is
+  close to it.
+
+  **Do not read the second row as good news.** The JavaScript backend states
+  about itself that there is no protection against side-channel attacks, and
+  that statement is more authoritative than this measurement. A null result on
+  a path whose author says it leaks means the test is too coarse to see it, not
+  that it is absent: wall-clock timing at JavaScript resolution cannot resolve a
+  leak below its own noise floor, and it observes no cache, branch-prediction,
+  power or electromagnetic channel at all.
+
+  What the measurement is actually worth: it is a regression detector and a
+  published bound, not a clearance. If a future change introduced a leak large
+  enough to be visible at this resolution, this would catch it.
 - FIPS 140-3 validation of a module used underneath would change what can be
   asserted about the boundary, and is not the same as the algorithm-level
   conformance evidence in [CONFORMANCE.md](CONFORMANCE.md).

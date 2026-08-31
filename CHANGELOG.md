@@ -1,5 +1,43 @@
 # Changelog
 
+## 1.5.2
+
+**Reverts `@noble/post-quantum` to 0.7.0. Upgrade from 1.5.1 immediately if you
+verify SLH-DSA signatures.**
+
+1.5.1 bumped the backend to 0.7.1. That version **fails nine NIST ACVP SLH-DSA
+verification vectors that 0.7.0 passes**, returning `false` where the vectors
+require `true`. In practice that means a valid SLH-DSA signature can be
+rejected. It is a correctness and availability fault, not a security weakening:
+nothing invalid is accepted. No other algorithm family is affected, and ML-DSA
+and ML-KEM pass unchanged on both versions.
+
+The failures are confined to the **internal** signature interface
+(`SLH-DSA.Verify_internal`), not the pre-hash interface, and appear across both
+SHA2 and SHAKE parameter sets: SHA2-128s, SHA2-192f, SHA2-256f, SHA2-256s,
+SHAKE-128f, SHAKE-128s, SHAKE-256f, SHAKE-256s. Reproduce with:
+
+```
+npm run conformance:fetch
+node conformance/run-acvp.mjs --set SLH-DSA-sigVer-FIPS205 --max-per-group 3
+```
+
+0.7.0 returns 87 passed, 0 failed, 21 skipped. 0.7.1 returns 78 passed, 9
+failed.
+
+This has been reported upstream. Until it is resolved the pin stays at 0.7.0,
+and the ACVP job will fail the build on any attempt to move it, which is the
+behaviour we want.
+
+**Why this is worth saying plainly rather than quietly reverting.** The
+conformance evidence in this repository is not decoration. It caught a real
+regression in a dependency within hours of that dependency's release, on a
+version bump whose own release notes described only hardening. A test suite that
+passes is not evidence; a test suite that fails when something breaks is. Ours
+did.
+
+1.5.1 is deprecated on npm.
+
 ## 1.5.1
 
 Dependency bump: `@noble/post-quantum` 0.7.0 to **0.7.1**, published 2026-08-27.

@@ -1,0 +1,38 @@
+{
+  "subject": {
+    "package": "kxco-post-quantum"
+  },
+  "backend": {
+    "kind": "openssl",
+    "openssl": "3.5.6"
+  },
+  "runtime": {
+    "node": "v26.1.0",
+    "platform": "win32-x64"
+  },
+  "method": "Welch t-test on interleaved fixed-vs-random secret key timings, lowest decile",
+  "threshold": 10,
+  "interpretation": "A |t| below the threshold is the absence of a leak THIS test could detect, at this sample size, on this machine. It is not a constant-time claim. Cache, branch prediction, power and electromagnetic channels are not measured.",
+  "studies": [
+    {
+      "study": "ML-DSA-65 sign, fixed vs random secret key",
+      "iterations": 3000,
+      "samplesCompared": 600,
+      "tStatistic": 0.027,
+      "threshold": 10,
+      "detected": false,
+      "meanFixedNs": 806672,
+      "meanRandomNs": 806546
+    },
+    {
+      "study": "ML-KEM-768 decapsulate, fixed vs random secret key",
+      "iterations": 3000,
+      "samplesCompared": 600,
+      "tStatistic": -0.93,
+      "threshold": 10,
+      "detected": false,
+      "meanFixedNs": 197565,
+      "meanRandomNs": 197829
+    }
+  ]
+}
