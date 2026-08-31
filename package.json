@@ -112,7 +112,7 @@
   },
   "dependencies": {
     "@noble/hashes": "2.3.0",
-    "@noble/post-quantum": "0.7.0"
+    "@noble/post-quantum": "0.7.1"
   },
   "scripts": {
     "test": "node --test test/basic.test.js && node --test test/context.test.js && node --test test/category5.test.js && node --test test/edge-cases.test.js && node --test test/browser-smoke.test.js && node test/run-vectors.js",
