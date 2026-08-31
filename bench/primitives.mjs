@@ -115,6 +115,45 @@ for (const [name, alg, n] of SLH_SETS) {
   rows.push({ alg: name, ...measure('verify', Math.max(n, 10), () => alg.verify(sig, MSG, publicKey)) })
 }
 
+// --------------------------------------------------------- OpenSSL backend
+//
+// Every row above measures the JavaScript primitives directly, so on a runtime
+// that provides the FIPS primitives natively they describe a code path the
+// package no longer takes. These rows measure the one it does take there.
+//
+// Reported side by side rather than replacing the JavaScript figures: both are
+// live, on different runtimes, and a single number that does not say which
+// backend produced it is not a measurement of anything in particular.
+const { native } = await import('#native')
+
+if (native) {
+  const NATIVE_SIG = [
+    ['ML-DSA-44', ml_dsa44, N],
+    ['ML-DSA-65', ml_dsa65, N],
+    ['ML-DSA-87', ml_dsa87, N],
+    ['SLH-DSA-SHA2-128f', slh.slh_dsa_sha2_128f, Math.min(N, 20)],
+    ['SLH-DSA-SHA2-192s', slh.slh_dsa_sha2_192s, Math.min(N, 3)],
+    ['SLH-DSA-SHAKE-256f', slh.slh_dsa_shake_256f, Math.min(N, 5)],
+  ]
+  for (const [name, alg, n] of NATIVE_SIG) {
+    if (!native.supports(name)) continue
+    const seed = new Uint8Array(alg.lengths.seed).fill(3)
+    const { publicKey, secretKey } = alg.keygen(seed)
+    const sig = native.sign(name, secretKey, MSG)
+    rows.push({ alg: name, backend: 'openssl', ...measure('sign', n, () => native.sign(name, secretKey, MSG)) })
+    rows.push({ alg: name, backend: 'openssl', ...measure('verify', Math.max(n, 10), () => native.verify(name, publicKey, MSG, sig)) })
+  }
+
+  for (const [name, alg] of [['ML-KEM-512', ml_kem512], ['ML-KEM-768', ml_kem768], ['ML-KEM-1024', ml_kem1024]]) {
+    if (!native.supports(name)) continue
+    const seed = new Uint8Array(alg.lengths.seed).fill(9)
+    const { publicKey, secretKey } = alg.keygen(seed)
+    const { cipherText } = native.encapsulate(name, publicKey)
+    rows.push({ alg: name, backend: 'openssl', ...measure('encapsulate', N, () => native.encapsulate(name, publicKey)) })
+    rows.push({ alg: name, backend: 'openssl', ...measure('decapsulate', N, () => native.decapsulate(name, cipherText, secretKey)) })
+  }
+}
+
 // ------------------------------------------------- wrapper derivation overhead
 const { mlDsa, mlKem } = await import('../src/index.js')
 const master = new Uint8Array(32).fill(11)

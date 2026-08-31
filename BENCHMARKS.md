@@ -15,7 +15,51 @@ node --expose-gc bench/primitives.mjs --iterations 100 --json bench/results/prim
 ```
 
 Every parameter set the package can reach is measured, not only the five it wraps
-in its own helpers.
+in its own helpers. The OpenSSL rows appear only on a runtime that provides those
+primitives, so run it on Node 24 or later to reproduce the comparison below and
+on Node 22 for the JavaScript figures alone.
+
+## Two backends
+
+Since 1.5.0 this package runs the FIPS primitives in OpenSSL 3.5 where the
+runtime provides them (Node 24 and later) and in JavaScript everywhere else.
+Those are different implementations, so one set of numbers cannot describe both.
+The harness measures whichever are available and labels every row, and the
+tables below the comparison are the JavaScript figures.
+
+| Algorithm | Operation | OpenSSL p50 | JavaScript p50 | OpenSSL p99 | JavaScript p99 | faster by |
+|---|---|---:|---:|---:|---:|---:|
+| ML-DSA-44 | sign | 1.125 | 5.116 | 4.619 | 21.325 | 4.5x |
+| ML-DSA-44 | verify | 0.241 | 1.373 | 0.725 | 2.451 | 5.7x |
+| ML-DSA-65 | sign | 1.293 | 8.074 | 4.562 | 40.840 | 6.2x |
+| ML-DSA-65 | verify | 0.288 | 2.249 | 0.652 | 3.803 | 7.8x |
+| ML-DSA-87 | sign | 1.879 | 11.031 | 7.128 | 39.404 | 5.9x |
+| ML-DSA-87 | verify | 0.613 | 3.363 | 1.831 | 5.843 | 5.5x |
+| ML-KEM-1024 | encapsulate | 0.126 | 0.708 | 0.278 | 1.986 | 5.6x |
+| ML-KEM-1024 | decapsulate | 0.230 | 0.919 | 0.339 | 1.630 | 4.0x |
+| ML-KEM-512 | encapsulate | 0.079 | 0.378 | 0.212 | 1.008 | 4.8x |
+| ML-KEM-512 | decapsulate | 0.236 | 0.461 | 0.380 | 1.498 | 2.0x |
+| ML-KEM-768 | encapsulate | 0.148 | 0.558 | 0.256 | 1.288 | 3.8x |
+| ML-KEM-768 | decapsulate | 0.183 | 0.874 | 0.523 | 5.378 | 4.8x |
+| SLH-DSA-SHA2-128f | sign | 68.639 | 97.791 | 165.092 | 173.466 | 1.4x |
+| SLH-DSA-SHA2-128f | verify | 3.459 | 6.082 | 4.303 | 27.278 | 1.8x |
+| SLH-DSA-SHA2-192s | sign | 1710.954 | 4342.105 | 1938.773 | 4628.987 | 2.5x |
+| SLH-DSA-SHA2-192s | verify | 1.263 | 7.457 | 2.405 | 40.920 | 5.9x |
+| SLH-DSA-SHAKE-256f | sign | 161.358 | 2158.272 | 179.655 | 3510.503 | 13.4x |
+| SLH-DSA-SHAKE-256f | verify | 5.599 | 66.177 | 6.774 | 98.654 | 11.8x |
+
+The speedup column is the headline, but for a document about tail latency the
+p99 columns matter more. ML-DSA-65 signing goes from a 40.8 ms p99 to 4.6 ms:
+the rejection-sampling tail that the opening of this document warns about is
+still there in the OpenSSL path, but it is roughly nine times tighter, so a
+timeout sized off it can be far smaller.
+
+SLH-DSA-SHAKE-256f is the largest single change, 2158 ms down to 161 ms for a
+signature. SLH-DSA-SHA2-192s remains slow in absolute terms at 1.7 seconds and
+no backend makes a hash-based signature cheap; it is 2.5x rather than fast.
+
+Neither column is a side-channel claim. See
+[THREAT-MODEL.md](THREAT-MODEL.md).
 
 ## Signatures
 

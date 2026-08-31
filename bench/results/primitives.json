@@ -15,435 +15,723 @@
       "op": "keygen",
       "iterations": 100,
       "ms": {
-        "min": 0.2619,
-        "median": 0.3384,
-        "p95": 0.9693,
-        "p99": 1.2771,
-        "max": 1.3273,
-        "mean": 0.45
+        "min": 0.2595,
+        "median": 0.4863,
+        "p95": 0.7337,
+        "p99": 0.8575,
+        "max": 2.1335,
+        "mean": 0.4663
       },
-      "opsPerSec": 2222,
-      "heapPerOpBytes": 11965
+      "opsPerSec": 2145,
+      "heapPerOpBytes": 11767
     },
     {
       "alg": "ML-KEM-512",
       "op": "encapsulate",
       "iterations": 100,
       "ms": {
-        "min": 0.3019,
-        "median": 0.5124,
-        "p95": 1.0433,
-        "p99": 1.6169,
-        "max": 1.7877,
-        "mean": 0.5812
+        "min": 0.2969,
+        "median": 0.3777,
+        "p95": 0.7135,
+        "p99": 1.008,
+        "max": 1.3851,
+        "mean": 0.4134
       },
-      "opsPerSec": 1720,
-      "heapPerOpBytes": 17316
+      "opsPerSec": 2419,
+      "heapPerOpBytes": 18020
     },
     {
       "alg": "ML-KEM-512",
       "op": "decapsulate",
       "iterations": 100,
       "ms": {
-        "min": 0.4428,
-        "median": 0.8453,
-        "p95": 2.1332,
-        "p99": 2.5606,
-        "max": 2.9376,
-        "mean": 1.0365
+        "min": 0.3742,
+        "median": 0.461,
+        "p95": 1.1472,
+        "p99": 1.4984,
+        "max": 6.2754,
+        "mean": 0.6116
       },
-      "opsPerSec": 965,
-      "heapPerOpBytes": 8721
+      "opsPerSec": 1635,
+      "heapPerOpBytes": 8889
     },
     {
       "alg": "ML-KEM-768",
       "op": "keygen",
       "iterations": 100,
       "ms": {
-        "min": 0.4225,
-        "median": 0.6455,
-        "p95": 1.3566,
-        "p99": 1.7569,
-        "max": 1.787,
-        "mean": 0.7443
+        "min": 0.3809,
+        "median": 0.4559,
+        "p95": 1.1284,
+        "p99": 1.3928,
+        "max": 2.075,
+        "mean": 0.5616
       },
-      "opsPerSec": 1344,
-      "heapPerOpBytes": 11675
+      "opsPerSec": 1781,
+      "heapPerOpBytes": 11747
     },
     {
       "alg": "ML-KEM-768",
       "op": "encapsulate",
       "iterations": 100,
       "ms": {
-        "min": 0.4716,
-        "median": 0.8224,
-        "p95": 2.0502,
-        "p99": 5.0666,
-        "max": 5.382,
-        "mean": 1.0302
+        "min": 0.46,
+        "median": 0.5579,
+        "p95": 1.0583,
+        "p99": 1.2875,
+        "max": 1.5009,
+        "mean": 0.6575
       },
-      "opsPerSec": 971,
-      "heapPerOpBytes": 13021
+      "opsPerSec": 1521,
+      "heapPerOpBytes": 12615
     },
     {
       "alg": "ML-KEM-768",
       "op": "decapsulate",
       "iterations": 100,
       "ms": {
-        "min": 0.6652,
-        "median": 1.2915,
-        "p95": 2.7497,
-        "p99": 4.0478,
-        "max": 5.5877,
-        "mean": 1.4842
+        "min": 0.6192,
+        "median": 0.8743,
+        "p95": 1.8681,
+        "p99": 5.3784,
+        "max": 6.2704,
+        "mean": 1.0659
       },
-      "opsPerSec": 674,
-      "heapPerOpBytes": 2010
+      "opsPerSec": 938,
+      "heapPerOpBytes": 2319
     },
     {
       "alg": "ML-KEM-1024",
       "op": "keygen",
       "iterations": 100,
       "ms": {
-        "min": 0.584,
-        "median": 1.062,
-        "p95": 2.0434,
-        "p99": 2.7764,
-        "max": 3.7543,
-        "mean": 1.1626
+        "min": 0.5849,
+        "median": 1.1138,
+        "p95": 2.1921,
+        "p99": 3.4855,
+        "max": 3.7466,
+        "mean": 1.2253
       },
-      "opsPerSec": 860,
-      "heapPerOpBytes": 20563
+      "opsPerSec": 816,
+      "heapPerOpBytes": 20983
     },
     {
       "alg": "ML-KEM-1024",
       "op": "encapsulate",
       "iterations": 100,
       "ms": {
-        "min": 0.6711,
-        "median": 1.0661,
-        "p95": 1.9021,
-        "p99": 10.8438,
-        "max": 43.2517,
-        "mean": 1.5593
+        "min": 0.662,
+        "median": 0.7077,
+        "p95": 1.3495,
+        "p99": 1.9865,
+        "max": 2.463,
+        "mean": 0.8356
       },
-      "opsPerSec": 641,
-      "heapPerOpBytes": 6138
+      "opsPerSec": 1197,
+      "heapPerOpBytes": 5451
     },
     {
       "alg": "ML-KEM-1024",
       "op": "decapsulate",
       "iterations": 100,
       "ms": {
-        "min": 0.8101,
-        "median": 0.9166,
-        "p95": 1.8131,
-        "p99": 2.1688,
-        "max": 2.4818,
-        "mean": 1.0892
+        "min": 0.8053,
+        "median": 0.919,
+        "p95": 1.3856,
+        "p99": 1.6297,
+        "max": 1.9374,
+        "mean": 1.0037
       },
-      "opsPerSec": 918,
-      "heapPerOpBytes": 18879
+      "opsPerSec": 996,
+      "heapPerOpBytes": 18247
     },
     {
       "alg": "ML-DSA-44",
       "op": "keygen",
       "iterations": 100,
       "ms": {
-        "min": 1.0251,
-        "median": 1.6951,
-        "p95": 2.8466,
-        "p99": 3.3168,
-        "max": 8.1669,
-        "mean": 1.8364
+        "min": 1.0114,
+        "median": 1.1226,
+        "p95": 1.6683,
+        "p99": 1.7393,
+        "max": 2.9059,
+        "mean": 1.2196
       },
-      "opsPerSec": 545,
-      "heapPerOpBytes": 7865
+      "opsPerSec": 820,
+      "heapPerOpBytes": 6910
     },
     {
       "alg": "ML-DSA-44",
       "op": "sign (hedged)",
       "iterations": 100,
       "ms": {
-        "min": 2.2405,
-        "median": 8.8803,
-        "p95": 24.1041,
-        "p99": 30.1926,
-        "max": 55.0393,
-        "mean": 10.9615
+        "min": 2.1949,
+        "median": 5.1157,
+        "p95": 17.695,
+        "p99": 21.3254,
+        "max": 27.5246,
+        "mean": 7.1314
       },
-      "opsPerSec": 91,
-      "heapPerOpBytes": 13278
+      "opsPerSec": 140,
+      "heapPerOpBytes": 12624
     },
     {
       "alg": "ML-DSA-44",
       "op": "verify",
       "iterations": 100,
       "ms": {
-        "min": 1.1814,
-        "median": 1.5542,
-        "p95": 3.0002,
-        "p99": 3.6503,
-        "max": 3.965,
-        "mean": 1.8109
+        "min": 1.1752,
+        "median": 1.3734,
+        "p95": 2.2883,
+        "p99": 2.4506,
+        "max": 3.6986,
+        "mean": 1.5245
       },
-      "opsPerSec": 552,
-      "heapPerOpBytes": 2185
+      "opsPerSec": 656,
+      "heapPerOpBytes": 1408
     },
     {
       "alg": "ML-DSA-65",
       "op": "keygen",
       "iterations": 100,
       "ms": {
-        "min": 1.7479,
-        "median": 3.3939,
-        "p95": 9.0577,
-        "p99": 11.6988,
-        "max": 14.9731,
-        "mean": 4.2033
+        "min": 1.7374,
+        "median": 1.947,
+        "p95": 3.1942,
+        "p99": 3.7933,
+        "max": 4.236,
+        "mean": 2.1177
       },
-      "opsPerSec": 238,
-      "heapPerOpBytes": 12878
+      "opsPerSec": 472,
+      "heapPerOpBytes": 11756
     },
     {
       "alg": "ML-DSA-65",
       "op": "sign (hedged)",
       "iterations": 100,
       "ms": {
-        "min": 3.6321,
-        "median": 11.3081,
-        "p95": 36.7515,
-        "p99": 51.0836,
-        "max": 69.1857,
-        "mean": 15.6119
+        "min": 3.2973,
+        "median": 8.0739,
+        "p95": 31.5441,
+        "p99": 40.8399,
+        "max": 46.1403,
+        "mean": 11.8245
       },
-      "opsPerSec": 64,
-      "heapPerOpBytes": 21022
+      "opsPerSec": 85,
+      "heapPerOpBytes": 15928
     },
     {
       "alg": "ML-DSA-65",
       "op": "verify",
       "iterations": 100,
       "ms": {
-        "min": 1.8766,
-        "median": 3.4557,
-        "p95": 5.0325,
-        "p99": 5.5534,
-        "max": 5.961,
-        "mean": 3.4767
+        "min": 1.841,
+        "median": 2.2495,
+        "p95": 3.2426,
+        "p99": 3.8031,
+        "max": 3.87,
+        "mean": 2.3612
       },
-      "opsPerSec": 288,
-      "heapPerOpBytes": 4192
+      "opsPerSec": 424,
+      "heapPerOpBytes": 3438
     },
     {
       "alg": "ML-DSA-87",
       "op": "keygen",
       "iterations": 100,
       "ms": {
-        "min": 2.7168,
-        "median": 5.2255,
-        "p95": 8.2702,
-        "p99": 9.6352,
-        "max": 9.8122,
-        "mean": 5.1533
+        "min": 2.7107,
+        "median": 3.0453,
+        "p95": 4.5007,
+        "p99": 4.8812,
+        "max": 4.9352,
+        "mean": 3.2184
       },
-      "opsPerSec": 194,
-      "heapPerOpBytes": 3274
+      "opsPerSec": 311,
+      "heapPerOpBytes": 2843
     },
     {
       "alg": "ML-DSA-87",
       "op": "sign (hedged)",
       "iterations": 100,
       "ms": {
-        "min": 4.9076,
-        "median": 13.148,
-        "p95": 33.9319,
-        "p99": 42.3813,
-        "max": 66.6158,
-        "mean": 16.1755
+        "min": 5.2339,
+        "median": 11.0311,
+        "p95": 30.2184,
+        "p99": 39.4035,
+        "max": 42.5299,
+        "mean": 13.833
       },
-      "opsPerSec": 62,
-      "heapPerOpBytes": 11400
+      "opsPerSec": 72,
+      "heapPerOpBytes": 5250
     },
     {
       "alg": "ML-DSA-87",
       "op": "verify",
       "iterations": 100,
       "ms": {
-        "min": 2.9402,
-        "median": 4.8774,
-        "p95": 11.119,
-        "p99": 21.7599,
-        "max": 30.8854,
-        "mean": 5.9785
+        "min": 2.9025,
+        "median": 3.3634,
+        "p95": 5.3181,
+        "p99": 5.8427,
+        "max": 6.4939,
+        "mean": 3.6953
       },
-      "opsPerSec": 167,
-      "heapPerOpBytes": 32172
+      "opsPerSec": 271,
+      "heapPerOpBytes": 32341
     },
     {
       "alg": "SLH-DSA-SHA2-128f",
       "op": "keygen",
       "iterations": 20,
       "ms": {
-        "min": 6.2598,
-        "median": 8.005,
-        "p95": 29.1225,
-        "p99": 41.2223,
-        "max": 41.2223,
-        "mean": 11.8985
+        "min": 3.5277,
+        "median": 4.3512,
+        "p95": 9.7914,
+        "p99": 18.898,
+        "max": 18.898,
+        "mean": 5.7246
       },
-      "opsPerSec": 84,
-      "heapPerOpBytes": 143037
+      "opsPerSec": 175,
+      "heapPerOpBytes": 146546
     },
     {
       "alg": "SLH-DSA-SHA2-128f",
       "op": "sign",
       "iterations": 20,
       "ms": {
-        "min": 106.7631,
-        "median": 151.319,
-        "p95": 194.9154,
-        "p99": 205.8806,
-        "max": 205.8806,
-        "mean": 151.4699
+        "min": 90.0301,
+        "median": 97.7911,
+        "p95": 150.0272,
+        "p99": 173.466,
+        "max": 173.466,
+        "mean": 109.8994
       },
-      "opsPerSec": 7,
-      "heapPerOpBytes": 169888
+      "opsPerSec": 9,
+      "heapPerOpBytes": 127707
     },
     {
       "alg": "SLH-DSA-SHA2-128f",
       "op": "verify",
       "iterations": 20,
       "ms": {
-        "min": 5.5458,
-        "median": 6.4116,
-        "p95": 10.6719,
-        "p99": 30.2979,
-        "max": 30.2979,
-        "mean": 8.2408
+        "min": 5.399,
+        "median": 6.0823,
+        "p95": 11.019,
+        "p99": 27.2779,
+        "max": 27.2779,
+        "mean": 7.5982
       },
-      "opsPerSec": 121,
-      "heapPerOpBytes": 145169
+      "opsPerSec": 132,
+      "heapPerOpBytes": 50541
     },
     {
       "alg": "SLH-DSA-SHA2-192s",
       "op": "keygen",
       "iterations": 3,
       "ms": {
-        "min": 446.0735,
-        "median": 609.4932,
-        "p95": 724.7095,
-        "p99": 724.7095,
-        "max": 724.7095,
-        "mean": 593.4254
+        "min": 402.4967,
+        "median": 407.3001,
+        "p95": 492.8769,
+        "p99": 492.8769,
+        "max": 492.8769,
+        "mean": 434.2246
       },
       "opsPerSec": 2,
-      "heapPerOpBytes": 192283
+      "heapPerOpBytes": 331728
     },
     {
       "alg": "SLH-DSA-SHA2-192s",
       "op": "sign",
       "iterations": 3,
       "ms": {
-        "min": 6603.2894,
-        "median": 6788.8604,
-        "p95": 7229.2095,
-        "p99": 7229.2095,
-        "max": 7229.2095,
-        "mean": 6873.7864
+        "min": 4086.7804,
+        "median": 4342.1045,
+        "p95": 4628.9867,
+        "p99": 4628.9867,
+        "max": 4628.9867,
+        "mean": 4352.6239
       },
       "opsPerSec": 0,
-      "heapPerOpBytes": 674829
+      "heapPerOpBytes": 2096781
     },
     {
       "alg": "SLH-DSA-SHA2-192s",
       "op": "verify",
       "iterations": 10,
       "ms": {
-        "min": 3.3491,
-        "median": 4.997,
-        "p95": 62.2871,
-        "p99": 62.2871,
-        "max": 62.2871,
-        "mean": 11.2117
+        "min": 5.9026,
+        "median": 7.4565,
+        "p95": 40.9199,
+        "p99": 40.9199,
+        "max": 40.9199,
+        "mean": 13.2556
       },
-      "opsPerSec": 89,
-      "heapPerOpBytes": 114230
+      "opsPerSec": 75,
+      "heapPerOpBytes": 607924
     },
     {
       "alg": "SLH-DSA-SHAKE-256f",
       "op": "keygen",
       "iterations": 5,
       "ms": {
-        "min": 97.9559,
-        "median": 102.0075,
-        "p95": 175.0322,
-        "p99": 175.0322,
-        "max": 175.0322,
-        "mean": 124.6037
+        "min": 94.6857,
+        "median": 105.111,
+        "p95": 116.1289,
+        "p99": 116.1289,
+        "max": 116.1289,
+        "mean": 106.5593
       },
-      "opsPerSec": 8,
-      "heapPerOpBytes": 863771
+      "opsPerSec": 9,
+      "heapPerOpBytes": 863658
     },
     {
       "alg": "SLH-DSA-SHAKE-256f",
       "op": "sign",
       "iterations": 5,
       "ms": {
-        "min": 2468.8182,
-        "median": 3333.1947,
-        "p95": 3786.2711,
-        "p99": 3786.2711,
-        "max": 3786.2711,
-        "mean": 3139.6925
+        "min": 1996.573,
+        "median": 2158.2719,
+        "p95": 3510.5027,
+        "p99": 3510.5027,
+        "max": 3510.5027,
+        "mean": 2385.4442
       },
       "opsPerSec": 0,
-      "heapPerOpBytes": 1139381
+      "heapPerOpBytes": 1135402
     },
     {
       "alg": "SLH-DSA-SHAKE-256f",
       "op": "verify",
       "iterations": 10,
       "ms": {
-        "min": 61.9797,
-        "median": 72.2193,
-        "p95": 86.7791,
-        "p99": 86.7791,
-        "max": 86.7791,
-        "mean": 73.3268
+        "min": 52.9202,
+        "median": 66.1769,
+        "p95": 98.6539,
+        "p99": 98.6539,
+        "max": 98.6539,
+        "mean": 67.2606
       },
-      "opsPerSec": 14,
-      "heapPerOpBytes": 25974
+      "opsPerSec": 15,
+      "heapPerOpBytes": 90703
+    },
+    {
+      "alg": "ML-DSA-44",
+      "backend": "openssl",
+      "op": "sign",
+      "iterations": 100,
+      "ms": {
+        "min": 0.456,
+        "median": 1.1247,
+        "p95": 3.731,
+        "p99": 4.6188,
+        "max": 6.3028,
+        "mean": 1.4872
+      },
+      "opsPerSec": 672,
+      "heapPerOpBytes": 6487
+    },
+    {
+      "alg": "ML-DSA-44",
+      "backend": "openssl",
+      "op": "verify",
+      "iterations": 100,
+      "ms": {
+        "min": 0.1731,
+        "median": 0.2413,
+        "p95": 0.5081,
+        "p99": 0.7245,
+        "max": 0.7303,
+        "mean": 0.2901
+      },
+      "opsPerSec": 3447,
+      "heapPerOpBytes": 5632
+    },
+    {
+      "alg": "ML-DSA-65",
+      "backend": "openssl",
+      "op": "sign",
+      "iterations": 100,
+      "ms": {
+        "min": 0.5705,
+        "median": 1.2927,
+        "p95": 3.9228,
+        "p99": 4.5618,
+        "max": 7.1567,
+        "mean": 1.6652
+      },
+      "opsPerSec": 601,
+      "heapPerOpBytes": 6154
+    },
+    {
+      "alg": "ML-DSA-65",
+      "backend": "openssl",
+      "op": "verify",
+      "iterations": 100,
+      "ms": {
+        "min": 0.2404,
+        "median": 0.2879,
+        "p95": 0.5114,
+        "p99": 0.6518,
+        "max": 1.1357,
+        "mean": 0.3341
+      },
+      "opsPerSec": 2993,
+      "heapPerOpBytes": 5527
+    },
+    {
+      "alg": "ML-DSA-87",
+      "backend": "openssl",
+      "op": "sign",
+      "iterations": 100,
+      "ms": {
+        "min": 0.8276,
+        "median": 1.8795,
+        "p95": 5.0764,
+        "p99": 7.1282,
+        "max": 7.5407,
+        "mean": 2.1582
+      },
+      "opsPerSec": 463,
+      "heapPerOpBytes": 5903
+    },
+    {
+      "alg": "ML-DSA-87",
+      "backend": "openssl",
+      "op": "verify",
+      "iterations": 100,
+      "ms": {
+        "min": 0.3449,
+        "median": 0.6129,
+        "p95": 1.1809,
+        "p99": 1.8306,
+        "max": 2.2546,
+        "mean": 0.6449
+      },
+      "opsPerSec": 1551,
+      "heapPerOpBytes": 5514
+    },
+    {
+      "alg": "SLH-DSA-SHA2-128f",
+      "backend": "openssl",
+      "op": "sign",
+      "iterations": 20,
+      "ms": {
+        "min": 43.2725,
+        "median": 68.6393,
+        "p95": 160.4155,
+        "p99": 165.0916,
+        "max": 165.0916,
+        "mean": 78.713
+      },
+      "opsPerSec": 13,
+      "heapPerOpBytes": 3566
+    },
+    {
+      "alg": "SLH-DSA-SHA2-128f",
+      "backend": "openssl",
+      "op": "verify",
+      "iterations": 20,
+      "ms": {
+        "min": 2.475,
+        "median": 3.4586,
+        "p95": 4.0204,
+        "p99": 4.3026,
+        "max": 4.3026,
+        "mean": 3.4773
+      },
+      "opsPerSec": 288,
+      "heapPerOpBytes": 5103
+    },
+    {
+      "alg": "SLH-DSA-SHA2-192s",
+      "backend": "openssl",
+      "op": "sign",
+      "iterations": 3,
+      "ms": {
+        "min": 1615.5494,
+        "median": 1710.9544,
+        "p95": 1938.7729,
+        "p99": 1938.7729,
+        "max": 1938.7729,
+        "mean": 1755.0922
+      },
+      "opsPerSec": 1,
+      "heapPerOpBytes": 4016
+    },
+    {
+      "alg": "SLH-DSA-SHA2-192s",
+      "backend": "openssl",
+      "op": "verify",
+      "iterations": 10,
+      "ms": {
+        "min": 1.211,
+        "median": 1.2628,
+        "p95": 2.4048,
+        "p99": 2.4048,
+        "max": 2.4048,
+        "mean": 1.4163
+      },
+      "opsPerSec": 706,
+      "heapPerOpBytes": 5190
+    },
+    {
+      "alg": "SLH-DSA-SHAKE-256f",
+      "backend": "openssl",
+      "op": "sign",
+      "iterations": 5,
+      "ms": {
+        "min": 150.6063,
+        "median": 161.3584,
+        "p95": 179.6554,
+        "p99": 179.6554,
+        "max": 179.6554,
+        "mean": 163.7263
+      },
+      "opsPerSec": 6,
+      "heapPerOpBytes": 3851
+    },
+    {
+      "alg": "SLH-DSA-SHAKE-256f",
+      "backend": "openssl",
+      "op": "verify",
+      "iterations": 10,
+      "ms": {
+        "min": 3.7371,
+        "median": 5.5995,
+        "p95": 6.7743,
+        "p99": 6.7743,
+        "max": 6.7743,
+        "mean": 5.2583
+      },
+      "opsPerSec": 190,
+      "heapPerOpBytes": 5190
+    },
+    {
+      "alg": "ML-KEM-512",
+      "backend": "openssl",
+      "op": "encapsulate",
+      "iterations": 100,
+      "ms": {
+        "min": 0.0725,
+        "median": 0.0789,
+        "p95": 0.1451,
+        "p99": 0.2125,
+        "max": 0.3471,
+        "mean": 0.0927
+      },
+      "opsPerSec": 10782,
+      "heapPerOpBytes": 5677
+    },
+    {
+      "alg": "ML-KEM-512",
+      "backend": "openssl",
+      "op": "decapsulate",
+      "iterations": 100,
+      "ms": {
+        "min": 0.1365,
+        "median": 0.2359,
+        "p95": 0.3155,
+        "p99": 0.3798,
+        "max": 0.3818,
+        "mean": 0.2142
+      },
+      "opsPerSec": 4668,
+      "heapPerOpBytes": 5768
+    },
+    {
+      "alg": "ML-KEM-768",
+      "backend": "openssl",
+      "op": "encapsulate",
+      "iterations": 100,
+      "ms": {
+        "min": 0.0914,
+        "median": 0.1483,
+        "p95": 0.1911,
+        "p99": 0.2556,
+        "max": 0.4503,
+        "mean": 0.1511
+      },
+      "opsPerSec": 6618,
+      "heapPerOpBytes": 5591
+    },
+    {
+      "alg": "ML-KEM-768",
+      "backend": "openssl",
+      "op": "decapsulate",
+      "iterations": 100,
+      "ms": {
+        "min": 0.1704,
+        "median": 0.1834,
+        "p95": 0.3907,
+        "p99": 0.5228,
+        "max": 1.2703,
+        "mean": 0.2281
+      },
+      "opsPerSec": 4384,
+      "heapPerOpBytes": 6099
+    },
+    {
+      "alg": "ML-KEM-1024",
+      "backend": "openssl",
+      "op": "encapsulate",
+      "iterations": 100,
+      "ms": {
+        "min": 0.1126,
+        "median": 0.1259,
+        "p95": 0.2554,
+        "p99": 0.2783,
+        "max": 0.3108,
+        "mean": 0.1515
+      },
+      "opsPerSec": 6603,
+      "heapPerOpBytes": 5446
+    },
+    {
+      "alg": "ML-KEM-1024",
+      "backend": "openssl",
+      "op": "decapsulate",
+      "iterations": 100,
+      "ms": {
+        "min": 0.2211,
+        "median": 0.23,
+        "p95": 0.2946,
+        "p99": 0.3393,
+        "max": 0.3749,
+        "mean": 0.2408
+      },
+      "opsPerSec": 4153,
+      "heapPerOpBytes": 5957
     },
     {
       "alg": "ML-DSA-65",
       "op": "wrapper keypairFromMaster",
       "iterations": 100,
       "ms": {
-        "min": 2.3696,
-        "median": 3.945,
-        "p95": 7.1884,
-        "p99": 9.0135,
-        "max": 10.3327,
-        "mean": 4.4144
+        "min": 1.7917,
+        "median": 2.4736,
+        "p95": 4.3373,
+        "p99": 4.6728,
+        "max": 5.2623,
+        "mean": 2.6933
       },
-      "opsPerSec": 227,
-      "heapPerOpBytes": 15838
+      "opsPerSec": 371,
+      "heapPerOpBytes": 11282
     },
     {
       "alg": "ML-KEM-768",
       "op": "wrapper keypairFromMaster",
       "iterations": 100,
       "ms": {
-        "min": 0.5302,
-        "median": 1.1289,
-        "p95": 2.6881,
-        "p99": 4.3111,
-        "max": 4.9928,
-        "mean": 1.3663
+        "min": 0.5233,
+        "median": 0.9723,
+        "p95": 2.0955,
+        "p99": 2.1599,
+        "max": 2.6404,
+        "mean": 0.9946
       },
-      "opsPerSec": 732,
-      "heapPerOpBytes": 48274
+      "opsPerSec": 1005,
+      "heapPerOpBytes": 10342
     }
   ]
 }
