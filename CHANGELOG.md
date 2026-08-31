@@ -1,5 +1,44 @@
 # Changelog
 
+## 1.4.1
+
+Evidence and documentation only. **No `src/` module changed**, no export was
+added or removed, and the dependency set is unchanged, so no call site can
+behave differently than it did on 1.4.0.
+
+**liboqs is now a third interop implementation.** The cross-implementation
+matrix ran against two peers and now runs against three: liboqs 0.16.0 (C),
+Bouncy Castle 1.85.2 (Java) and dilithium-py 1.4.0 / kyber-py 1.2.0 (Python).
+**225 checks passed, 0 failed, 42 not applicable, across 38 rows**, up from
+156/0/10 across 24. The previous figures are reproduced exactly when the new
+peer is excluded, so nothing about the existing evidence moved.
+
+SLH-DSA had one peer and now has two. liboqs runs from a container built from
+source at a tag pinned in `peers-lock.json`, and CI builds it, so the version
+tested is the version named.
+
+A peer that cannot do something now records as not-applicable rather than as a
+disagreement. The 42 not-applicable are itemised in CONFORMANCE.md: ten from our
+own hedged signing, thirty-two from two liboqs API limits.
+
+**AUDIT.md corrections.** The reviewer checklist told anyone doing due diligence
+to fetch an endpoint that returns 500. Verification now goes to Armature L1 over
+public JSON-RPC, with the calldata layout documented and a named article page
+for the other half of the join. Both documented commands were run verbatim
+against production before publishing.
+
+Two false claims in the same file are withdrawn. It said we pin
+`@noble/post-quantum@0.6.1`, "the exact version covered by the maintainer's own
+self-audit"; we ship `0.7.0`, the self-audit covers `0.6.1`, and **the version we
+ship is covered by no audit at all**. It also described the dependency as
+"itself audited", contradicting its own section 1.
+
+**Supply chain.** Each release now publishes its CycloneDX SBOM as a GitHub
+Release asset at `releases/download/<tag>/sbom.cyclonedx.json`, a permanent
+unauthenticated URL. It was previously generated but retained only as an
+expiring Actions artifact, which is not a published SBOM. The dependency policy
+is now stated in SECURITY.md rather than living only in `dependabot.yml`.
+
 ## 1.4.0
 
 Adds the Security Category 5 parameter sets, and publishes conformance and
