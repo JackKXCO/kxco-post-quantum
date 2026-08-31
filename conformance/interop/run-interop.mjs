@@ -9,6 +9,7 @@
 // Peers:
 //   bouncycastle  Bouncy Castle bcprov (Java)          ML-DSA, ML-KEM, SLH-DSA
 //   python        dilithium-py + kyber-py (Python)     ML-DSA, ML-KEM
+//   liboqs        liboqs (C, containerised)            ML-DSA, ML-KEM, SLH-DSA
 //
 // Per parameter set and peer:
 //   1  key agreement   same seed, same public key bytes in both stacks
@@ -77,6 +78,17 @@ const SETS = [
 // Keys are addressed by seed throughout, not by encoded private key: the
 // seed-form encoding differs between libraries while the seed itself is fixed by
 // FIPS 203 / FIPS 204, so it is the portable handle.
+//
+// Capability gaps are declared by each peer at run time, in its reply, rather
+// than mirrored here: a peer that cannot honour a request answers `unsupported`
+// and the matrix records N/A. The one exception is deterministic signing, which
+// has to be known before the request is made because it changes what a matching
+// result would even mean.
+//
+// Signing requests carry both a seed and an encoded secret key, and each peer
+// takes the handle it supports. liboqs has no seed-derived keygen, so it uses
+// the encoded key; that still tests something real, because the FIPS 203 and
+// FIPS 204 private key encodings are themselves standardised.
 const PEERS = {
   bouncycastle: {
     supports: () => true,
@@ -84,6 +96,10 @@ const PEERS = {
   python: {
     // No maintained pure-Python SLH-DSA implementation was available to pin.
     supports: (alg) => alg.startsWith('ML-'),
+  },
+  liboqs: {
+    supports: () => true,
+    deterministicSigning: false,
   },
 }
 
@@ -248,7 +264,21 @@ function preparePython() {
   return { cmd: py, args: [...pyArgs, join(HERE, 'peers', 'python-peer.py')] }
 }
 
-const PREPARE = { bouncycastle: prepareBouncyCastle, python: preparePython }
+// liboqs needs a C toolchain, so it runs in a container rather than making every
+// contributor install one. The image is built from peers/liboqs.Dockerfile; if it
+// is absent the peer reports unavailable, which is not a failure but is also not
+// evidence.
+function prepareLiboqs() {
+  const image = lock.liboqs.image
+  execFileSync('docker', ['image', 'inspect', image], { stdio: 'pipe' })
+  return { cmd: 'docker', args: ['run', '--rm', '-i', image] }
+}
+
+const PREPARE = {
+  bouncycastle: prepareBouncyCastle,
+  python: preparePython,
+  liboqs: prepareLiboqs,
+}
 
 // ------------------------------------------------------------------- the matrix
 
@@ -261,6 +291,13 @@ const report = {
 }
 
 let failures = 0
+
+// A peer that cannot do something is not a peer that disagrees with us. It
+// answers `unsupported`, and that records as N/A rather than counting against
+// the matrix. Any other error is a real failure.
+function gap(res) {
+  return res.unsupported === true
+}
 
 function record(row) {
   report.rows.push(row)
@@ -322,9 +359,13 @@ async function runSignatureSet(peerName, peer, set, path) {
         ok: hex(local.publicKey) === theirs.publicKey,
         detail: `ours ${hex(local.publicKey).slice(0, 24)} theirs ${String(theirs.publicKey).slice(0, 24)}`,
       }
-    : { ok: false, detail: theirs.error }
+    : gap(theirs)
+      ? { ok: null, detail: `not applicable: ${theirs.error}` }
+      : { ok: false, detail: theirs.error }
 
-  if (!checks.keys.ok) {
+  // A peer that cannot derive from a seed still has to interoperate on every
+  // other check, so only a real disagreement stops the row here.
+  if (checks.keys.ok === false) {
     record({ peer: peerName, alg: set.alg, path, checks })
     return
   }
@@ -345,18 +386,23 @@ async function runSignatureSet(peerName, peer, set, path) {
     })
     checks[`ours>theirs${suffix}`] = theirVerify.ok
       ? { ok: theirVerify.valid === true, detail: `peer returned valid=${theirVerify.valid}` }
-      : { ok: false, detail: theirVerify.error }
+      : gap(theirVerify)
+        ? { ok: null, detail: `not applicable: ${theirVerify.error}` }
+        : { ok: false, detail: theirVerify.error }
 
     const theirSign = await peer.request({
       op: 'sign',
       alg: set.alg,
       seed: hex(seed),
+      secretKey: hex(local.secretKey),
       message: hex(message),
       context: hex(ctx),
       deterministic: true,
     })
     if (!theirSign.ok) {
-      checks[`theirs>ours${suffix}`] = { ok: false, detail: theirSign.error }
+      checks[`theirs>ours${suffix}`] = gap(theirSign)
+        ? { ok: null, detail: `not applicable: ${theirSign.error}` }
+        : { ok: false, detail: theirSign.error }
       checks[`bytes${suffix}`] = { ok: null, detail: 'peer could not sign' }
     } else {
       const theirSig = bytes(theirSign.signature)
@@ -367,6 +413,8 @@ async function runSignatureSet(peerName, peer, set, path) {
       checks[`bytes${suffix}`] =
         path === 'wrapper'
           ? { ok: null, detail: 'not applicable: the wrapper signs hedged, so signatures are not reproducible' }
+          : PEERS[peerName].deterministicSigning === false
+          ? { ok: null, detail: 'not applicable: the peer signs hedged and exposes no deterministic mode' }
           : {
               ok: hex(ourSig) === theirSign.signature,
               detail: `deterministic signatures differ (ours ${hex(ourSig).slice(0, 20)}, theirs ${theirSign.signature.slice(0, 20)})`,
@@ -386,7 +434,9 @@ async function runSignatureSet(peerName, peer, set, path) {
     })
     checks[`tamper${suffix}`] = theirReject.ok
       ? { ok: theirReject.valid === false, detail: 'peer accepted a tampered signature' }
-      : { ok: true, detail: `peer rejected with an error: ${theirReject.error}` }
+      : gap(theirReject)
+        ? { ok: null, detail: `not applicable: ${theirReject.error}` }
+        : { ok: true, detail: `peer rejected with an error: ${theirReject.error}` }
   }
 
   record({ peer: peerName, alg: set.alg, path, checks })
@@ -402,9 +452,11 @@ async function runKemSet(peerName, peer, set, path) {
 
   checks.keys = theirs.ok
     ? { ok: hex(local.publicKey) === theirs.publicKey, detail: 'derived encapsulation keys differ' }
-    : { ok: false, detail: theirs.error }
+    : gap(theirs)
+      ? { ok: null, detail: `not applicable: ${theirs.error}` }
+      : { ok: false, detail: theirs.error }
 
-  if (!checks.keys.ok) {
+  if (checks.keys.ok === false) {
     record({ peer: peerName, alg: set.alg, path, checks })
     return
   }
@@ -417,11 +469,14 @@ async function runKemSet(peerName, peer, set, path) {
     op: 'decapsulate',
     alg: set.alg,
     seed: hex(seed),
+    secretKey: hex(local.secretKey),
     ciphertext: hex(ourCt),
   })
   checks['ours>theirs'] = theirDecap.ok
     ? { ok: theirDecap.sharedSecret === hex(ours.sharedSecret), detail: 'shared secrets differ' }
-    : { ok: false, detail: theirDecap.error }
+    : gap(theirDecap)
+      ? { ok: null, detail: `not applicable: ${theirDecap.error}` }
+      : { ok: false, detail: theirDecap.error }
 
   // They encapsulate with fixed entropy, we decapsulate.
   const theirEncap = await peer.request({
@@ -431,7 +486,9 @@ async function runKemSet(peerName, peer, set, path) {
     entropy: hex(entropy),
   })
   if (!theirEncap.ok) {
-    checks['theirs>ours'] = { ok: false, detail: theirEncap.error }
+    checks['theirs>ours'] = gap(theirEncap)
+      ? { ok: null, detail: `not applicable: ${theirEncap.error}` }
+      : { ok: false, detail: theirEncap.error }
   } else {
     const recovered =
       path === 'wrapper'
@@ -451,6 +508,7 @@ async function runKemSet(peerName, peer, set, path) {
     op: 'decapsulate',
     alg: set.alg,
     seed: hex(seed),
+    secretKey: hex(local.secretKey),
     ciphertext: hex(badCt),
   })
   checks.reject = theirBad.ok
@@ -458,7 +516,9 @@ async function runKemSet(peerName, peer, set, path) {
         ok: theirBad.sharedSecret !== hex(ours.sharedSecret),
         detail: 'peer returned the real shared secret for a corrupted ciphertext',
       }
-    : { ok: true, detail: `peer rejected with an error: ${theirBad.error}` }
+    : gap(theirBad)
+      ? { ok: null, detail: `not applicable: ${theirBad.error}` }
+      : { ok: true, detail: `peer rejected with an error: ${theirBad.error}` }
 
   record({ peer: peerName, alg: set.alg, path, checks })
 }

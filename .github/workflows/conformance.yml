@@ -2,7 +2,7 @@ name: conformance
 
 # Regenerates the published conformance evidence: NIST ACVP vectors for FIPS
 # 203/204/205, and the cross-implementation interoperability matrix against
-# Bouncy Castle (Java) and dilithium-py / kyber-py (Python).
+# liboqs (C), Bouncy Castle (Java) and dilithium-py / kyber-py (Python).
 #
 # This runs on every push and weekly, so CONFORMANCE.md describes what the code
 # does now rather than what it did on the day someone ran the harness by hand.
@@ -114,6 +114,16 @@ jobs:
         run: |
           python -m pip install --disable-pip-version-check \
             $(node -e "console.log(require('./conformance/interop/peers-lock.json').python.requirements.join(' '))")
+
+      # liboqs is C and is built from source into a container rather than
+      # installed, so the tag in peers-lock.json is what actually gets tested.
+      # Without this step the peer reports unavailable and the matrix silently
+      # drops fourteen rows, which would read as a smaller pass count rather
+      # than as a missing peer.
+      - name: Build the liboqs interop peer image
+        run: |
+          LOCK=conformance/interop/peers-lock.json
+          docker build             --build-arg LIBOQS_TAG=$(node -p "require('./$LOCK').liboqs.liboqs")             --build-arg LIBOQS_PYTHON_TAG=$(node -p "require('./$LOCK').liboqs.liboqs_python")             -f conformance/interop/peers/liboqs.Dockerfile             -t $(node -p "require('./$LOCK').liboqs.image")             conformance/interop/peers
 
       - name: Run interop matrix
         env:

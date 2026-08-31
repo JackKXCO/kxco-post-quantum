@@ -11,5 +11,12 @@
       "pycryptodome==3.23.0"
     ],
     "note": "Pure-Python FIPS 204 / FIPS 203 implementations. pycryptodome is required by kyber-py's seeded DRBG; without it kyber-py warns on stdout. Version pins are checked at run time; update them here deliberately, not silently."
+  },
+  "liboqs": {
+    "image": "kxco-interop-liboqs:0.16.0",
+    "dockerfile": "peers/liboqs.Dockerfile",
+    "liboqs": "0.16.0",
+    "liboqs_python": "0.16.0",
+    "note": "The reference C implementation, built from source in a container because liboqs needs a C toolchain. liboqs and its Python binding are version-locked to each other; a mismatch makes the binding clone a liboqs branch that does not exist. Rebuild with: docker build -f peers/liboqs.Dockerfile -t kxco-interop-liboqs:0.16.0 peers/"
   }
 }

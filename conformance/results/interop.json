@@ -1,7 +1,7 @@
 {
   "subject": {
     "package": "kxco-post-quantum",
-    "version": "1.3.0"
+    "version": "1.4.0"
   },
   "backend": {
     "@noble/hashes": "2.3.0",
@@ -24,7 +24,8 @@
       "available": true,
       "pinned": [
         "dilithium-py==1.4.0",
-        "kyber-py==1.2.0"
+        "kyber-py==1.2.0",
+        "pycryptodome==3.23.0"
       ],
       "name": "dilithium-py + kyber-py",
       "language": "Python",
@@ -37,6 +38,35 @@
         "ML-KEM-768"
       ],
       "python": "3.12.10"
+    },
+    "liboqs": {
+      "available": true,
+      "name": "liboqs",
+      "language": "C",
+      "algorithms": [
+        "ML-DSA-44",
+        "ML-DSA-65",
+        "ML-DSA-87",
+        "ML-KEM-1024",
+        "ML-KEM-512",
+        "ML-KEM-768",
+        "SLH-DSA-SHA2-128f",
+        "SLH-DSA-SHA2-128s",
+        "SLH-DSA-SHA2-192f",
+        "SLH-DSA-SHA2-192s",
+        "SLH-DSA-SHA2-256f",
+        "SLH-DSA-SHA2-256s",
+        "SLH-DSA-SHAKE-128f",
+        "SLH-DSA-SHAKE-128s",
+        "SLH-DSA-SHAKE-192f",
+        "SLH-DSA-SHAKE-192s",
+        "SLH-DSA-SHAKE-256f",
+        "SLH-DSA-SHAKE-256s"
+      ],
+      "derivesFromSeed": false,
+      "deterministicSigning": false,
+      "liboqs": "0.16.0",
+      "binding": "0.16.0"
     }
   },
   "rows": [
@@ -871,11 +901,513 @@
           "detail": "peer returned the real shared secret for a corrupted ciphertext"
         }
       }
+    },
+    {
+      "peer": "liboqs",
+      "alg": "ML-DSA-44",
+      "path": "backend",
+      "checks": {
+        "keys": {
+          "ok": null,
+          "detail": "not applicable: liboqs exposes no seed-derived keygen; address this peer by secretKey"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes": {
+          "ok": null,
+          "detail": "not applicable: the peer signs hedged and exposes no deterministic mode"
+        },
+        "tamper": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        },
+        "ours>theirs/ctx": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours/ctx": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes/ctx": {
+          "ok": null,
+          "detail": "not applicable: the peer signs hedged and exposes no deterministic mode"
+        },
+        "tamper/ctx": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        }
+      }
+    },
+    {
+      "peer": "liboqs",
+      "alg": "ML-DSA-65",
+      "path": "wrapper",
+      "checks": {
+        "keys": {
+          "ok": null,
+          "detail": "not applicable: liboqs exposes no seed-derived keygen; address this peer by secretKey"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes": {
+          "ok": null,
+          "detail": "not applicable: the wrapper signs hedged, so signatures are not reproducible"
+        },
+        "tamper": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        },
+        "ours>theirs/ctx": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours/ctx": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes/ctx": {
+          "ok": null,
+          "detail": "not applicable: the wrapper signs hedged, so signatures are not reproducible"
+        },
+        "tamper/ctx": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        }
+      }
+    },
+    {
+      "peer": "liboqs",
+      "alg": "ML-DSA-65",
+      "path": "backend",
+      "checks": {
+        "keys": {
+          "ok": null,
+          "detail": "not applicable: liboqs exposes no seed-derived keygen; address this peer by secretKey"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes": {
+          "ok": null,
+          "detail": "not applicable: the peer signs hedged and exposes no deterministic mode"
+        },
+        "tamper": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        },
+        "ours>theirs/ctx": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours/ctx": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes/ctx": {
+          "ok": null,
+          "detail": "not applicable: the peer signs hedged and exposes no deterministic mode"
+        },
+        "tamper/ctx": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        }
+      }
+    },
+    {
+      "peer": "liboqs",
+      "alg": "ML-DSA-87",
+      "path": "wrapper",
+      "checks": {
+        "keys": {
+          "ok": null,
+          "detail": "not applicable: liboqs exposes no seed-derived keygen; address this peer by secretKey"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes": {
+          "ok": null,
+          "detail": "not applicable: the wrapper signs hedged, so signatures are not reproducible"
+        },
+        "tamper": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        },
+        "ours>theirs/ctx": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours/ctx": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes/ctx": {
+          "ok": null,
+          "detail": "not applicable: the wrapper signs hedged, so signatures are not reproducible"
+        },
+        "tamper/ctx": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        }
+      }
+    },
+    {
+      "peer": "liboqs",
+      "alg": "ML-DSA-87",
+      "path": "backend",
+      "checks": {
+        "keys": {
+          "ok": null,
+          "detail": "not applicable: liboqs exposes no seed-derived keygen; address this peer by secretKey"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes": {
+          "ok": null,
+          "detail": "not applicable: the peer signs hedged and exposes no deterministic mode"
+        },
+        "tamper": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        },
+        "ours>theirs/ctx": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours/ctx": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes/ctx": {
+          "ok": null,
+          "detail": "not applicable: the peer signs hedged and exposes no deterministic mode"
+        },
+        "tamper/ctx": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        }
+      }
+    },
+    {
+      "peer": "liboqs",
+      "alg": "ML-KEM-512",
+      "path": "backend",
+      "checks": {
+        "keys": {
+          "ok": null,
+          "detail": "not applicable: liboqs exposes no seed-derived keygen; address this peer by secretKey"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "shared secrets differ"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we recovered a different shared secret than the peer sent"
+        },
+        "reject": {
+          "ok": true,
+          "detail": "peer returned the real shared secret for a corrupted ciphertext"
+        }
+      }
+    },
+    {
+      "peer": "liboqs",
+      "alg": "ML-KEM-768",
+      "path": "wrapper",
+      "checks": {
+        "keys": {
+          "ok": null,
+          "detail": "not applicable: liboqs exposes no seed-derived keygen; address this peer by secretKey"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "shared secrets differ"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we recovered a different shared secret than the peer sent"
+        },
+        "reject": {
+          "ok": true,
+          "detail": "peer returned the real shared secret for a corrupted ciphertext"
+        }
+      }
+    },
+    {
+      "peer": "liboqs",
+      "alg": "ML-KEM-768",
+      "path": "backend",
+      "checks": {
+        "keys": {
+          "ok": null,
+          "detail": "not applicable: liboqs exposes no seed-derived keygen; address this peer by secretKey"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "shared secrets differ"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we recovered a different shared secret than the peer sent"
+        },
+        "reject": {
+          "ok": true,
+          "detail": "peer returned the real shared secret for a corrupted ciphertext"
+        }
+      }
+    },
+    {
+      "peer": "liboqs",
+      "alg": "ML-KEM-1024",
+      "path": "wrapper",
+      "checks": {
+        "keys": {
+          "ok": null,
+          "detail": "not applicable: liboqs exposes no seed-derived keygen; address this peer by secretKey"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "shared secrets differ"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we recovered a different shared secret than the peer sent"
+        },
+        "reject": {
+          "ok": true,
+          "detail": "peer returned the real shared secret for a corrupted ciphertext"
+        }
+      }
+    },
+    {
+      "peer": "liboqs",
+      "alg": "ML-KEM-1024",
+      "path": "backend",
+      "checks": {
+        "keys": {
+          "ok": null,
+          "detail": "not applicable: liboqs exposes no seed-derived keygen; address this peer by secretKey"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "shared secrets differ"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we recovered a different shared secret than the peer sent"
+        },
+        "reject": {
+          "ok": true,
+          "detail": "peer returned the real shared secret for a corrupted ciphertext"
+        }
+      }
+    },
+    {
+      "peer": "liboqs",
+      "alg": "SLH-DSA-SHA2-128f",
+      "path": "backend",
+      "checks": {
+        "keys": {
+          "ok": null,
+          "detail": "not applicable: liboqs exposes no seed-derived keygen; address this peer by secretKey"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes": {
+          "ok": null,
+          "detail": "not applicable: the peer signs hedged and exposes no deterministic mode"
+        },
+        "tamper": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        },
+        "ours>theirs/ctx": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours/ctx": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes/ctx": {
+          "ok": null,
+          "detail": "not applicable: the peer signs hedged and exposes no deterministic mode"
+        },
+        "tamper/ctx": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        }
+      }
+    },
+    {
+      "peer": "liboqs",
+      "alg": "SLH-DSA-SHA2-192s",
+      "path": "wrapper",
+      "checks": {
+        "keys": {
+          "ok": null,
+          "detail": "not applicable: liboqs exposes no seed-derived keygen; address this peer by secretKey"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes": {
+          "ok": null,
+          "detail": "not applicable: the wrapper signs hedged, so signatures are not reproducible"
+        },
+        "tamper": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        },
+        "ours>theirs/ctx": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours/ctx": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes/ctx": {
+          "ok": null,
+          "detail": "not applicable: the wrapper signs hedged, so signatures are not reproducible"
+        },
+        "tamper/ctx": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        }
+      }
+    },
+    {
+      "peer": "liboqs",
+      "alg": "SLH-DSA-SHA2-192s",
+      "path": "backend",
+      "checks": {
+        "keys": {
+          "ok": null,
+          "detail": "not applicable: liboqs exposes no seed-derived keygen; address this peer by secretKey"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes": {
+          "ok": null,
+          "detail": "not applicable: the peer signs hedged and exposes no deterministic mode"
+        },
+        "tamper": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        },
+        "ours>theirs/ctx": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours/ctx": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes/ctx": {
+          "ok": null,
+          "detail": "not applicable: the peer signs hedged and exposes no deterministic mode"
+        },
+        "tamper/ctx": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        }
+      }
+    },
+    {
+      "peer": "liboqs",
+      "alg": "SLH-DSA-SHAKE-256f",
+      "path": "backend",
+      "checks": {
+        "keys": {
+          "ok": null,
+          "detail": "not applicable: liboqs exposes no seed-derived keygen; address this peer by secretKey"
+        },
+        "ours>theirs": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes": {
+          "ok": null,
+          "detail": "not applicable: the peer signs hedged and exposes no deterministic mode"
+        },
+        "tamper": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        },
+        "ours>theirs/ctx": {
+          "ok": true,
+          "detail": "peer returned valid=true"
+        },
+        "theirs>ours/ctx": {
+          "ok": true,
+          "detail": "we rejected a signature the peer produced"
+        },
+        "bytes/ctx": {
+          "ok": null,
+          "detail": "not applicable: the peer signs hedged and exposes no deterministic mode"
+        },
+        "tamper/ctx": {
+          "ok": true,
+          "detail": "peer accepted a tampered signature"
+        }
+      }
     }
   ],
   "totals": {
-    "passed": 156,
+    "passed": 225,
     "failed": 0,
-    "inconclusive": 10
+    "inconclusive": 42
   }
 }
