@@ -1,6 +1,6 @@
 # Audit Posture
 
-**Status as of v1.2.0 release (2026-07-22).** Self-attested. No third-party audit of this wrapper library has been performed yet. This document exists to make our posture **legible to reviewers** so the right questions get asked of the right party.
+**Status as of v1.4.0 release (2026-08-18).** Self-attested. No third-party audit of this wrapper library has been performed yet. This document exists to make our posture **legible to reviewers** so the right questions get asked of the right party.
 
 If you are doing institutional due diligence, read this end-to-end before the README.
 
@@ -10,7 +10,9 @@ If you are doing institutional due diligence, read this end-to-end before the RE
 
 ## 1. Upstream audit posture
 
-**`@noble/post-quantum@0.6.1`** — the underlying NIST primitives we wrap — has **not** been independently audited by a third party. As of v1.2.0 we pin `0.6.1`, which is the exact version covered by the maintainer's own self-audit (see table below).
+**`@noble/post-quantum@0.7.0`**, the underlying NIST primitives we wrap, has **not** been independently audited by a third party.
+
+> **Correction (v1.4.0):** this section previously stated that we pin `0.6.1`, "the exact version covered by the maintainer's own self-audit." That is no longer true and the claim has been withdrawn. Since v1.3.0 we ship **`0.7.0`**, published 2026-08-09. The maintainer's self-audit covers **`0.6.1`**. **The version we ship is not covered by any audit, self- or third-party.** We ship it anyway because 0.7.0 reproduces all 39 pinned vectors bit-for-bit and cross-verifies against 0.6.1 in both directions, but that is our own regression evidence, not an audit. Stated here as the conservative bound.
 
 | Review | Year | Scope | Source |
 |---|---|---|---|
@@ -25,8 +27,8 @@ When you `npm install kxco-post-quantum`, the upstream `@noble/post-quantum` cod
 The exact upstream we pin:
 
 ```
-@noble/post-quantum@0.6.1
-integrity: sha512-+pormrDZwjRw05U8ADK4JpHejo87+gBd+muRBB/ozztH5yhDLMDF4jHQWN3NQQAsu1zBNPWTG0ZwVI0CR29H0A==
+@noble/post-quantum@0.7.0
+integrity: sha512-IH2tpuGV4vBMdpCCua2BN7EuUICtmGp6DlBMNBYAYcL6QQ7eHt85GjLyD7ZT6Qx/xgIPIMqsSLDGvYqOm8Vqag==
 ```
 
 ## 2. What has NOT been audited (this wrapper)
@@ -38,7 +40,7 @@ What we have done:
 - **Internal review** by the KXCO engineering team and KXCO Cybersecurity (lead: Sean O'Coiligh, 30+ years cybersecurity, formerly led Offensive Cyber at the DTCC Cyber Threat Fusion Center)
 - **Reproducible test vectors** in `test/vectors.json` covering every primitive — anyone running `npm test` gets the same outputs the maintainers see
 - **Production deployment** across the KXCO platform (KnightsVault, KXCO Bank, KnightsBot, The Exchequer, Armature L1) since November 2025
-- **Public verifiable proof** of the signing identity at https://chain.kxco.ai/wallet/api/.well-known/kxco-pq-pubkey — anyone can fetch the kid, install this library, and verify signatures from the production fleet
+- **Public verifiable proof** of the signing identity **on Armature L1**, not on a KXCO web endpoint. A published signature is anchored on chain and can be read back over public JSON-RPC by anyone, with no KXCO account, endpoint or cooperation in the path. Worked example in section 4.
 
 What we have **not** done:
 
@@ -64,7 +66,7 @@ You do not have to trust us. Run these to verify:
 
 ```bash
 # Clone and install
-git clone https://github.com/JackKXCO/kxco-post-quantum
+git clone https://github.com/KnightsbridgeAIQ/kxco-post-quantum
 npm install
 
 # Run the full test suite — primitives + vectors
@@ -73,9 +75,36 @@ npm test
 # Run vector verification only
 npm run test:vectors
 
-# Fetch the live production platform key and verify offline
-curl https://chain.kxco.ai/wallet/api/.well-known/kxco-pq-pubkey
+# Read a production signature back off Armature L1 over public JSON-RPC
+curl -s -X POST https://chain.kxco.ai/rpc -H 'Content-Type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"eth_getTransactionByHash","params":["0xbb7c7cc5fca921e151b457ad18a5b9c4f2c562e70b7c2afb66e23fbd826563c1"]}'
 ```
+
+That transaction is on chainId **1111111**, block **90633**. Its 164-byte
+calldata is a plain ABI-encoded call and decodes with no tooling of ours:
+
+| Bytes | Field | Value |
+|---|---|---|
+| 0-3 | selector | `0xeabb11c8` |
+| 4-35 | `bytes8` kid, left aligned | `6b8e4750027cfe89` |
+| 36-67 | `bytes32` envelope digest | `8935e56a9a45a7c044c84ae3e3973356fedf842b4c97d1b7c47ddfe2e7bb4db4` |
+| 68- | `string` event type | `article-published` |
+
+Now fetch the other half of the join, which is a page we do not control the
+chain from:
+
+```bash
+curl -s https://www.livetradingnews.com/kxco-native-post-quantum-cryptography-for-the-ai-and-blockchain-era   | grep -oE '"name":"(content|chain)-[a-z-]*","value":"[^"]*"'
+```
+
+That page declares `content-signature-algorithm` ML-DSA-65,
+`content-signature-kid` `6b8e4750027cfe89`, `content-envelope-digest`
+`8935e56a...4db4`, `chain-block` 90633 and the same `chain-tx-hash` you just
+queried: **the same kid and the same digest that the chain returns above**.
+
+The page claims, the chain confirms, and the two were written by different
+systems at different times. Neither can be edited to agree with the other after
+the fact. Any published article works; this is simply one we have quoted the
+values for.
 
 Expected: `npm test` reports `✓ All 39 checks pass — library output matches pinned vectors bit-for-bit.`
 
@@ -92,7 +121,7 @@ If you are evaluating this library, look at:
 
 - **Test coverage:** 11 functional tests + 39 vector checks covering every export (plus 7 browser-mode smoke tests)
 - **Code size:** small enough to review end-to-end in an afternoon, across 7 single-purpose modules
-- **Dependency surface:** one runtime dependency (`@noble/post-quantum`), itself audited
+- **Dependency surface:** one runtime dependency (`@noble/post-quantum`), which is **not** independently audited (see section 1)
 - **Determinism:** every output is reproducible from inputs — no hidden state, no globals beyond a lazy cache, no network
 - **API stability:** v1.0 commits to the public surface listed in CHANGELOG.md
 
@@ -103,11 +132,12 @@ For institutional reviewers, the smallest version of "did they actually do the w
 - [ ] `npm view kxco-post-quantum dist.signatures` returns a signed package
 - [ ] `npm test` passes after fresh clone + install
 - [ ] `npm run test:vectors` matches the pinned vectors
-- [ ] `curl https://chain.kxco.ai/wallet/api/.well-known/kxco-pq-pubkey` returns a valid ML-DSA-65 public key
-- [ ] The kid (`kid` field above) matches `fingerprint()` of the returned `publicKey` field
+- [ ] The `eth_getTransactionByHash` call in section 4 returns that transaction from Armature L1
+- [ ] Its calldata decodes to the kid and digest in the table above, at the stated byte offsets
+- [ ] The article page's schema.org `content-signature-kid` and `content-envelope-digest` match those two values
 - [ ] An outbound webhook from `chain.kxco.ai` verifies with `webhook.verifyDelivery` against the pinned kid
 
-All six are reproducible without any cooperation from KXCO. That's the standard we hold ourselves to.
+All seven are reproducible without any cooperation from KXCO. That's the standard we hold ourselves to.
 
 ---
 
