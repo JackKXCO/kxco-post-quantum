@@ -1,5 +1,27 @@
 # Changelog
 
+## 1.5.3
+
+Documentation and metadata. No code change.
+
+Corrects stale performance figures. The README and BENCHMARKS.md both quoted a
+4.5x median-to-p99 tail for ML-DSA signing and about 6.8 seconds for
+SLH-DSA-SHA2-192s. Measured now, across both backends: the tail is 5.1x in
+JavaScript and 3.5x on OpenSSL, and SLH-DSA-SHA2-192s signs in 4.3 s and 1.7 s.
+
+Says what the package does. The README still described it as a wrapper around
+@noble/post-quantum without mentioning that on Node 24 and later the primitives
+run in OpenSSL 3.5. The npm description, which is what appears in registry search
+results, listed the algorithms and nothing else: not the 2,103 NIST ACVP vectors,
+not the 225-check interoperability matrix, not the reproducible build or the
+provenance attestation. Those are the parts that distinguish this from any other
+post-quantum wrapper, and they were absent from the one line most readers see.
+
+A dependabot ignore blocks @noble/post-quantum 0.7.1 specifically, so it is not
+reproposed weekly. The ACVP job fails the build on it regardless; this stops the
+pull request being opened. 0.7.2 and later will still be offered and should be
+accepted once the vectors pass.
+
 ## 1.5.2
 
 **Reverts `@noble/post-quantum` to 0.7.0. Upgrade from 1.5.1 immediately if you
