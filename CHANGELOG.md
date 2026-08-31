@@ -1,5 +1,50 @@
 # Changelog
 
+## 1.5.0
+
+**The FIPS primitives now run in OpenSSL where the runtime has them.** On Node 24
+and later this package uses OpenSSL 3.5 for ML-KEM, ML-DSA and SLH-DSA. On Node
+20 and 22, in browsers, and on any runtime without them, the JavaScript backend
+is used exactly as before.
+
+Additive. No export changed, no signature changed, no key format changed, and
+`@noble/post-quantum` is still a dependency and still the backend on every
+runtime that lacks the native primitives. Nothing is removed.
+
+**Both backends are checked against each other rather than assumed to agree.**
+The interoperability matrix runs in full on both, against liboqs, Bouncy Castle
+and dilithium-py / kyber-py, and both return **225 passed, 0 failed, 42 not
+applicable across 38 rows**. CI runs both legs. Every generated report now
+records which backend produced it under `wrapperBackend`, because a run that
+does not say is not evidence about either one.
+
+Keys and signatures are unchanged on the wire, which is what makes this safe to
+do silently: a signature made by one backend verifies under the other, in both
+directions, for all nine parameter sets. Existing keys keep working. Nothing
+needs migrating.
+
+Measured on the development machine:
+
+| | OpenSSL | JavaScript | |
+|---|---|---|---|
+| ML-DSA-65 sign | 1.34 ms | 11.54 ms | 8.6x |
+| ML-DSA-65 verify | 0.28 ms | 2.22 ms | 7.9x |
+| SLH-DSA-SHA2-192s sign | 1595 ms | 4717 ms | 3.0x |
+
+**A FIPS 204 context string keeps the JavaScript path.** Node's `sign` and
+`verify` take no context argument, and signing without the caller's context
+would produce a signature that verifies against nothing. That is a deliberate
+fallback, not a gap.
+
+**THREAT-MODEL.md is updated, and the change is narrower than it looks.** That
+document argued the timing and cache attacker was out of scope *structurally*,
+because the property cannot be established from inside JavaScript. On the
+OpenSSL path that argument no longer applies. It does not follow that this
+package is constant-time: we have published no timing measurements, and
+OpenSSL's side-channel posture is theirs to state rather than ours to assert.
+The honest position is that the attacker moves from structurally out of scope to
+**unmeasured** on Node 24+, and stays out of scope everywhere else.
+
 ## 1.4.1
 
 Evidence and documentation only. **No `src/` module changed**, no export was

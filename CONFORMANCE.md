@@ -102,7 +102,19 @@ no maintained pure-Python implementation was available to pin. That is a
 narrower base than the other two families and is stated rather than averaged
 away.
 
-None of the three shares code with this package's backend. liboqs is the
+### Which backend the matrix exercised
+
+From 1.5.0 this package has two backends: OpenSSL 3.5 where the runtime provides
+the FIPS primitives (Node 24 and later) and JavaScript everywhere else. They are
+different implementations, so a matrix run against one is not evidence about the
+other. CI therefore runs the whole matrix on **both**, and every generated report
+records which one it used under `wrapperBackend`. A report that does not say is
+not evidence.
+
+Both produce the same result: **225 passed, 0 failed, 42 not applicable**. That
+is the point of running both.
+
+None of the three peers shares code with either of this package's backends. liboqs is the
 reference C implementation the wider ecosystem tests against; Bouncy Castle is a
 widely deployed independent implementation; the Python pair are independent
 spec-derived implementations.

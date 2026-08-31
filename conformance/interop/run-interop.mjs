@@ -45,6 +45,8 @@ import * as slhDsa from '../../src/slh-dsa.js'
 import * as mlDsa87 from '../../src/ml-dsa-87.js'
 import * as mlKem1024 from '../../src/ml-kem-1024.js'
 
+import { native as nativeBackend } from '#native'
+
 const HERE = dirname(fileURLToPath(import.meta.url))
 const pkg = JSON.parse(readFileSync(join(HERE, '..', '..', 'package.json'), 'utf8'))
 const lock = JSON.parse(readFileSync(join(HERE, 'peers-lock.json'), 'utf8'))
@@ -285,6 +287,17 @@ const PREPARE = {
 const report = {
   subject: { package: pkg.name, version: pkg.version },
   backend: pkg.dependencies,
+  // Which backend the wrapper rows actually exercised. On Node 24+ the package
+  // routes through OpenSSL and on anything older through JavaScript, so a run
+  // that does not say which one it used is ambiguous evidence: the same pass
+  // count can describe two different implementations.
+  wrapperBackend: nativeBackend === null
+    ? { kind: 'javascript', reason: 'the runtime does not provide the FIPS primitives' }
+    : {
+        kind: 'openssl',
+        openssl: nativeBackend.openssl,
+        parameterSets: nativeBackend.algorithms(),
+      },
   runtime: { node: process.version, platform: `${process.platform}-${process.arch}` },
   peers: {},
   rows: [],

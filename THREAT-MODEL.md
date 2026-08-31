@@ -70,8 +70,34 @@ layout, memory placement or cache behaviour; the JIT may specialise a hot path
 on the values flowing through it; the garbage collector may copy secret bytes to
 places the caller cannot reach and cannot clear. Constant-time execution cannot
 be established, let alone maintained across engine versions, from inside the
-language. The backend states this about itself in plain terms: *"There is no
-protection against side-channel attacks."*
+language. The JavaScript backend states this about itself in plain terms:
+*"There is no protection against side-channel attacks."*
+
+**Since 1.5.0 that paragraph no longer describes every deployment, and the
+difference should not be overstated.** On Node 24 and later this package runs
+the FIPS 203/204/205 primitives in OpenSSL 3.5 rather than in JavaScript, so the
+argument above stops applying to the primitive path: the code doing the
+arithmetic is C, compiled ahead of time, outside the JIT and outside the
+collector.
+
+What that does and does not buy:
+
+- It **does** remove the structural impossibility. The reasoning above was that
+  the property could not be established from inside the language at all. On the
+  OpenSSL path it can, in principle, be established.
+- It **does not** amount to a constant-time claim from us. We have published no
+  timing measurements of either backend, and OpenSSL's post-quantum
+  implementations carry their own side-channel posture which is theirs to state,
+  not ours to assert on their behalf.
+- It **does not** apply to Node 20 or 22, to browsers, or to any runtime without
+  those primitives. Those keep the JavaScript backend and everything above
+  applies to them unchanged.
+- It **does not** cover power or electromagnetic analysis on any path.
+
+So the honest position is narrower than "we fixed side channels": the timing and
+cache attacker moves from *structurally out of scope* to *unmeasured* on Node
+24+, and stays out of scope everywhere else. Treat it as unmeasured until
+measurements exist.
 
 Two consequences worth being blunt about:
 

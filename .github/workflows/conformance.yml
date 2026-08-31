@@ -86,7 +86,16 @@ jobs:
           path: conformance/results/acvp-${{ matrix.group.slug }}.json
 
   interop:
-    name: Cross-implementation interop
+    # Both backends, because they are different implementations and a single run
+    # cannot evidence both. Node 22 exercises the JavaScript backend; Node 24
+    # exercises OpenSSL, which is what this package uses there. A green matrix on
+    # one says nothing about the other, and the published report records which
+    # one it ran.
+    name: Cross-implementation interop (node ${{ matrix.node }})
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['22', '24']
     runs-on: ubuntu-latest
     # A full matrix measured well under 30 minutes locally; the headroom is for a
     # slower runner, because a timeout here reads as failed interop rather than
@@ -97,7 +106,7 @@ jobs:
 
       - uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
         with:
-          node-version: '22'
+          node-version: ${{ matrix.node }}
 
       - uses: actions/setup-java@dded0888837ed1f317902acf8a20df0ad188d165 # v5.0.0
         with:
@@ -133,5 +142,5 @@ jobs:
       - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         if: always()
         with:
-          name: interop-report
+          name: interop-report-node${{ matrix.node }}
           path: conformance/results/interop.json
