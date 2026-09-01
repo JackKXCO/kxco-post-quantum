@@ -40,9 +40,9 @@
     "total": 0
   },
   "signatures": {
-    "signed": 4,
-    "attested": 4,
-    "audited": 4
+    "invalid": 0,
+    "missing": 0,
+    "productionTree": 4
   },
   "reachability": {
     "entryPoints": [
@@ -291,12 +291,12 @@
       "detail": ""
     },
     {
-      "name": "every package has a verified registry signature",
+      "name": "no package has an invalid registry signature or attestation",
       "ok": true,
       "detail": ""
     },
     {
-      "name": "every package has a verified provenance attestation",
+      "name": "no package is missing a registry signature or attestation",
       "ok": true,
       "detail": ""
     },

@@ -26,8 +26,9 @@ Current result: **26 checks passed, 0 failed, 0 skipped.**
 | `@noble/ciphers` | 2.3.0 | MIT | transitive | no | Cure53, Sep 2024 |
 
 One maintainer publishes all four, and all four carry a verified npm registry
-signature and a verified SLSA provenance attestation. Nothing in the tree runs
-code at install time, and `npm audit` reports no advisory at any severity.
+signature and a verified SLSA provenance attestation, with nothing invalid and
+nothing missing across the installed tree. Nothing in the tree runs code at
+install time, and `npm audit` reports no advisory at any severity.
 
 ## Why each one is there
 
@@ -90,8 +91,8 @@ on any disagreement:
 | no package declares an install script | lockfile flag and every installed manifest |
 | reachability matches the review, in both directions | static import walk |
 | no known advisories | `npm audit` |
-| a verified registry signature for every package | `npm audit signatures` |
-| a verified SLSA provenance attestation for every package | `npm audit signatures` |
+| no invalid registry signature or attestation anywhere | `npm audit signatures --json` |
+| no missing registry signature or attestation anywhere | `npm audit signatures --json` |
 
 The reachability check is bidirectional, and that matters. A package the review
 calls unused becoming reachable fails the build, and so does a package the review
@@ -120,8 +121,8 @@ by the OpenSSL backend.
 ## Supply-chain posture in one paragraph
 
 Four packages, one publisher, all MIT, all exactly locked by integrity hash, all
-carrying registry signatures and SLSA provenance, none able to execute at install
-time, none carrying an advisory, three of four independently reviewed by named
+carrying registry signatures and SLSA provenance with nothing invalid or missing,
+none able to execute at install time, none carrying an advisory, three of four independently reviewed by named
 firms, and the fourth evidenced directly against NIST's vectors and three
 independent implementations in this repository. The whole tree is small enough
 that "all dependencies audited" is a statement someone can check in an afternoon,

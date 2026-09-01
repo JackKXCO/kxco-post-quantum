@@ -218,17 +218,29 @@ if (offline) {
     findings.push({ name: 'no known advisories', ok: null, detail: 'npm audit produced no parseable output' })
   }
 
+  // `npm audit signatures --json` reports what failed rather than what passed:
+  // { invalid: [...], missing: [...] }. Assert on those. Counting how many
+  // packages npm says it audited and comparing it to our own count of the
+  // production tree is a different denominator, and it failed in CI at 6 of 4
+  // while nothing was actually wrong.
   try {
-    const out = npmJson(['audit', 'signatures'])
-    const signed = Number(/(\d+) packages? have verified registry signatures/.exec(out)?.[1] ?? -1)
-    const attested = Number(/(\d+) packages? have verified attestations/.exec(out)?.[1] ?? -1)
-    signatures = { signed, attested, audited: inTree.size }
-    check('every package has a verified registry signature',
-      !review.policy.requireRegistrySignature || signed === inTree.size,
-      `${signed} of ${inTree.size} packages carry a verified signature`)
-    check('every package has a verified provenance attestation',
-      !review.policy.requireProvenanceAttestation || attested === inTree.size,
-      `${attested} of ${inTree.size} packages carry a verified SLSA attestation`)
+    const sig = JSON.parse(npmJson(['audit', 'signatures', '--json']))
+    const invalid = sig.invalid ?? []
+    const missing = sig.missing ?? []
+    signatures = {
+      invalid: invalid.length,
+      missing: missing.length,
+      productionTree: inTree.size,
+    }
+    const describe = (list) => list
+      .map((e) => (typeof e === 'string' ? e : `${e.name}@${e.version}`))
+      .join(', ')
+    check('no package has an invalid registry signature or attestation',
+      !review.policy.requireRegistrySignature || invalid.length === 0,
+      `invalid: ${describe(invalid)}`)
+    check('no package is missing a registry signature or attestation',
+      !review.policy.requireProvenanceAttestation || missing.length === 0,
+      `missing: ${describe(missing)}`)
   } catch (e) {
     findings.push({ name: 'registry signatures and attestations', ok: false, detail: `npm audit signatures failed: ${String(e.message).split('\n')[0]}` })
   }
