@@ -18,5 +18,11 @@
     "liboqs": "0.16.0",
     "liboqs_python": "0.16.0",
     "note": "The reference C implementation, built from source in a container because liboqs needs a C toolchain. liboqs and its Python binding are version-locked to each other; a mismatch makes the binding clone a liboqs branch that does not exist. Rebuild with: docker build -f peers/liboqs.Dockerfile -t kxco-interop-liboqs:0.16.0 peers/"
+  },
+  "openssl": {
+    "image": "kxco-protocol-openssl:3.5",
+    "dockerfile": "../protocol/openssl.Dockerfile",
+    "base": "alpine:3.22",
+    "note": "Issues the X.509 certificates and CMS SignedData blobs that conformance/protocol verifies. OpenSSL 3.5 is the first line carrying ML-DSA, and the Dockerfile asserts that at build time rather than assuming it. Rebuild with: docker build -f conformance/protocol/openssl.Dockerfile -t kxco-protocol-openssl:3.5 conformance/protocol"
   }
 }

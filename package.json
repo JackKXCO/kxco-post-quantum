@@ -101,6 +101,7 @@
     "README.md",
     "LICENSE",
     "CONFORMANCE.md",
+    "DEPENDENCIES.md",
     "BENCHMARKS.md",
     "THREAT-MODEL.md",
     "MIGRATION.md",
@@ -122,6 +123,8 @@
     "conformance:fetch": "node conformance/fetch-vectors.mjs",
     "conformance:acvp": "node conformance/run-acvp.mjs --json conformance/results/acvp.json",
     "conformance:interop": "node conformance/interop/run-interop.mjs --json conformance/results/interop.json",
+    "conformance:protocol": "node conformance/protocol/run-protocol.mjs --json conformance/results/protocol.json",
+    "audit:deps": "node audit/run-audit.mjs --json audit/results/dependencies.json",
     "sbom": "npm sbom --sbom-format cyclonedx --sbom-type library",
     "bench:timing": "node --expose-gc bench/timing.mjs --iterations 20000 --json bench/results/timing.json",
     "bench:primitives": "node --expose-gc bench/primitives.mjs --iterations 100 --json bench/results/primitives.json"

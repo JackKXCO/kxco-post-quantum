@@ -6,8 +6,13 @@
 // KnightsVault, KXCO Bank, KnightsBot, The Exchequer, and Armature L1.
 //
 // This package does NOT reimplement the NIST primitives. It wraps the
-// audited @noble/post-quantum reference implementation with the integration
-// patterns we have proven in production.
+// @noble/post-quantum reference implementation with the integration patterns we
+// have proven in production, and on Node 24+ it prefers the OpenSSL 3.5 backend.
+//
+// The primitives are evidenced here rather than taken on trust: every parameter
+// set is checked against NIST's own ACVP vectors and cross-checked against
+// liboqs, Bouncy Castle and dilithium-py/kyber-py in both directions. See
+// CONFORMANCE.md, and audit/ for the dependency review.
 
 export * as mlDsa  from './ml-dsa.js'
 export * as mlKem  from './ml-kem.js'

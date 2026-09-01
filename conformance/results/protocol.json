@@ -1,0 +1,190 @@
+{
+  "subject": {
+    "package": "kxco-post-quantum",
+    "version": "1.5.3"
+  },
+  "issuer": {
+    "name": "OpenSSL",
+    "version": "OpenSSL 3.5.8 25 Aug 2026 (Library: OpenSSL 3.5.8 25 Aug 2026)",
+    "image": "kxco-protocol-openssl:3.5"
+  },
+  "runtime": {
+    "node": "v26.1.0",
+    "platform": "win32-x64"
+  },
+  "totals": {
+    "passed": 33,
+    "failed": 0,
+    "notApplicable": 0
+  },
+  "rows": [
+    {
+      "kind": "x509",
+      "set": "ML-DSA-44",
+      "checks": {
+        "opensslAccepts": {
+          "ok": true,
+          "detail": "OpenSSL rejected its own artefact"
+        },
+        "verifies": {
+          "ok": true,
+          "detail": "this package rejected a certificate OpenSSL issued and accepts"
+        },
+        "tamperRejected": {
+          "ok": true,
+          "detail": "a modified certificate body still verified"
+        }
+      }
+    },
+    {
+      "kind": "cms",
+      "set": "ML-DSA-44",
+      "checks": {
+        "opensslAccepts": {
+          "ok": true,
+          "detail": "OpenSSL rejected its own artefact"
+        },
+        "opensslRoundTrip": {
+          "ok": true,
+          "detail": "OpenSSL could not verify its own CMS blob"
+        },
+        "algorithmOid": {
+          "ok": true,
+          "detail": "SignerInfo names 2.16.840.1.101.3.4.3.17, expected 2.16.840.1.101.3.4.3.17 for ML-DSA-44"
+        },
+        "signatureVerified": {
+          "ok": true,
+          "detail": "this package rejected a CMS signature OpenSSL produced and accepts"
+        },
+        "digestBindsMessage": {
+          "ok": true,
+          "detail": "messageDigest 1d78e24752eb3d73 does not match the content digest 1d78e24752eb3d73"
+        },
+        "contentTypeBound": {
+          "ok": true,
+          "detail": "the signed contentType attribute does not match eContentType (RFC 5652 s5.3)"
+        },
+        "contentMatches": {
+          "ok": true,
+          "detail": "the embedded eContent is not the message that was signed"
+        },
+        "tamperRejected": {
+          "ok": true,
+          "detail": "modified signed attributes still verified"
+        }
+      }
+    },
+    {
+      "kind": "x509",
+      "set": "ML-DSA-65",
+      "checks": {
+        "opensslAccepts": {
+          "ok": true,
+          "detail": "OpenSSL rejected its own artefact"
+        },
+        "verifies": {
+          "ok": true,
+          "detail": "this package rejected a certificate OpenSSL issued and accepts"
+        },
+        "tamperRejected": {
+          "ok": true,
+          "detail": "a modified certificate body still verified"
+        }
+      }
+    },
+    {
+      "kind": "cms",
+      "set": "ML-DSA-65",
+      "checks": {
+        "opensslAccepts": {
+          "ok": true,
+          "detail": "OpenSSL rejected its own artefact"
+        },
+        "opensslRoundTrip": {
+          "ok": true,
+          "detail": "OpenSSL could not verify its own CMS blob"
+        },
+        "algorithmOid": {
+          "ok": true,
+          "detail": "SignerInfo names 2.16.840.1.101.3.4.3.18, expected 2.16.840.1.101.3.4.3.18 for ML-DSA-65"
+        },
+        "signatureVerified": {
+          "ok": true,
+          "detail": "this package rejected a CMS signature OpenSSL produced and accepts"
+        },
+        "digestBindsMessage": {
+          "ok": true,
+          "detail": "messageDigest 3516230c29412021 does not match the content digest 3516230c29412021"
+        },
+        "contentTypeBound": {
+          "ok": true,
+          "detail": "the signed contentType attribute does not match eContentType (RFC 5652 s5.3)"
+        },
+        "contentMatches": {
+          "ok": true,
+          "detail": "the embedded eContent is not the message that was signed"
+        },
+        "tamperRejected": {
+          "ok": true,
+          "detail": "modified signed attributes still verified"
+        }
+      }
+    },
+    {
+      "kind": "x509",
+      "set": "ML-DSA-87",
+      "checks": {
+        "opensslAccepts": {
+          "ok": true,
+          "detail": "OpenSSL rejected its own artefact"
+        },
+        "verifies": {
+          "ok": true,
+          "detail": "this package rejected a certificate OpenSSL issued and accepts"
+        },
+        "tamperRejected": {
+          "ok": true,
+          "detail": "a modified certificate body still verified"
+        }
+      }
+    },
+    {
+      "kind": "cms",
+      "set": "ML-DSA-87",
+      "checks": {
+        "opensslAccepts": {
+          "ok": true,
+          "detail": "OpenSSL rejected its own artefact"
+        },
+        "opensslRoundTrip": {
+          "ok": true,
+          "detail": "OpenSSL could not verify its own CMS blob"
+        },
+        "algorithmOid": {
+          "ok": true,
+          "detail": "SignerInfo names 2.16.840.1.101.3.4.3.19, expected 2.16.840.1.101.3.4.3.19 for ML-DSA-87"
+        },
+        "signatureVerified": {
+          "ok": true,
+          "detail": "this package rejected a CMS signature OpenSSL produced and accepts"
+        },
+        "digestBindsMessage": {
+          "ok": true,
+          "detail": "messageDigest 933263115df46b23 does not match the content digest 933263115df46b23"
+        },
+        "contentTypeBound": {
+          "ok": true,
+          "detail": "the signed contentType attribute does not match eContentType (RFC 5652 s5.3)"
+        },
+        "contentMatches": {
+          "ok": true,
+          "detail": "the embedded eContent is not the message that was signed"
+        },
+        "tamperRejected": {
+          "ok": true,
+          "detail": "modified signed attributes still verified"
+        }
+      }
+    }
+  ]
+}

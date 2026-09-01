@@ -1,12 +1,15 @@
 # Conformance and interoperability evidence
 
-Two claims, each with a harness in this repository that anyone can run:
+Three claims, each with a harness in this repository that anyone can run:
 
 1. **This package computes what FIPS 203, 204 and 205 say it should.** Evidenced
    against NIST's own ACVP test vectors.
 2. **Independent implementations can consume what it produces, and it can
    consume theirs.** Evidenced against liboqs (C), Bouncy Castle (Java) and
    dilithium-py / kyber-py (Python), in both directions.
+3. **The PKI artefacts standard tooling issues validate here.** Evidenced by
+   having OpenSSL 3.5 issue ML-DSA certificates and signed messages, and
+   verifying them from this package with its own DER parsing.
 
 The second claim is the one that matters in deployment and the one that vector
 files cannot make. Passing NIST's vectors proves agreement with NIST. It does
@@ -19,9 +22,10 @@ Everything below is reproducible:
 npm run conformance:fetch      # pinned NIST vectors, digest-checked
 npm run conformance:acvp       # claim 1
 npm run conformance:interop    # claim 2
+npm run conformance:protocol   # claim 3
 ```
 
-Both harnesses run in CI on every push and in full weekly. See
+All three harnesses run in CI on every push and in full weekly. See
 [.github/workflows/conformance.yml](.github/workflows/conformance.yml).
 
 ---
@@ -243,6 +247,72 @@ keys, both carrying these identifiers, which is what makes the two backends
 interchangeable with each other and with any X.509 or CMS consumer that speaks
 the same encodings.
 
+## 5. Protocol artefacts: X.509 and CMS
+
+Claims 1 and 2 are about primitives and encodings. Neither answers the question a
+PKI team asks first, which is whether a certificate issued by the tooling they
+already run will validate.
+
+So OpenSSL issues and this package verifies. Nothing in the chain is ours on both
+sides, and the artefacts are generated fresh on every run rather than committed,
+because a fixture keeps passing after an encoding has drifted.
+
+| Issuer | Version | Base image |
+|---|---|---|
+| OpenSSL | 3.5.8, asserted at image build time | `alpine:3.22` |
+
+Pinned as `openssl` in
+[conformance/interop/peers-lock.json](conformance/interop/peers-lock.json). The
+exact build string is recorded in every report rather than the family, because
+"OpenSSL 3.5" names a line and not the binary that signed the bytes.
+
+### X.509
+
+A self-signed certificate per parameter set. Verification walks the DER to the
+`tbsCertificate`, takes it including its own tag and length octets, which is what
+RFC 5280 actually signs, and checks the `signature` BIT STRING over it with the
+public key read out of a separately supplied SubjectPublicKeyInfo.
+
+### CMS SignedData
+
+A signed message per parameter set, `-nodetach`, SHA-256 digest. ML-DSA carries no
+default digest in OpenSSL 3.5, so `-md` has to be named explicitly; without it
+`CMS_add1_signer` fails with "no default digest". That is a property of the CMS
+layer rather than of the key.
+
+The signature in a SignedData does not cover the message. It covers the DER
+encoding of the signed attributes, re-tagged from the `[0] IMPLICIT` they travel
+in to the `SET OF` they are signed as (RFC 5652 s5.4). Verifying it therefore
+takes four checks that only mean something together:
+
+| Check | What it establishes |
+|---|---|
+| `signatureVerified` | the signature is valid over the signed attributes |
+| `digestBindsMessage` | the `messageDigest` attribute is the digest of the content |
+| `contentTypeBound` | the signed `contentType` matches `eContentType` (RFC 5652 s5.3) |
+| `contentMatches` | the embedded content is the message that was submitted |
+
+The first alone would hold equally for a signature over somebody else's message.
+
+### Controls
+
+Every row carries OpenSSL's own verdict on the artefact, so a disagreement is
+attributable rather than assumed, and a tamper control that flips one bit of the
+signed body and requires the verification to fail. The controls are not
+decoration: the first version of the certificate parser sliced the wrong byte
+range and returned false for everything, which passed the tamper control and
+failed the positive check. Without the pair, a verifier that always returned true
+and one that always returned false would both have looked green.
+
+`algorithmOid` additionally checks that the SignerInfo names the OID in section 4
+for the set it claims. An implementation that verifies the bytes but disagrees
+about which algorithm they belong to still fails to interoperate.
+
+### Result
+
+33 checks across 6 rows, all passing, none not applicable. Reports are published
+as CI artefacts per Node version.
+
 ## What this evidence does not cover
 
 Stated plainly, because a conformance report that only lists what passed is
@@ -264,9 +334,11 @@ marketing.
   these modules change. The accurate sentences are "NIST FIPS 203/204/205
   conformant" and "supports ML-DSA-87 and ML-KEM-1024". Anything stronger,
   including "CNSA 2.0 ready", would be an overclaim.
-- **Protocol-level interop is not covered here.** Key and signature bytes
-  interoperate. Certificate and message encodings, X.509, CMS, COSE, JOSE and
-  TLS group negotiation are separate surfaces and no claim is made about them.
+- **Protocol coverage is X.509 and CMS, for the ML-DSA sets.** Section 5 covers
+  certificates and CMS SignedData against OpenSSL 3.5 for ML-DSA-44/65/87. COSE,
+  JOSE and TLS group negotiation are separate surfaces, and ML-KEM and SLH-DSA
+  are covered at the key and signature layer rather than in certificates,
+  because OpenSSL 3.5 issues neither.
 - **Self-administered.** Every number above was produced by harnesses in this
   repository, run by us. That is why they are reproducible and why the pins,
   digests and negative controls are there. It is not third-party attestation and

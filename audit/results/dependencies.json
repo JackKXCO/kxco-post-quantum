@@ -1,0 +1,309 @@
+{
+  "subject": {
+    "package": "kxco-post-quantum",
+    "version": "1.5.3"
+  },
+  "review": {
+    "reviewedAt": "2026-09-01",
+    "reviewedBy": "KXCO engineering",
+    "policy": {
+      "maxProductionDependencies": 4,
+      "allowedLicences": [
+        "MIT",
+        "Apache-2.0",
+        "BSD-3-Clause",
+        "ISC"
+      ],
+      "requireRegistrySignature": true,
+      "requireProvenanceAttestation": true,
+      "allowInstallScripts": false,
+      "maxVulnerabilities": 0
+    }
+  },
+  "runtime": {
+    "node": "v26.1.0",
+    "platform": "win32-x64"
+  },
+  "totals": {
+    "passed": 26,
+    "failed": 0,
+    "skipped": 0
+  },
+  "productionDependencies": 4,
+  "devDependencies": 0,
+  "advisories": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0,
+    "total": 0
+  },
+  "signatures": {
+    "signed": 4,
+    "attested": 4,
+    "audited": 4
+  },
+  "reachability": {
+    "entryPoints": [
+      ".",
+      "./ml-dsa",
+      "./ml-dsa-87",
+      "./ml-kem",
+      "./ml-kem-1024",
+      "./slh-dsa",
+      "./derive",
+      "./webhook",
+      "./kid"
+    ],
+    "filesWalked": 33,
+    "packagesReached": [
+      "@noble/curves",
+      "@noble/hashes",
+      "@noble/post-quantum"
+    ],
+    "builtinsReached": [
+      "node:crypto"
+    ]
+  },
+  "packages": [
+    {
+      "name": "@noble/post-quantum",
+      "version": "0.7.0",
+      "licence": "MIT",
+      "why": "The FIPS 203, 204 and 205 primitives. This package is the wrapper around it: parameter-set selection, FIPS 204 context strings, key derivation, fingerprinting and a native backend, none of which change the primitive arithmetic.",
+      "used": [
+        "ml_dsa44",
+        "ml_dsa65",
+        "ml_dsa87",
+        "ml_kem512",
+        "ml_kem768",
+        "ml_kem1024",
+        "slh_dsa_sha2_128f",
+        "slh_dsa_sha2_192s",
+        "slh_dsa_shake_256f"
+      ],
+      "externalAudit": "none",
+      "auditNote": "Self-audited by the maintainer at 0.7.0's predecessor 0.6.1 in Apr 2026. No independent audit. This is the reason conformance/ exists in this repository: every parameter set is checked against NIST's own ACVP vectors and cross-checked against liboqs, Bouncy Castle and dilithium-py/kyber-py in both directions, so the primitive is evidenced here rather than taken on the dependency's word.",
+      "pinning": "exact",
+      "pinningNote": "Pinned exactly, not caret-ranged. 0.7.1 regressed nine NIST SLH-DSA verify vectors that 0.7.0 passes; it shipped in 1.5.1, was reverted in 1.5.2, and is blocked in dependabot. A caret range would have taken that regression automatically.",
+      "reachable": true,
+      "resolvedVersion": "0.7.0",
+      "resolved": "https://registry.npmjs.org/@noble/post-quantum/-/post-quantum-0.7.0.tgz",
+      "integrity": "sha512-IH2tpuGV4vBMdpCCua2BN7EuUICtmGp6DlBMNBYAYcL6QQ7eHt85GjLyD7ZT6Qx/xgIPIMqsSLDGvYqOm8Vqag==",
+      "reachableNow": true,
+      "checks": {
+        "versionOk": true,
+        "licenceOk": true,
+        "scriptOk": true,
+        "reachOk": true
+      }
+    },
+    {
+      "name": "@noble/hashes",
+      "version": "2.3.0",
+      "licence": "MIT",
+      "why": "SHA-256, SHA-512, SHAKE and HKDF. Used for key derivation from a master secret, public-key fingerprinting and the hashes FIPS 205 needs.",
+      "used": [
+        "sha256",
+        "sha512",
+        "shake256",
+        "hkdf"
+      ],
+      "externalAudit": "Cure53, Jan 2022, at version 1.0.0, funded by the Ethereum Foundation with Nomic Labs. Self-audited at 2.2.0 in Apr 2026.",
+      "auditNote": "The 2022 Cure53 scope covered everything except blake3, sha3-addons, sha1 and argon2. None of those four are used here.",
+      "pinning": "exact",
+      "pinningNote": "Pinned exactly and declared directly rather than inherited, so the version this package uses is visible in its own manifest instead of resolved from a transitive range.",
+      "reachable": true,
+      "resolvedVersion": "2.3.0",
+      "resolved": "https://registry.npmjs.org/@noble/hashes/-/hashes-2.3.0.tgz",
+      "integrity": "sha512-oN+QwyX7VSHotibwubG3kpzbwKrfnyR6OOO+3Nk/53ADL7FmgHHz4TgrbaYKvvOw09u6QTx0oiH1cNCIOuN0CQ==",
+      "reachableNow": true,
+      "checks": {
+        "versionOk": true,
+        "licenceOk": true,
+        "scriptOk": true,
+        "reachOk": true
+      }
+    },
+    {
+      "name": "@noble/curves",
+      "version": "2.3.0",
+      "licence": "MIT",
+      "why": "Reached through @noble/post-quantum, not imported here directly. ml-dsa.js takes `abool` from @noble/curves/utils.js, and _crystals.js, which both ML-DSA and ML-KEM are built on, takes `FFTCore` and `reverseBits` from @noble/curves/abstract/fft.js. So it is on the signing and encapsulation path for every parameter set this package exposes.",
+      "used": [
+        "abstract/fft.js: FFTCore, reverseBits (via _crystals.js)",
+        "utils.js: abool (via ml-dsa.js)"
+      ],
+      "externalAudit": "Trail of Bits, Feb 2023, at 0.7.3. Kudelski Security, Sep 2023, at 1.2.0. Cure53, Sep 2024, at 1.6.0. Self-audited at 2.2.0 in Apr 2026.",
+      "auditNote": "The most heavily reviewed package in the tree, and it is on the hot path rather than idle in it. Three independent firms across four years: Trail of Bits, Kudelski Security and Cure53. The reachability check in run-audit.mjs established this rather than the manifest: nothing in this package's own source names @noble/curves.",
+      "pinning": "transitive",
+      "pinningNote": "Resolved from @noble/post-quantum's ~2.3.0 range and locked in package-lock.json.",
+      "reachable": true,
+      "resolvedVersion": "2.3.0",
+      "resolved": "https://registry.npmjs.org/@noble/curves/-/curves-2.3.0.tgz",
+      "integrity": "sha512-v7cY+4oWYPQszRj6ZFGzTVL7uP2TaLo1xMhWHzYC5wj0ZhOXQ5x+sBre8rF3hi8cAoi0bh1qXoovoOkdFtvqEg==",
+      "reachableNow": true,
+      "checks": {
+        "versionOk": true,
+        "licenceOk": true,
+        "scriptOk": true,
+        "reachOk": true
+      }
+    },
+    {
+      "name": "@noble/ciphers",
+      "version": "2.3.0",
+      "licence": "MIT",
+      "why": "Not used by this package. Transitive dependency of @noble/post-quantum.",
+      "used": [],
+      "externalAudit": "Cure53, Sep 2024, at version 1.0.0, funded by OpenSats. Self-audited at 2.2.0 in Apr 2026.",
+      "auditNote": "Present but not reachable from this package's published surface.",
+      "pinning": "transitive",
+      "pinningNote": "Resolved from @noble/post-quantum's ~2.3.0 range and locked in package-lock.json.",
+      "reachable": false,
+      "resolvedVersion": "2.3.0",
+      "resolved": "https://registry.npmjs.org/@noble/ciphers/-/ciphers-2.3.0.tgz",
+      "integrity": "sha512-Clu/xdfgVTf9o7ngLOURaxePwR0j8sjclKEtVij10/jGulwFsPWCvvRgG/XjUVf8Nei+jLG6uwyXzUTGY1DQrw==",
+      "reachableNow": false,
+      "checks": {
+        "versionOk": true,
+        "licenceOk": true,
+        "scriptOk": true,
+        "reachOk": true
+      }
+    }
+  ],
+  "findings": [
+    {
+      "name": "every production dependency is reviewed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the review names no dependency that has left the tree",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "the tree is within the declared ceiling",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "@noble/hashes is pinned exactly",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "@noble/post-quantum is pinned exactly",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no devDependencies",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "@noble/post-quantum is at the reviewed version",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "@noble/post-quantum licence is allowed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "@noble/post-quantum runs no install script",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "@noble/post-quantum reachability matches the review",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "@noble/hashes is at the reviewed version",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "@noble/hashes licence is allowed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "@noble/hashes runs no install script",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "@noble/hashes reachability matches the review",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "@noble/curves is at the reviewed version",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "@noble/curves licence is allowed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "@noble/curves runs no install script",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "@noble/curves reachability matches the review",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "@noble/ciphers is at the reviewed version",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "@noble/ciphers licence is allowed",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "@noble/ciphers runs no install script",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "@noble/ciphers reachability matches the review",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no known advisories",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "every package has a verified registry signature",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "every package has a verified provenance attestation",
+      "ok": true,
+      "detail": ""
+    },
+    {
+      "name": "no package in the installed tree runs code at install time",
+      "ok": true,
+      "detail": ""
+    }
+  ]
+}

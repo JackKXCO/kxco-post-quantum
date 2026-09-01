@@ -1,0 +1,86 @@
+{
+  "$comment": "Curated, human-written review of every production dependency. The harness in run-audit.mjs re-derives the mechanical facts from the lockfile, the registry and the installed tree, and FAILS if any of them has drifted from what is recorded here. That is the point: a dependency audit that cannot go stale silently. Adding or bumping a dependency breaks this file until someone reviews it.",
+  "reviewedAt": "2026-09-01",
+  "reviewedBy": "KXCO engineering",
+  "policy": {
+    "maxProductionDependencies": 4,
+    "allowedLicences": [
+      "MIT",
+      "Apache-2.0",
+      "BSD-3-Clause",
+      "ISC"
+    ],
+    "requireRegistrySignature": true,
+    "requireProvenanceAttestation": true,
+    "allowInstallScripts": false,
+    "maxVulnerabilities": 0
+  },
+  "packages": [
+    {
+      "name": "@noble/post-quantum",
+      "version": "0.7.0",
+      "licence": "MIT",
+      "why": "The FIPS 203, 204 and 205 primitives. This package is the wrapper around it: parameter-set selection, FIPS 204 context strings, key derivation, fingerprinting and a native backend, none of which change the primitive arithmetic.",
+      "used": [
+        "ml_dsa44",
+        "ml_dsa65",
+        "ml_dsa87",
+        "ml_kem512",
+        "ml_kem768",
+        "ml_kem1024",
+        "slh_dsa_sha2_128f",
+        "slh_dsa_sha2_192s",
+        "slh_dsa_shake_256f"
+      ],
+      "externalAudit": "none",
+      "auditNote": "Self-audited by the maintainer at 0.7.0's predecessor 0.6.1 in Apr 2026. No independent audit. This is the reason conformance/ exists in this repository: every parameter set is checked against NIST's own ACVP vectors and cross-checked against liboqs, Bouncy Castle and dilithium-py/kyber-py in both directions, so the primitive is evidenced here rather than taken on the dependency's word.",
+      "pinning": "exact",
+      "pinningNote": "Pinned exactly, not caret-ranged. 0.7.1 regressed nine NIST SLH-DSA verify vectors that 0.7.0 passes; it shipped in 1.5.1, was reverted in 1.5.2, and is blocked in dependabot. A caret range would have taken that regression automatically.",
+      "reachable": true
+    },
+    {
+      "name": "@noble/hashes",
+      "version": "2.3.0",
+      "licence": "MIT",
+      "why": "SHA-256, SHA-512, SHAKE and HKDF. Used for key derivation from a master secret, public-key fingerprinting and the hashes FIPS 205 needs.",
+      "used": [
+        "sha256",
+        "sha512",
+        "shake256",
+        "hkdf"
+      ],
+      "externalAudit": "Cure53, Jan 2022, at version 1.0.0, funded by the Ethereum Foundation with Nomic Labs. Self-audited at 2.2.0 in Apr 2026.",
+      "auditNote": "The 2022 Cure53 scope covered everything except blake3, sha3-addons, sha1 and argon2. None of those four are used here.",
+      "pinning": "exact",
+      "pinningNote": "Pinned exactly and declared directly rather than inherited, so the version this package uses is visible in its own manifest instead of resolved from a transitive range.",
+      "reachable": true
+    },
+    {
+      "name": "@noble/curves",
+      "version": "2.3.0",
+      "licence": "MIT",
+      "why": "Reached through @noble/post-quantum, not imported here directly. ml-dsa.js takes `abool` from @noble/curves/utils.js, and _crystals.js, which both ML-DSA and ML-KEM are built on, takes `FFTCore` and `reverseBits` from @noble/curves/abstract/fft.js. So it is on the signing and encapsulation path for every parameter set this package exposes.",
+      "used": [
+        "abstract/fft.js: FFTCore, reverseBits (via _crystals.js)",
+        "utils.js: abool (via ml-dsa.js)"
+      ],
+      "externalAudit": "Trail of Bits, Feb 2023, at 0.7.3. Kudelski Security, Sep 2023, at 1.2.0. Cure53, Sep 2024, at 1.6.0. Self-audited at 2.2.0 in Apr 2026.",
+      "auditNote": "The most heavily reviewed package in the tree, and it is on the hot path rather than idle in it. Three independent firms across four years: Trail of Bits, Kudelski Security and Cure53. The reachability check in run-audit.mjs established this rather than the manifest: nothing in this package's own source names @noble/curves.",
+      "pinning": "transitive",
+      "pinningNote": "Resolved from @noble/post-quantum's ~2.3.0 range and locked in package-lock.json.",
+      "reachable": true
+    },
+    {
+      "name": "@noble/ciphers",
+      "version": "2.3.0",
+      "licence": "MIT",
+      "why": "Not used by this package. Transitive dependency of @noble/post-quantum.",
+      "used": [],
+      "externalAudit": "Cure53, Sep 2024, at version 1.0.0, funded by OpenSats. Self-audited at 2.2.0 in Apr 2026.",
+      "auditNote": "Present but not reachable from this package's published surface.",
+      "pinning": "transitive",
+      "pinningNote": "Resolved from @noble/post-quantum's ~2.3.0 range and locked in package-lock.json.",
+      "reachable": false
+    }
+  ]
+}
