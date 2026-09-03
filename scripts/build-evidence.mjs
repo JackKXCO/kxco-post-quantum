@@ -126,13 +126,37 @@ write('01-identity.json', identity)
 // ── 2. conformance ──────────────────────────────────────────────────────────
 //
 // The cheap sets always. SLH-DSA signature generation costs roughly two orders
-// of magnitude more, so a default bundle subsamples and says so; --full does
-// the whole thing.
+// of magnitude more, so a default bundle runs FIPS 203 and 204 subsampled and
+// says so; --full adds FIPS 205 and lifts the cap.
+//
+// This previously omitted FIPS 205 even under --full, while the comment said
+// "--full does the whole thing" and the README advertised FIPS 203/204/205.
+// The bundle is the thing an assessor checks against the claim, so a bundle
+// narrower than the claim is worse than a smaller claim would have been.
 
-const acvpSets = 'ML-KEM-keyGen-FIPS203,ML-KEM-encapDecap-FIPS203,ML-DSA-keyGen-FIPS204,ML-DSA-sigGen-FIPS204,ML-DSA-sigVer-FIPS204'
-const acvpArgs = ['conformance/run-acvp.mjs', '--set', acvpSets, '--json', join(outDir, '02-conformance-acvp.json'), '--quiet']
+const FIPS_203_204 = [
+  'ML-KEM-keyGen-FIPS203', 'ML-KEM-encapDecap-FIPS203',
+  'ML-DSA-keyGen-FIPS204', 'ML-DSA-sigGen-FIPS204', 'ML-DSA-sigVer-FIPS204',
+]
+const FIPS_205 = ['SLH-DSA-keyGen-FIPS205', 'SLH-DSA-sigGen-FIPS205', 'SLH-DSA-sigVer-FIPS205']
+
+const acvpArgs = ['conformance/run-acvp.mjs', '--set', FIPS_203_204.join(','),
+  '--json', join(outDir, '02-conformance-acvp.json'), '--quiet']
 if (!full) acvpArgs.push('--max-per-group', '25')
 run('acvp', process.execPath, acvpArgs)
+
+// FIPS 205 goes in its own file with its own cap. SLH-DSA signature
+// generation runs in seconds per operation, so an uncapped pass takes over an
+// hour and would blow the job timeout. Capped and labelled beats absent:
+// a reader can see the parameter sets were exercised and see exactly how
+// much of each, which a missing section does not tell them.
+if (full) {
+  run('acvp-fips205', process.execPath, [
+    'conformance/run-acvp.mjs', '--set', FIPS_205.join(','),
+    '--max-per-group', '5',
+    '--json', join(outDir, '02b-conformance-acvp-fips205.json'), '--quiet',
+  ], { optional: true })
+}
 
 run('interop', process.execPath, [
   'conformance/interop/run-interop.mjs', '--json', join(outDir, '03-conformance-interop.json'),

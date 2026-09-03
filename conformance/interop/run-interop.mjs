@@ -596,11 +596,25 @@ report.totals = report.rows.reduce(
   { passed: 0, failed: 0, inconclusive: 0 }
 )
 
+// An inconclusive check is one the PEER cannot support, not one we failed:
+// liboqs exposes no seed-derived keygen, and several peers sign hedged so a
+// byte-identical signature is impossible by construction. Each row says which.
+//
+// Reporting only passed/failed/inconclusive invites a reader to compute
+// passed / (passed + inconclusive) and read 84% as a shortfall. `applicable`
+// is the denominator that means something, so state it rather than leaving it
+// to be derived wrongly.
+report.totals.applicable = report.totals.passed + report.totals.failed
+report.totals.note =
+  'inconclusive = the peer does not support the check (no seed-derived keygen, ' +
+  'or hedged signing with no deterministic mode), not a failure on either side. ' +
+  'passed/applicable is the meaningful ratio.'
+
 if (!quiet) {
   const t = report.totals
   console.log(
-    `\n${t.passed} interop checks passed, ${t.failed} failed, ${t.inconclusive} inconclusive ` +
-      `across ${report.rows.length} rows`
+    `\n${t.passed}/${t.applicable} applicable interop checks passed, ${t.failed} failed, ` +
+      `${t.inconclusive} not applicable to the peer, across ${report.rows.length} rows`
   )
 }
 

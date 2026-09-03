@@ -41,7 +41,9 @@ permissions:
 jobs:
   evidence:
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    # FIPS 205 is capped rather than uncapped precisely so this stays bounded,
+    # but SLH-DSA is slow enough that 45 was tight even without it.
+    timeout-minutes: 75
     strategy:
       fail-fast: false
       matrix:
