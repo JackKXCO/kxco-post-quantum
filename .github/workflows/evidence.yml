@@ -109,7 +109,8 @@ jobs:
               const need = [
                 '02-conformance-acvp.json',
                 '02b-conformance-acvp-fips205.json',
-                '02c-fips205-siggen-NOT-IN-THIS-BUNDLE.md',
+                '02c-fips205-siggen-SAMPLED.md',
+                '02d-conformance-acvp-fips205-siggen.json',
               ];
               const missing = need.filter((f) => !fs.existsSync('dist/evidence/' + f));
               if (missing.length) {
