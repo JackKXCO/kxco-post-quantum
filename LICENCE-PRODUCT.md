@@ -53,6 +53,20 @@ See [`SALES-SKU.md`](https://github.com/KnightsbridgeAIQ/kxco-pq-network/blob/ma
 
 Writes to the hosted relay require a licence, and always did in substance — this is now enforced in the client rather than only at the server, so a misconfigured service fails at boot instead of at a customer's first transaction.
 
+### Why the chain is permissioned
+
+Because the question a regulated institution has to answer is not "is this
+decentralised" but **"who approved this, and can you prove it?"**
+
+On Armature that has a name attached. Four known validators, screened and
+contractually bound, in a jurisdiction, with a legal entity behind them. A
+permissionless validator set cannot answer it — which is also why it cannot
+satisfy a sanctions obligation, and why an institution's records end up sharing
+permanent state with whatever else anyone chose to write.
+
+A known counterparty is the product, not a compromise on one. See
+[`ACCOUNTABILITY.md`](https://github.com/KnightsbridgeAIQ/kxco-chain-live/blob/main/docs/ACCOUNTABILITY.md).
+
 ---
 
 ## Trademark
@@ -72,11 +86,14 @@ The cryptography is NIST-standardised and the conformance is published, pinned a
 | | |
 |---|---|
 | Algorithms | ML-DSA-65 (FIPS 204), ML-KEM-768 (FIPS 203), SLH-DSA (FIPS 205) |
+| Category 5 | **ML-DSA-87 and ML-KEM-1024 are shipped** — the parameter sets CNSA 2.0 specifies. Available today via `mlDsa87` / `mlKem1024`, ACVP-checked like every other set. Compliance is a property of a deployment, not of a library, so we state the capability and leave the claim to the deployment |
 | Backend | OpenSSL 3.5 where the runtime provides it, `@noble/post-quantum` elsewhere. Identical on the wire, checked in both directions |
 | Conformance | 2,103 NIST ACVP vectors across FIPS 203, 204 and 205. Vectors pinned by digest |
 | Interoperability | 225 checks against OpenSSL 3.5, liboqs, Bouncy Castle and dilithium-py/kyber-py |
 | Supply chain | SLSA provenance attestation on every release; CycloneDX SBOM; reproducible build |
 | Evidence bundle | `npm run evidence` regenerates all of it from source, on your machine |
+| On-chain verification | Armature L1 verifies ML-DSA-65 **in consensus** — `MLDSA65VerifyPrecompiledContract` at `0x0b`, executed by every validator, ~50,000 gas |
+| Accountability | Four **named** validators under QBFT proof-of-authority. Every block has an identified proposer and every write an accountable operator |
 
 **You do not have to take any of it on our word.** Every figure above comes from a command you can run yourself against the same commit, and the vectors are NIST's, not ours. A customer may re-run them at any time without asking us and without telling us. If your result differs from ours we want to know: `john@knightsbridgelaw.com`, acknowledged within 2 business days.
 
