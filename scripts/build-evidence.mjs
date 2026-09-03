@@ -138,7 +138,17 @@ const FIPS_203_204 = [
   'ML-KEM-keyGen-FIPS203', 'ML-KEM-encapDecap-FIPS203',
   'ML-DSA-keyGen-FIPS204', 'ML-DSA-sigGen-FIPS204', 'ML-DSA-sigVer-FIPS204',
 ]
-const FIPS_205 = ['SLH-DSA-keyGen-FIPS205', 'SLH-DSA-sigGen-FIPS205', 'SLH-DSA-sigVer-FIPS205']
+// FIPS 205 splits by cost, measured rather than assumed. Uncapped: keyGen
+// about 80 seconds, sigVer about 10. sigGen is in a different class entirely,
+// because the 's' parameter sets sign in seconds per operation and there are
+// many groups: even ONE vector per group ran past 105 seconds without
+// finishing, so no cap makes it fit a release build.
+//
+// So the bundle carries keyGen and sigVer in full, and says plainly that
+// sigGen is not in it and where the full 624-vector result lives. An absent
+// section that explains itself is honest. A section quietly narrower than the
+// claim above it is what this file used to do.
+const FIPS_205_AFFORDABLE = ['SLH-DSA-keyGen-FIPS205', 'SLH-DSA-sigVer-FIPS205']
 
 const acvpArgs = ['conformance/run-acvp.mjs', '--set', FIPS_203_204.join(','),
   '--json', join(outDir, '02-conformance-acvp.json'), '--quiet']
@@ -152,10 +162,30 @@ run('acvp', process.execPath, acvpArgs)
 // much of each, which a missing section does not tell them.
 if (full) {
   run('acvp-fips205', process.execPath, [
-    'conformance/run-acvp.mjs', '--set', FIPS_205.join(','),
-    '--max-per-group', '5',
+    'conformance/run-acvp.mjs', '--set', FIPS_205_AFFORDABLE.join(','),
     '--json', join(outDir, '02b-conformance-acvp-fips205.json'), '--quiet',
   ], { optional: true })
+
+  write('02c-fips205-siggen-NOT-IN-THIS-BUNDLE.md', [
+    '# SLH-DSA signature generation is not in this bundle',
+    '',
+    'FIPS 205 key generation and signature verification are, in full, in',
+    '`02b-conformance-acvp-fips205.json`. Signature generation is not, and',
+    'this file exists so that is stated rather than inferred from a gap.',
+    '',
+    'The slow SLH-DSA parameter sets sign in seconds per operation across many',
+    'groups. One vector per group did not finish inside 105 seconds, so there',
+    'is no cap that makes it fit a release build without either timing out or',
+    'reducing it to something not worth publishing.',
+    '',
+    'The full run is 624 vectors, 472 passed, 0 failed, 152 skipped. It is',
+    'recorded in CONFORMANCE.md and reproduced with:',
+    '',
+    '    node conformance/run-acvp.mjs --set SLH-DSA-sigGen-FIPS205',
+    '',
+    'Zero failures there, and the skips are this library refusing a pre-hash',
+    'weaker than the parameter set, listed individually with the reason.',
+  ].join('\n') + '\n')
 }
 
 run('interop', process.execPath, [
