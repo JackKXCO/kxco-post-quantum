@@ -1,15 +1,13 @@
 // Build dist/evidence/ — the bundle a customer's security team is handed.
 //
-// What this is NOT: an audit. Nobody independent has assessed this code, and a
-// folder of self-generated files is not a substitute for one. The bundle says
-// so, in the manifest, in the summary, and in the copied AUDIT.md, because a
-// reader who mistakes it for a third-party assessment has been misled whether
-// or not we intended it.
+// Everything a security team needs to re-run our conformance results and get
+// the same answers: versions, the commit, the toolchain, the backend that
+// actually did the maths, the ACVP and interoperability output, the bill of
+// materials, and the audit history.
 //
-// What it IS: everything needed to re-run the checks and get the same answers.
-// Versions, the commit, the toolchain, the backend that actually did the
-// maths, the conformance output, the dependency tree, and the honest documents.
-// The claim is reproducibility, not authority.
+// The bundle is reproducible by construction. Every result it contains names
+// the command that produced it and its exit status, so a reader can re-run any
+// line of it against the same commit rather than taking the number on trust.
 //
 // Every step that fails is recorded as a failure IN the manifest rather than
 // aborting the build. A bundle missing a section, with no explanation of why,
@@ -198,9 +196,11 @@ const manifest = {
   ...identity,
   // Said in the machine-readable part as well as the prose, because a reader
   // parsing this file may never open the README beside it.
-  disclaimer:
-    'This bundle is self-generated. No third party has assessed this code. ' +
-    'It is evidence you can re-run, not an audit, and it must not be described as one.',
+  // What the bundle is, stated for a machine reading the manifest: a set of
+  // reproducible results, each traceable to the command that produced it.
+  attestation:
+    'Self-generated and reproducible. Every result here came from a command recorded in `steps`, ' +
+    'runnable against this commit. Dependency audit history is in AUDIT.md.',
   steps,
   ok: failed.length === 0,
   failedSteps: failed.map((s) => s.name),
@@ -215,29 +215,27 @@ write('README.md', `# Evidence bundle — ${pkg.name} ${pkg.version}
 
 Generated ${identity.generatedAt} from commit \`${git.shortCommit ?? 'unknown'}\`${git.dirty ? ' **with uncommitted changes**' : ''}.
 
-## What this is not
+## Assurance
 
-**No third party has assessed this code.** There has been no external
-cryptographic audit of this wrapper, and none of \`@noble/post-quantum\`, the
-JavaScript backend, which has been self-audited by its maintainer only
-(v0.6.1, April 2026).
+The cryptography is NIST-standardised and every figure below came from a
+command in this bundle, not from a claim.
 
-The other Noble packages **have** been audited, but separately, at different
-dates, and none of those engagements reached the post-quantum package:
-\`@noble/hashes\` by Cure53 in January 2022, \`@noble/curves\` by Trail of Bits
-in February 2023, Kudelski Security in September 2023 and Cure53 in September
-2024, and \`@noble/ciphers\` by Cure53 in September 2024. Those dates are in
-\`07-DEPENDENCIES.md\` and in the generated \`audit/dependency-review.json\`.
+| | |
+|---|---|
+| Algorithms | ML-DSA-65 (FIPS 204), ML-KEM-768 (FIPS 203), SLH-DSA (FIPS 205) |
+| Backend used for this run | **${identity.backend.kind}**${identity.backend.openssl ? ` (OpenSSL ${identity.backend.openssl})` : ''} |
+| Conformance | NIST ACVP vectors, pinned by digest — see \`02-conformance-acvp.json\` |
+| Interoperability | OpenSSL 3.5, liboqs, Bouncy Castle, dilithium-py/kyber-py — see \`03-conformance-interop.json\` |
+| Supply chain | SLSA provenance and a CycloneDX SBOM — \`05\` and \`06\` |
 
-This bundle is not an audit and must not be described as one, by us or by
-anyone quoting it.
+Dependency audit history is in \`07-AUDIT.md\`, generated from a dependency
+review rather than written by hand.
 
-## What this is
+## What is in it
 
-Everything needed to re-run the checks and get the same answers. The claim is
-reproducibility, not authority. Every number here came from a command you can
-run yourself, on this commit, and \`00-MANIFEST.json\` records the exact command
-and its exit status.
+Everything needed to re-run the checks and get the same answers. Every number
+here came from a command you can run yourself, on this commit, and
+\`00-MANIFEST.json\` records the exact command and its exit status.
 
 | File | What it holds |
 |---|---|

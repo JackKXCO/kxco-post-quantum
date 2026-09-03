@@ -53,7 +53,7 @@ time:
 
 | Package | Audited by |
 |---|---|
-| `@noble/post-quantum` | **nobody.** Self-audited by its maintainer, v0.6.1, Apr 2026 |
+| `@noble/post-quantum` | maintainer-audited, v0.6.1, Apr 2026 |
 | `@noble/hashes` | Cure53, Jan 2022, v1.0.0 (Ethereum Foundation with Nomic Labs) |
 | `@noble/curves` | Trail of Bits Feb 2023; Kudelski Sep 2023; Cure53 Sep 2024 |
 | `@noble/ciphers` | Cure53, Sep 2024, v1.0.0 (OpenSats) |

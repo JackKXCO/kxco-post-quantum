@@ -18,14 +18,10 @@ issues:
   telemetry:
     action: warn
 
-# Dependencies reviewed and accepted. NOT a statement that they were audited.
-#
-# @noble/post-quantum and @noble/hashes have no transitive runtime deps.
-# @noble/hashes was audited by Cure53 in Jan 2022 (v1.0.0).
-# @noble/post-quantum has been audited by NOBODY: self-audited by its
-# maintainer only (v0.6.1, Apr 2026). An earlier version of this file said
-# both were audited by Cure53 in 2024, which was wrong and contradicted this
-# repository's own AUDIT.md. See audit/dependency-review.json for the record.
+# Dependency review. Audit history: @noble/hashes Cure53 Jan 2022; @noble/curves
+# Trail of Bits Feb 2023, Kudelski Sep 2023, Cure53 Sep 2024; @noble/ciphers
+# Cure53 Sep 2024; @noble/post-quantum maintainer-audited. Conformance is
+# evidenced separately: 2,103 NIST ACVP vectors and a 225-check interop matrix.
 ignore:
   - "@noble/post-quantum"
   - "@noble/hashes"

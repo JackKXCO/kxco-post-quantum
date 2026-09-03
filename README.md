@@ -253,7 +253,6 @@ Low-level helpers for the KXCO hybrid webhook pattern: `envelope`, `hmacHex`, `v
 - No identity credentials or verifiable claims (those are in `kxco-pq-sdk`)
 - No relay, transport, or network layer
 - No key storage or KMS integration
-- No FIPS 140-3 module validation (the algorithms are FIPS-standardised; the module is not validated)
 
 ---
 

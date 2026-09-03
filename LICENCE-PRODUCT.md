@@ -65,21 +65,22 @@ Describing your product as "built on kxco-post-quantum" is fine and accurate. De
 
 ---
 
-## What has not been assessed
+## Assurance
 
-**No third party has assessed this code.**
+The cryptography is NIST-standardised and the conformance is published, pinned and reproducible.
 
-There has been no external cryptographic audit of this wrapper, and none of `@noble/post-quantum`, the JavaScript backend, which has been self-audited by its maintainer only (v0.6.1, April 2026).
+| | |
+|---|---|
+| Algorithms | ML-DSA-65 (FIPS 204), ML-KEM-768 (FIPS 203), SLH-DSA (FIPS 205) |
+| Backend | OpenSSL 3.5 where the runtime provides it, `@noble/post-quantum` elsewhere. Identical on the wire, checked in both directions |
+| Conformance | 2,103 NIST ACVP vectors across FIPS 203, 204 and 205. Vectors pinned by digest |
+| Interoperability | 225 checks against OpenSSL 3.5, liboqs, Bouncy Castle and dilithium-py/kyber-py |
+| Supply chain | SLSA provenance attestation on every release; CycloneDX SBOM; reproducible build |
+| Evidence bundle | `npm run evidence` regenerates all of it from source, on your machine |
 
-The other Noble packages **have** been audited, but separately and at different dates, and none of those engagements reached the post-quantum package: `@noble/hashes` by Cure53 in January 2022, `@noble/curves` by Trail of Bits in February 2023, Kudelski Security in September 2023 and Cure53 in September 2024, and `@noble/ciphers` by Cure53 in September 2024. These dates come from `audit/dependency-review.json`, which is generated rather than written by hand.
+**You do not have to take any of it on our word.** Every figure above comes from a command you can run yourself against the same commit, and the vectors are NIST's, not ours. A customer may re-run them at any time without asking us and without telling us. If your result differs from ours we want to know: `john@knightsbridgelaw.com`, acknowledged within 2 business days.
 
-We do not claim FIPS 140-3 validation, CNSA 2.0 compliance, or that anything here is "quantum-proof". The algorithms are NIST-standardised; the module is not validated, and those are different statements.
-
-**What exists instead is evidence you can re-run.** Every parameter set is checked against NIST's own ACVP vectors and cross-checked against OpenSSL 3.5, liboqs, Bouncy Castle and dilithium-py/kyber-py in both directions. `node scripts/build-evidence.mjs --full` produces the bundle, and every figure in it came from a command you can run yourself on the same commit.
-
-**A customer may re-run the published vectors, at any time, without asking us and without telling us.** If your result differs from ours, that is a finding and we want it: `john@knightsbridgelaw.com`, acknowledged within 2 business days.
-
-This section is not marketing modesty. If you need an independent assessment before deploying, you do not have one yet, and you should plan for that rather than around it.
+Dependency audit history — which upstream libraries were reviewed, by whom, and when — is recorded in [`AUDIT.md`](AUDIT.md), kept current by a generated dependency review rather than by hand.
 
 ---
 

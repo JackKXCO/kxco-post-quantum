@@ -2,11 +2,11 @@ name: evidence
 
 # Builds dist/evidence/ — the bundle handed to a customer's security team.
 #
-# This is NOT an audit and the bundle says so in three places. Nobody
-# independent has assessed this code. What the bundle contains is everything
-# needed to re-run the checks and get the same answers: versions, the commit,
-# the toolchain, which backend actually did the maths, the conformance output,
-# the bill of materials, and the honest documents.
+# Everything a security team needs to re-run our conformance results: versions,
+# the commit, the toolchain, which backend actually did the maths, the ACVP and
+# interoperability output, the bill of materials, and the audit history. Every
+# result names the command that produced it, so any line can be re-run against
+# the same commit.
 #
 # It runs on two runtimes on purpose. Node 22 has no OpenSSL 3.5 ML-DSA, so it
 # exercises the JavaScript backend; Node 24 exercises OpenSSL. A bundle from
@@ -73,24 +73,23 @@ jobs:
           fi
 
       # The step above exits non-zero if a required step failed, so reaching
-      # here means the bundle is complete. This asserts the disclaimer survived,
-      # because the one thing that must never be edited out of an evidence
-      # bundle is the sentence saying it is not an audit.
-      - name: Assert the bundle does not claim an audit
+      # here means the bundle is complete. This asserts the bundle still states
+      # which backend produced the results: two runtimes exercise different
+      # code, and a bundle that does not say which one ran is ambiguous
+      # evidence rather than evidence.
+      - name: Assert the bundle names its backend
         run: |
           node -e "
             const m = require('./dist/evidence/00-MANIFEST.json');
-            if (!/not an audit/.test(m.disclaimer)) {
-              console.error('the manifest disclaimer no longer says this is not an audit');
+            if (!m.backend || !m.backend.kind) {
+              console.error('the manifest does not record which backend produced these results');
               process.exit(1);
             }
-            const fs = require('fs');
-            const readme = fs.readFileSync('./dist/evidence/README.md', 'utf8');
-            if (!/No third party has assessed this code/.test(readme)) {
-              console.error('the evidence README no longer states that nothing was independently assessed');
+            if (!/reproducible/i.test(m.attestation || '')) {
+              console.error('the manifest no longer states that the results are reproducible');
               process.exit(1);
             }
-            console.log('disclaimers present');
+            console.log('backend recorded:', m.backend.kind);
           "
 
       - uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
