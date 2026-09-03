@@ -63,6 +63,11 @@ export function keypairFromMaster(master, info = 'ml-kem-1024-v1') {
   return {
     publicKey: wrap(k.publicKey),
     secretKey: wrap(k.secretKey),
+    // The seed this key was expanded from. Additive: callers destructuring
+    // { publicKey, secretKey } are unaffected. It is here because an expanded
+    // key does not contain its seed, so this is the only moment it can be
+    // captured, and seed form is what RFC 9964 JWKs and KMS custody take.
+    seed:      wrap(seedU8),
   }
 }
 

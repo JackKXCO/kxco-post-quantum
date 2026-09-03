@@ -1,6 +1,6 @@
 {
   "name": "kxco-post-quantum",
-  "version": "1.5.3",
+  "version": "1.6.0",
   "description": "ML-DSA-65, ML-KEM-768 and SLH-DSA-SHA2-192s with key fingerprinting. Runs in OpenSSL 3.5 on Node 24+, JavaScript elsewhere. 2,103 NIST ACVP vectors and 225 cross-implementation interop checks, 0 failed. Reproducible builds, SLSA provenance, published SBOM. The base layer for all kxco-pq-* packages.",
   "keywords": [
     "post-quantum",
@@ -94,19 +94,32 @@
     "./kid": {
       "types": "./src/kid.d.ts",
       "import": "./src/kid.js"
+    },
+    "./seed": {
+      "types": "./src/seed.d.ts",
+      "import": "./src/seed.js"
+    },
+    "./jws": {
+      "types": "./src/jws.d.ts",
+      "import": "./src/jws.js"
+    },
+    "./backend": {
+      "types": "./src/backend.d.ts",
+      "import": "./src/backend.js"
     }
   },
   "files": [
-    "src",
-    "README.md",
-    "LICENSE",
+    "BENCHMARKS.md",
+    "CHANGELOG.md",
     "CONFORMANCE.md",
     "DEPENDENCIES.md",
-    "BENCHMARKS.md",
-    "THREAT-MODEL.md",
+    "LICENCE-PRODUCT.md",
+    "LICENSE",
     "MIGRATION.md",
+    "README.md",
     "SECURITY.md",
-    "CHANGELOG.md"
+    "THREAT-MODEL.md",
+    "src"
   ],
   "engines": {
     "node": ">=20.19"
@@ -116,7 +129,7 @@
     "@noble/post-quantum": "0.7.0"
   },
   "scripts": {
-    "test": "node --test test/basic.test.js && node --test test/context.test.js && node --test test/category5.test.js && node --test test/edge-cases.test.js && node --test test/browser-smoke.test.js && node test/run-vectors.js",
+    "test": "node --test test/basic.test.js && node --test test/context.test.js && node --test test/category5.test.js && node --test test/edge-cases.test.js && node --test test/seed.test.js && node --test test/browser-smoke.test.js && node test/run-vectors.js",
     "test:vectors": "node test/run-vectors.js",
     "generate:vectors": "node test/generate-vectors.js > test/vectors.json",
     "bench": "node bench/bench.js",
@@ -127,7 +140,9 @@
     "audit:deps": "node audit/run-audit.mjs --json audit/results/dependencies.json",
     "sbom": "npm sbom --sbom-format cyclonedx --sbom-type library",
     "bench:timing": "node --expose-gc bench/timing.mjs --iterations 20000 --json bench/results/timing.json",
-    "bench:primitives": "node --expose-gc bench/primitives.mjs --iterations 100 --json bench/results/primitives.json"
+    "bench:primitives": "node --expose-gc bench/primitives.mjs --iterations 100 --json bench/results/primitives.json",
+    "evidence": "node scripts/build-evidence.mjs",
+    "evidence:full": "node scripts/build-evidence.mjs --full"
   },
   "publishConfig": {
     "provenance": true,

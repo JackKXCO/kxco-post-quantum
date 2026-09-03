@@ -11,3 +11,9 @@ export * as mlKem1024 from './ml-kem-1024.js'
 export * from './derive.js'
 export * from './kid.js'
 export * as webhook from './webhook.js'
+
+/** Seed-form keys: RFC 9964 AKP JWKs and LAMPS seed-form PKCS#8. */
+export * as seed from './seed.js'
+/** Compact JWS using the RFC 9964 algorithm names. Format only, no network. */
+export * as jws from './jws.js'
+export { backend, isNative } from './backend.js'

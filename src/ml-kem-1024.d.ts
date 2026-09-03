@@ -5,6 +5,14 @@ export interface MlKem1024Keypair {
   publicKey: Buffer
   /** 3168-byte secret key */
   secretKey: Buffer
+  /**
+   * The 64-byte seed this keypair was expanded from.
+   *
+   * An expanded secret key does not contain its seed, so this is the only
+   * point at which it can be captured. Pass it to `exportJwk` or
+   * `exportSeedPkcs8` for RFC 9964 / LAMPS seed-form storage.
+   */
+  seed: Buffer
 }
 
 export interface MlKem1024Encapsulation {

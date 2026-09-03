@@ -101,3 +101,40 @@ test('hybrid webhook sign + verify in browser-mode', () => {
 test.after(() => {
   if (realBuffer) globalThis.Buffer = realBuffer
 })
+
+// ── seed form and JWS without Buffer ────────────────────────────────────────
+//
+// Both new modules do their own base64url, because Buffer is the fast path and
+// btoa/atob is the only one a browser has. A bug in the fallback would be
+// invisible on Node, so it is exercised here rather than assumed.
+
+const { seed: seedApi, jws } = await import('../src/index.js?nobuf') // same cached module: HAS_BUFFER was false at its import
+
+test('seed-form JWKs round-trip without Buffer', () => {
+  for (const alg of seedApi.SEED_ALGORITHMS) {
+    const master = new Uint8Array(32).fill(0x5c)
+    const kp = seedApi.keypairFromSeed(alg, seedApi.seedFromMaster(alg, master))
+    assert.equal(kp.seed.constructor.name, 'Uint8Array', alg)
+
+    const jwk = seedApi.exportJwk(alg, kp)
+    const back = seedApi.importJwk(jwk)
+    assert.deepEqual(back.publicKey, kp.publicKey, `${alg} pub`)
+    assert.deepEqual(back.secretKey, kp.secretKey, `${alg} sec`)
+  }
+})
+
+test('seed-form PKCS#8 round-trips without Buffer', () => {
+  const alg = 'ML-DSA-65'
+  const s = seedApi.seedFromMaster(alg, new Uint8Array(32).fill(0x5c))
+  const der = seedApi.exportSeedPkcs8(alg, s)
+  assert.equal(der.constructor.name, 'Uint8Array')
+  assert.deepEqual(seedApi.importSeedPkcs8(der).seed, s)
+})
+
+test('compact JWS signs and verifies without Buffer', () => {
+  const { publicKey, secretKey } = mlDsa.keypairFromMaster(new Uint8Array(32).fill(0x11))
+  const token = jws.signJws({ browser: true }, secretKey, { kid: fingerprint(publicKey) })
+  const result = jws.verifyJws(token, publicKey)
+  assert.equal(result.valid, true)
+  assert.deepEqual(JSON.parse(result.text), { browser: true })
+})

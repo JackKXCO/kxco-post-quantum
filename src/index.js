@@ -27,3 +27,14 @@ export * as mlKem1024 from './ml-kem-1024.js'
 export * from './derive.js'
 export * from './kid.js'
 export * as webhook from './webhook.js'
+
+// Seed-form keys (RFC 9964 AKP JWKs, LAMPS seed-form PKCS#8) and compact JWS
+// with the RFC 9964 algorithm names. Both are format and derivation only: they
+// contact nothing, need no licence, and a token or key they produce stays
+// verifiable offline for as long as the holder keeps the public key.
+export * as seed from './seed.js'
+export * as jws  from './jws.js'
+
+// Reports which backend is doing the maths in this process, for evidence
+// bundles and support. It reports; it never switches.
+export { backend, isNative } from './backend.js'

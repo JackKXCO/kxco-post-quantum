@@ -27,6 +27,7 @@ import { sha224, sha256, sha384, sha512, sha512_224, sha512_256 } from '@noble/h
 import { sha3_224, sha3_256, sha3_384, sha3_512, shake128_32, shake256_64 } from '@noble/hashes/sha3.js'
 
 import { vectorPath, acvpSource } from './fetch-vectors.mjs'
+import { native } from '#native'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const pkg = JSON.parse(readFileSync(join(HERE, '..', 'package.json'), 'utf8'))
@@ -379,6 +380,25 @@ const sets = only ?? Object.keys(RUNNERS)
 const report = {
   subject: { package: pkg.name, version: pkg.version },
   backend: pkg.dependencies,
+  // Which implementation these results describe. This runner drives the
+  // JavaScript primitives directly, because the primitives are the artefact
+  // under test and NIST publishes vectors for parameter sets the wrapper does
+  // not expose. So an ACVP pass here is evidence about the JavaScript backend
+  // and nothing else, whatever the runtime happens to offer.
+  //
+  // The OpenSSL backend is evidenced separately, by conformance/interop, which
+  // runs every parameter set against both backends in both directions. A
+  // reader needs both reports to cover both implementations, and saying so is
+  // the difference between evidence and a pass count.
+  backendUnderTest: {
+    kind: 'javascript',
+    library: '@noble/post-quantum',
+    version: pkg.dependencies['@noble/post-quantum'],
+    note: 'the OpenSSL backend is covered by conformance/results/interop.json, not this report',
+  },
+  runtimeNativeBackend: native === null
+    ? { available: false, reason: 'the runtime does not provide the FIPS primitives' }
+    : { available: true, openssl: native.openssl, parameterSets: native.algorithms() },
   runtime: { node: process.version, platform: `${process.platform}-${process.arch}` },
   acvp: source,
   sampling: Number.isFinite(maxPerGroup)

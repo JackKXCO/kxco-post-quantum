@@ -1,0 +1,100 @@
+name: evidence
+
+# Builds dist/evidence/ — the bundle handed to a customer's security team.
+#
+# This is NOT an audit and the bundle says so in three places. Nobody
+# independent has assessed this code. What the bundle contains is everything
+# needed to re-run the checks and get the same answers: versions, the commit,
+# the toolchain, which backend actually did the maths, the conformance output,
+# the bill of materials, and the honest documents.
+#
+# It runs on two runtimes on purpose. Node 22 has no OpenSSL 3.5 ML-DSA, so it
+# exercises the JavaScript backend; Node 24 exercises OpenSSL. A bundle from
+# one of them describes one implementation, and shipping only one would let a
+# reader draw a conclusion about code that never ran.
+#
+# The push build subsamples ACVP groups and records that it did. The weekly and
+# release builds do a full pass. A subsampled bundle is never presented as a
+# full-suite claim.
+#
+# All third-party actions are pinned by 40-char commit SHA.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '41 5 * * 1'
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        # 22.x: no OpenSSL 3.5 FIPS primitives, so the JavaScript backend runs.
+        # 24.x: OpenSSL 3.5, so the native backend runs.
+        node: ['22.x', '24.x']
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          # The bundle records the commit it describes, so a shallow clone with
+          # no history would leave that field wrong rather than absent.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@39370e3970a6d050c480ffad4ff0ed4d3fdee5af # v4.1.0
+        with:
+          node-version: ${{ matrix.node }}
+
+      - run: npm ci
+
+      - name: Record the backend under test
+        run: |
+          node -e "const {backend}=require('./src/backend.js');console.log(JSON.stringify(backend()))" \
+            || node --input-type=module -e "import {backend} from './src/backend.js'; console.log(JSON.stringify(backend()))"
+
+      # A full pass on a schedule or a release; subsampled on a push, because
+      # SLH-DSA signature generation alone measured over an hour.
+      - name: Build evidence
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event_name }}" = "release" ]; then
+            npm run evidence:full
+          else
+            npm run evidence
+          fi
+
+      # The step above exits non-zero if a required step failed, so reaching
+      # here means the bundle is complete. This asserts the disclaimer survived,
+      # because the one thing that must never be edited out of an evidence
+      # bundle is the sentence saying it is not an audit.
+      - name: Assert the bundle does not claim an audit
+        run: |
+          node -e "
+            const m = require('./dist/evidence/00-MANIFEST.json');
+            if (!/not an audit/.test(m.disclaimer)) {
+              console.error('the manifest disclaimer no longer says this is not an audit');
+              process.exit(1);
+            }
+            const fs = require('fs');
+            const readme = fs.readFileSync('./dist/evidence/README.md', 'utf8');
+            if (!/No third party has assessed this code/.test(readme)) {
+              console.error('the evidence README no longer states that nothing was independently assessed');
+              process.exit(1);
+            }
+            console.log('disclaimers present');
+          "
+
+      - uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
+        with:
+          name: evidence-node${{ matrix.node }}
+          path: dist/evidence/
+          retention-days: 90

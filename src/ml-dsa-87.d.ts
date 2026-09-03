@@ -5,6 +5,14 @@ export interface MlDsa87Keypair {
   publicKey: Buffer
   /** 4896-byte secret key */
   secretKey: Buffer
+  /**
+   * The 32-byte seed this keypair was expanded from.
+   *
+   * An expanded secret key does not contain its seed, so this is the only
+   * point at which it can be captured. Pass it to `exportJwk` or
+   * `exportSeedPkcs8` for RFC 9964 / LAMPS seed-form storage.
+   */
+  seed: Buffer
 }
 
 /**

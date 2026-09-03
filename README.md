@@ -135,7 +135,7 @@ separation.
 
 | Export | Signature | Description |
 |---|---|---|
-| `keypairFromMaster` | `(master, info?) → { publicKey, secretKey }` | Deterministic keypair via HKDF-SHA-512. `info` defaults to `'ml-dsa-65-v1'`. |
+| `keypairFromMaster` | `(master, info?) → { publicKey, secretKey, seed }` | Deterministic keypair via HKDF-SHA-512. `info` defaults to `'ml-dsa-65-v1'`. `seed` is the 32 bytes the pair was expanded from — see [`seed`](#seed--seed-form-keys-rfc-9964-lamps). |
 | `sign` | `(secretKey, message) → string` | Signs a message. Returns a hex-encoded signature (6618 chars). |
 | `verify` | `(publicKey, message, sigHex) → boolean` | Verifies a hex-encoded signature. Returns `false` on any failure. |
 | `ml_dsa65` | raw primitive | The underlying `@noble/post-quantum` primitive, re-exported. |
@@ -159,7 +159,7 @@ Hash-based, stateless signatures. Security Category 3 (matching ML-DSA-65), but 
 
 | Export | Signature | Description |
 |---|---|---|
-| `keypairFromMaster` | `(master, info?) → { publicKey, secretKey }` | Deterministic keypair via HKDF-SHA-512. `info` defaults to `'ml-kem-768-v1'`. |
+| `keypairFromMaster` | `(master, info?) → { publicKey, secretKey, seed }` | Deterministic keypair via HKDF-SHA-512. `info` defaults to `'ml-kem-768-v1'`. `seed` is the 64 bytes the pair was expanded from. |
 | `encapsulate` | `(publicKey) → { ciphertext, sharedSecret }` | Generates a shared secret and ciphertext to send to the key holder. |
 | `decapsulate` | `(ciphertext, secretKey) → Buffer` | Recovers the shared secret from a ciphertext. Returns 32 bytes. |
 | `ml_kem768` | raw primitive | The underlying `@noble/post-quantum` primitive, re-exported. |
@@ -177,6 +177,70 @@ Constant-time comparison of two kid strings. Use this when comparing user-suppli
 ### `deriveSeed(master, info, length)` → `Buffer`
 
 HKDF-SHA-512 derivation. `master` must be at least 16 bytes. `info` is a required domain-separation string. Returns `length` bytes.
+
+### `seed` — seed-form keys (RFC 9964, LAMPS)
+
+FIPS 203 and 204 expand a keypair from a short seed. The expanded private key
+this package returns is derived from that seed and does not contain it, so a
+seed cannot be recovered from an expanded key. `keypairFromMaster` therefore
+returns the seed it derived alongside the pair — additive, so callers that
+destructure `{ publicKey, secretKey }` are unaffected.
+
+Seed form is 32 bytes for ML-DSA and 64 for ML-KEM. It fits in a KMS secret, an
+HSM object or an env var, and it is the only private form an RFC 9964 AKP JWK
+accepts.
+
+| Export | Signature | Description |
+|---|---|---|
+| `SEED_ALGORITHMS` | `string[]` | `ML-DSA-65`, `ML-DSA-87`, `ML-KEM-768`, `ML-KEM-1024`. SLH-DSA has no seed form. |
+| `seedFromMaster` | `(alg, master, info?) → bytes` | Same HKDF-SHA-512 derivation `keypairFromMaster` uses, so it reproduces keys already in production. |
+| `keypairFromSeed` | `(alg, seed) → { publicKey, secretKey, seed }` | Expands a seed. Byte-identical to what OpenSSL 3.5 derives from the same seed. |
+| `exportJwk` | `(alg, { publicKey, seed? }, opts?) → jwk` | RFC 9964 AKP JWK. `priv` carries the seed. |
+| `importJwk` | `(jwk) → { alg, publicKey, secretKey?, seed? }` | Rejects a JWK whose seed and `pub` disagree. |
+| `exportSeedPkcs8` | `(alg, seed) → bytes` | PKCS#8 in LAMPS seed form, the `[0] IMPLICIT` CHOICE. |
+| `importSeedPkcs8` | `(der) → { alg, seed }` | Refuses an expanded-form key rather than truncating it into a seed. |
+
+The encodings are not read off the specification. `test/seed.test.js` asserts
+that the DER this package writes is byte-identical to what this machine's
+OpenSSL writes, for every parameter set, and skips with a reason where there is
+no native backend to compare against.
+
+```js
+import { mlDsa, seed } from 'kxco-post-quantum'
+
+const key = mlDsa.keypairFromMaster(process.env.KXCO_MASTER_KEY)
+const jwk = seed.exportJwk('ML-DSA-65', key, { kid: fingerprint(key.publicKey) })
+// { kty: 'AKP', alg: 'ML-DSA-65', pub: '...', priv: '<32-byte seed>', kid: '...' }
+```
+
+### `jws` — compact JWS with the RFC 9964 algorithm names
+
+Format only. A token signed here verifies in any process holding the public
+key, offline, with no configuration and no licence. RFC 9964 registered
+`ML-DSA-65` and `ML-DSA-87` as JWS algorithms so a post-quantum signature can
+travel the path an institution's gateway, IdP and partner verifier already
+parse.
+
+| Export | Signature | Description |
+|---|---|---|
+| `signJws` | `(payload, secretKey, opts?) → string` | Compact JWS. Objects are JSON-serialised. `opts.alg` defaults to `ML-DSA-65`. |
+| `verifyJws` | `(token, publicKey, opts?) → { valid, ... }` | Fails closed. `{ alg }` and `{ kid }` pin what the header may declare. |
+| `decodeJwsHeader` | `(token) → object \| null` | Unauthenticated read, for choosing which key to fetch. |
+
+The algorithm is resolved from an allowlist inside the module, never from the
+token, so a token cannot name its own verification routine. `crit` and `b64`
+headers are refused rather than ignored, and the public key's length must match
+the algorithm the header declares.
+
+There is no SLH-DSA option here: FIPS 205 signing takes on the order of a
+second and a half, which does not belong on a request path.
+
+### `backend()` and `isNative(alg)`
+
+Reports which implementation is doing the maths in this process — `openssl`
+with its version and parameter sets, or `javascript` with the reason the native
+backend is unavailable. For evidence bundles and support tickets. It reports;
+there is deliberately no way to switch backend from here.
 
 ### `webhook` — hybrid HMAC + ML-DSA-65 delivery signing
 
