@@ -31,7 +31,12 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  # contents: write is needed to attach the bundle to the GitHub Release.
+  # An Actions artifact is not published evidence: it expires on the retention
+  # window and needs an authenticated GitHub session to fetch, so an outside
+  # assessor cannot read it at all. A release asset is a permanent
+  # unauthenticated URL, which is the thing being claimed.
+  contents: write
 
 jobs:
   evidence:
@@ -97,3 +102,23 @@ jobs:
           name: evidence-node${{ matrix.node }}
           path: dist/evidence/
           retention-days: 90
+
+      # The bundle only counts as evidence if someone outside can fetch it.
+      # The interop matrix, the ACVP results, the SBOM and the signature audit
+      # all live in here, and an assessor reading only npm and the README sees
+      # none of it.
+      - name: Publish the evidence bundle on the GitHub Release
+        if: github.event_name == 'release'
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          cd dist/evidence
+          zip -qr "../../evidence-node${{ matrix.node }}.zip" .
+          cd ../..
+          gh release upload "$TAG"             "evidence-node${{ matrix.node }}.zip"             --clobber
+          # The manifest goes up unzipped too, so the digests and the backend
+          # that produced them can be read without downloading anything.
+          cp dist/evidence/00-MANIFEST.json "manifest-node${{ matrix.node }}.json"
+          gh release upload "$TAG" "manifest-node${{ matrix.node }}.json" --clobber

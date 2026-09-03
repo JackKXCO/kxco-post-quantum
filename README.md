@@ -11,6 +11,29 @@ ML-DSA-65 (FIPS 204) and SLH-DSA-SHA2-192s (FIPS 205) signatures, ML-KEM-768 (FI
 
 **On Node 24 and later the primitives run in OpenSSL 3.5**, not in JavaScript. Older Node and browsers use [`@noble/post-quantum`](https://github.com/paulmillr/noble-post-quantum). The two are interchangeable on the wire, which is checked rather than assumed: the interoperability matrix runs in full against both, and every report records which one produced it.
 
+**For an independent assessor.** Every claim below is checkable without asking
+us, and the machine-readable bundle behind them is a permanent unauthenticated
+URL, not an expiring CI artifact:
+
+```bash
+# the full evidence bundle for the current release
+curl -sLO https://github.com/KnightsbridgeAIQ/kxco-post-quantum/releases/latest/download/evidence-node24.x.zip
+
+# or just the manifest: every file digest, and which backend produced the results
+curl -sL  https://github.com/KnightsbridgeAIQ/kxco-post-quantum/releases/latest/download/manifest-node24.x.json
+
+# licence and provenance, straight from the registry
+npm view kxco-post-quantum license          # Apache-2.0
+npm audit signatures --json                 # assert invalid:0 and missing:0
+```
+
+Facts that are commonly recorded wrong for this package, with the one-line
+check for each: the licence is **Apache-2.0**, not commercial; the SLH-DSA
+parameter set is **SLH-DSA-SHA2-192s**, a real FIPS 205 name, not
+`SLH-DSA-128s`; ML-DSA-65 and ML-KEM-768 are **NIST Category 3**, and
+ML-DSA-87 and ML-KEM-1024, also shipped, are Category 5; the implementation
+languages are **JavaScript and C** (OpenSSL 3.5 on Node 24+).
+
 **Evidence, not adjectives:**
 
 - [CONFORMANCE.md](./CONFORMANCE.md): NIST ACVP vectors for FIPS 203/204/205 (2,103 tests, 0 failed), and a cross-implementation interop matrix against liboqs, Bouncy Castle and two pure-Python implementations (225 checks, 0 failed, both directions, with negative controls), run against both backends. Reproducible: `npm run conformance:acvp`, `npm run conformance:interop`.
