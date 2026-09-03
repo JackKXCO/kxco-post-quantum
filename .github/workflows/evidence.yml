@@ -97,6 +97,34 @@ jobs:
               process.exit(1);
             }
             console.log('backend recorded:', m.backend.kind);
+
+            // The defect this guards: the README advertised FIPS 203/204/205
+            // while the bundle carried only 203 and 204, because --full lifted
+            // the per-group cap without widening a hardcoded set list. A
+            // bundle narrower than the claim beside it is worse than a
+            // narrower claim would have been, and nothing caught it.
+            const full = m.sampling && m.sampling.full;
+            if (full) {
+              const fs = require('fs');
+              const need = [
+                '02-conformance-acvp.json',
+                '02b-conformance-acvp-fips205.json',
+                '02c-fips205-siggen-NOT-IN-THIS-BUNDLE.md',
+              ];
+              const missing = need.filter((f) => !fs.existsSync('dist/evidence/' + f));
+              if (missing.length) {
+                console.error('a full bundle is missing: ' + missing.join(', '));
+                console.error('the README claims FIPS 203/204/205; the bundle must show it');
+                process.exit(1);
+              }
+              const f205 = require('./dist/evidence/02b-conformance-acvp-fips205.json');
+              if (!f205.totals || f205.totals.failed !== 0 || f205.totals.passed < 1) {
+                console.error('FIPS 205 section is empty or has failures: ' +
+                  JSON.stringify(f205.totals));
+                process.exit(1);
+              }
+              console.log('FIPS 205 present:', JSON.stringify(f205.totals));
+            }
           "
 
       - uses: actions/upload-artifact@6f51ac03b9356f520e9adb1b1b7802705f340c2b # v4.5.0
