@@ -227,3 +227,24 @@ jobs:
           TAG="v$(node -p "require('./package.json').version")"
           cp "$BUNDLE" evidence.intoto.jsonl
           gh release upload "$TAG" evidence.intoto.jsonl --clobber
+
+      # Sign this leg's bundle with ML-DSA-65, using this package's own signing
+      # path. A post-quantum signing library whose releases carry only classical
+      # signatures is making an argument it does not act on. Each leg signs the
+      # zip it built, because the other leg's file does not exist on this runner
+      # and signing something fetched back from the release would only attest
+      # that the download worked.
+      #
+      # The public key is committed as release-signing-key.pub.hex, and the
+      # script refuses to sign if the seed in CI stops deriving it: a signature
+      # verifiable only against a key nobody holds is worse than no signature.
+      - name: Sign the bundle with ML-DSA-65
+        if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          KXCO_RELEASE_SEED: ${{ secrets.KXCO_RELEASE_SEED }}
+        run: |
+          TAG="v$(node -p "require('./package.json').version")"
+          node scripts/sign-release.mjs "evidence-node${{ matrix.node }}.zip"
+          gh release upload "$TAG" "evidence-node${{ matrix.node }}.zip.sig" --clobber
+          gh release upload "$TAG" release-signing-key.pub.hex --clobber

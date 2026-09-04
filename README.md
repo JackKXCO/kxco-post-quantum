@@ -344,3 +344,29 @@ Apache-2.0. See [LICENSE](./LICENSE).
 ## Maintainers
 
 Shayne Heffernan and John Heffernan — [KXCO by Knightsbridge](https://kxco.ai)
+
+## Verifying a release
+
+Every release asset is signed with ML-DSA-65 by this package's own signing path,
+and carries a SLSA provenance file recording the workflow that built it.
+
+```
+manifest-node24.x.json          the bundle's manifest
+evidence-node24.x.zip           the bundle
+evidence-node24.x.zip.sig       ML-DSA-65 signature over the zip, hex
+evidence.intoto.jsonl           SLSA provenance
+release-signing-key.pub.hex     the public key, also committed to this repository
+```
+
+```js
+import { readFileSync } from 'node:fs'
+import { mlDsa } from 'kxco-post-quantum'
+
+const pub = Buffer.from(readFileSync('release-signing-key.pub.hex', 'utf8').trim(), 'hex')
+const sig = readFileSync('evidence-node24.x.zip.sig', 'utf8').trim()
+mlDsa.verify(pub, readFileSync('evidence-node24.x.zip'), sig)   // true
+```
+
+Compare the public key against the copy in this repository before trusting a
+signature: a key served alongside the artefact it signs proves only that the
+same party produced both.
