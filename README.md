@@ -271,13 +271,14 @@ Low-level helpers for the KXCO hybrid webhook pattern: `envelope`, `hmacHex`, `v
 
 ---
 
-## What this does NOT do
+## Where this fits
 
-- No identity credentials or verifiable claims (those are in `kxco-pq-sdk`)
-- No relay, transport, or network layer
-- No key storage or KMS integration
+This is the primitive layer, and it stays that: keys, signatures, encapsulation
+and fingerprints, with nothing else in the way. Everything above it builds here.
 
----
+- [`kxco-pq-sdk`](https://www.npmjs.com/package/kxco-pq-sdk) for identity credentials and verifiable claims
+- [`kxco-pq-chain`](https://www.npmjs.com/package/kxco-pq-chain) to put a signature on Armature L1, where the chain verifies it in consensus
+- [`kxco-pq-hsm`](https://www.npmjs.com/package/kxco-pq-hsm) to hold the key in hardware
 
 ## Part of the KXCO stack
 
