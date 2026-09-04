@@ -194,3 +194,9 @@ jobs:
           # that produced them can be read without downloading anything.
           cp dist/evidence/00-MANIFEST.json "manifest-node${{ matrix.node }}.json"
           gh release upload "$TAG" "manifest-node${{ matrix.node }}.json" --clobber
+
+          # The bundle is attached, so the release can stop being a draft. Until
+          # this runs, releases/latest still points at the last release that has
+          # its evidence, which is the behaviour the README's permanent URL needs.
+          # Idempotent: both matrix legs run it and the second is a no-op.
+          gh release edit "$TAG" --draft=false

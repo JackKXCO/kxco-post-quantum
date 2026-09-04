@@ -111,6 +111,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ github.event.inputs.ref || github.ref_name }}
+        # Created as a DRAFT. evidence.yml publishes it once the bundle is
+        # attached. Without that, releases/latest moves the moment this job
+        # finishes, while the evidence build is still running, so the
+        # manifest URL the README calls permanent 404s on every release.
+        # A draft is skipped by releases/latest, so the previous good release
+        # keeps serving until the new one actually has its evidence.
         run: |
-          gh release view "$TAG" >/dev/null 2>&1             || gh release create "$TAG" --title "$TAG" --generate-notes
+          gh release view "$TAG" >/dev/null 2>&1             || gh release create "$TAG" --title "$TAG" --generate-notes --draft
           gh release upload "$TAG" sbom.cyclonedx.json --clobber
