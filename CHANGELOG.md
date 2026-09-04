@@ -1,5 +1,20 @@
 # Changelog
 
+## 1.6.4
+
+Documentation. The npm description said "2,103 NIST ACVP vectors and 225
+interop checks, 0 failed", which reads as 2,103 passing. The evidence records
+2,103 tested, 1,793 passed, 0 failed, 310 skipped, and CONFORMANCE.md says a
+skip is not a pass.
+
+Twelve sibling READMEs were corrected for this yesterday and this package's own
+README has been right for months. The description was the one place it
+survived, and a description only changes when the package is published, so it
+needed a release rather than a commit. It is the first thing anyone reads.
+
+Also corrects the count of what the downloadable bundle contains, from 1,479
+to the 1,551 actually present in the published v1.6.3 assets.
+
 ## 1.6.3
 
 Release plumbing only. No source change.
