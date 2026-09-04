@@ -176,14 +176,43 @@ test('an unrecognised algorithm OID is refused', () => {
 
 // ── cross-backend: the encodings are OpenSSL's, not our reading of the spec ──
 
-test('seed-form PKCS#8 is byte-identical to what OpenSSL writes', (t) => {
+// FIPS 204 allows a private key to be carried as the seed or as the expanded
+// key, and OpenSSL changed which one it writes by default between 3.5.6 and
+// 3.5.7: 3.5.6 emits the 54-byte seed form, 3.5.7 the 4098-byte expanded form.
+// Ours is unchanged and remains the seed form.
+//
+// So a flat byte comparison against whatever OpenSSL happens to emit tests the
+// installed OpenSSL's preference, not our encoding. Where OpenSSL writes the
+// seed form we still hold the strong claim, byte for byte. Where it writes the
+// expanded form we assert the claim that actually matters and is true on both:
+// OpenSSL parses our seed form and arrives at the same key.
+test('seed-form PKCS#8 is what OpenSSL reads, and what it writes when it writes seeds', (t) => {
   if (!isNative('ML-DSA-65')) {
     return t.skip(`no native backend on this runtime (${backend().reason})`)
   }
   for (const alg of SEED_ALGORITHMS) {
     const theirs = nativeKeypair(alg)
     const ours = Buffer.from(exportSeedPkcs8(alg, theirs.seed))
-    assert.deepEqual(ours, Buffer.from(theirs.pkcs8), `${alg} seed-form PKCS#8`)
+
+    if (theirs.pkcs8.length === ours.length) {
+      assert.deepEqual(ours, Buffer.from(theirs.pkcs8), `${alg} seed-form PKCS#8`)
+      continue
+    }
+
+    // OpenSSL emitted the expanded form. Hand it our seed form and require it
+    // to land on the same key it generated.
+    const reread = crypto.createPrivateKey({ key: ours, format: 'der', type: 'pkcs8' })
+    const rejwk = reread.export({ format: 'jwk' })
+    assert.deepEqual(
+      Buffer.from(rejwk.pub, 'base64url'),
+      theirs.publicKey,
+      `${alg} seed-form PKCS#8 must reload to the same public key`,
+    )
+    assert.deepEqual(
+      Buffer.from(rejwk.priv, 'base64url'),
+      theirs.seed,
+      `${alg} seed-form PKCS#8 must reload to the same seed`,
+    )
   }
 })
 
