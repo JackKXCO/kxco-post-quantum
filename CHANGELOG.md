@@ -1,5 +1,21 @@
 # Changelog
 
+## 1.6.3
+
+Release plumbing only. No source change.
+
+1.6.2 shipped without its evidence bundle, because the upload step was gated on
+a `release` event that cannot occur: publish.yml creates the release with the
+default GITHUB_TOKEN, and GitHub raises no workflow events for actions taken
+with that token. The bundle attached by hand afterwards came from a
+push-triggered build, so it carried 855 subsampled vectors while the README
+states that 1,479 are in the downloadable bundle. Correctly labelled in the
+manifest, but not what the README describes.
+
+This release exists so a tag produces the bundle the README promises: the
+workflow now runs on `v*` tags, treats a tag as a full build rather than a
+subsampled one, and uploads without a human in the loop.
+
 ## 1.6.2
 
 No change to the cryptography, the exports or the wire format. This release

@@ -1,6 +1,6 @@
 {
   "name": "kxco-post-quantum",
-  "version": "1.6.2",
+  "version": "1.6.3",
   "description": "ML-DSA-65, ML-KEM-768 and SLH-DSA-SHA2-192s with key fingerprinting. OpenSSL 3.5 primitives on Node 24+, JavaScript elsewhere. 2,103 NIST ACVP vectors and 225 cross-implementation interop checks, 0 failed. Reproducible builds and SLSA provenance.",
   "keywords": [
     "post-quantum",
