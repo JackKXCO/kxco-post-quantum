@@ -1,5 +1,37 @@
 # Changelog
 
+## 1.7.0
+
+Additive. No existing export changes shape, no wire format moves, and the
+default behaviour of the package is unchanged.
+
+**`requireNativeBackend([algorithms])`.** The package picks OpenSSL where the
+runtime has the FIPS 203/204/205 primitives and the JavaScript implementation
+otherwise. Both produce identical bytes, so the fallback is right nearly always.
+It is wrong under a control that says cryptography must execute inside a
+validated module: there the fallback means the control is not in force and
+nothing says so. This throws `ERR_KXCO_PQ_BACKEND` instead, carrying `actual`,
+`missing` and `available` so the failure says which requirement was not met.
+
+**`KXCO_PQ_REQUIRE_NATIVE=1`.** The same requirement from the environment,
+because the team under the control is usually not the team calling the library.
+A process that has landed on the JavaScript backend then fails at import rather
+than at its first signature.
+
+It asserts, it does not switch. There is still no way to force a backend, for
+the reason there never was: a flag that changed which implementation signed
+would change what a customer's evidence means. This only refuses to continue on
+the wrong one.
+
+It also claims only what it can see. Whether the OpenSSL underneath is a
+FIPS-validated module is a property of the operator's build; no library can
+determine that from the inside, and this does not pretend to. It removes the
+silent fallback, which is the part this package owns.
+
+Tested on both backends without mocking: CI runs Node 20 and 22, which have no
+native primitives and exercise the refusal, and Node 24, which exercises the
+accept path.
+
 ## 1.6.4
 
 Documentation. The npm description said "2,103 NIST ACVP vectors and 225

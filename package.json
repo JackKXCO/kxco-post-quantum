@@ -1,6 +1,6 @@
 {
   "name": "kxco-post-quantum",
-  "version": "1.6.4",
+  "version": "1.7.0",
   "description": "ML-DSA-65, ML-KEM-768 and SLH-DSA-SHA2-192s with key fingerprinting. OpenSSL 3.5 primitives on Node 24+, JavaScript elsewhere. 2,103 NIST ACVP vectors: 1,793 passed, 0 failed, 310 skipped. 225 interop checks, 0 failed. Reproducible builds and provenance.",
   "keywords": [
     "post-quantum",
@@ -129,7 +129,7 @@
     "@noble/post-quantum": "0.7.0"
   },
   "scripts": {
-    "test": "node --test test/basic.test.js && node --test test/context.test.js && node --test test/category5.test.js && node --test test/edge-cases.test.js && node --test test/seed.test.js && node --test test/browser-smoke.test.js && node test/run-vectors.js",
+    "test": "node --test test/basic.test.js && node --test test/backend.test.js && node --test test/context.test.js && node --test test/category5.test.js && node --test test/edge-cases.test.js && node --test test/seed.test.js && node --test test/browser-smoke.test.js && node test/run-vectors.js",
     "test:vectors": "node test/run-vectors.js",
     "generate:vectors": "node test/generate-vectors.js > test/vectors.json",
     "bench": "node bench/bench.js",

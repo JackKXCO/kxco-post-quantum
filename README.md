@@ -271,6 +271,46 @@ Low-level helpers for the KXCO hybrid webhook pattern: `envelope`, `hmacHex`, `v
 
 ---
 
+## Requiring the native backend
+
+This package picks its implementation at import time: OpenSSL 3.5 where the
+runtime provides the FIPS 203/204/205 primitives, the JavaScript implementation
+otherwise. Both produce identical wire bytes, so falling back is the right
+default and nothing about a signature changes.
+
+It is the wrong default in one situation: a deployment under a control that says
+cryptography must execute inside a validated module. There, a silent fallback
+means the control is not in force and nothing says so.
+
+```js
+import { requireNativeBackend } from 'kxco-post-quantum'
+
+requireNativeBackend(['ML-DSA-65', 'ML-KEM-768'])
+```
+
+It throws `ERR_KXCO_PQ_BACKEND` if the JavaScript backend is live, or if the
+OpenSSL present cannot provide a parameter set you named. The error carries
+`actual`, `missing` and `available` so a failure says which, rather than only
+that.
+
+Operators can enforce it without touching application code, which matters
+because the team under the control is usually not the team calling the library:
+
+```
+KXCO_PQ_REQUIRE_NATIVE=1
+```
+
+Set that and a process which has landed on the JavaScript backend fails at
+import, before its first signature rather than after.
+
+**What this does and does not claim.** It asserts that OpenSSL is doing the
+maths. Whether that OpenSSL is a FIPS-validated module is a property of your
+build, not of this package, and no library can see it from the inside. What it
+removes is the silent fallback, which is the part this package is responsible
+for. It is an assertion, never a switch: it cannot change which backend runs,
+because a flag that changed which implementation signed would change what your
+evidence means.
+
 ## Where this fits
 
 This is the primitive layer, and it stays that: keys, signatures, encapsulation
