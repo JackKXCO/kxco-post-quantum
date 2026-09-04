@@ -22,6 +22,12 @@ name: evidence
 on:
   push:
     branches: [main]
+    # Also on version tags. The release-triggered path below cannot fire on its
+    # own: publish.yml creates the GitHub Release with the default GITHUB_TOKEN,
+    # and GitHub deliberately does not raise workflow events for actions taken
+    # with that token. So a release built this way never got its bundle, which
+    # is why releases/latest/download/manifest-node24.x.json has been a 404.
+    tags: ['v*']
   pull_request:
     branches: [main]
   schedule:
@@ -106,7 +112,7 @@ jobs:
         env:
           PYTHON: python
         run: |
-          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event_name }}" = "release" ]; then
+          if [ "${{ github.event_name }}" = "schedule" ] || [ "${{ github.event_name }}" = "release" ] || [ "${{ startsWith(github.ref, 'refs/tags/v') }}" = "true" ]; then
             npm run evidence:full
           else
             npm run evidence
@@ -172,13 +178,13 @@ jobs:
       # all live in here, and an assessor reading only npm and the README sees
       # none of it.
       - name: Publish the evidence bundle on the GitHub Release
-        if: github.event_name == 'release'
+        if: github.event_name == 'release' || startsWith(github.ref, 'refs/tags/v')
         # Not continue-on-error. This step silently did nothing on v1.6.1, so
         # releases/latest/download/manifest-node24.x.json 404s while the README
         # cites it as a permanent URL. A missing asset must fail the run.
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ github.event.release.tag_name }}
+          TAG: ${{ github.event.release.tag_name || github.ref_name }}
         run: |
           cd dist/evidence
           zip -qr "../../evidence-node${{ matrix.node }}.zip" .
