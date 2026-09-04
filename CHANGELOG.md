@@ -1,5 +1,38 @@
 # Changelog
 
+## 1.6.2
+
+No change to the cryptography, the exports or the wire format. This release
+exists because the evidence describing them was wrong.
+
+**The interoperability report contradicted itself.** Every check wrote its
+failure sentence unconditionally while `ok` was computed separately, so a
+passing tamper control published `{"ok": true, "detail": "peer accepted a
+tampered signature"}`, and a passing byte-equality check published
+"deterministic signatures differ" followed by two identical values. 150 passing
+checks in the last bundle carried text that reads as a security failure. Every
+check now takes its sentence from its outcome.
+
+**The evidence bundle could not be built in CI, and never had been.** The
+workflow ran `npm ci` and nothing else: no ACVP vector fetch, no Java, no
+pinned Python peers, no liboqs image. Eight runs, both runtimes, all failed at
+the same step, so the only bundle an assessor could reach was hand-built from
+an uncommitted working tree. The workflow now does the setup its sibling always
+did, and the build starts from an empty directory rather than inheriting files
+from the run before it.
+
+**OpenSSL changed its default ML-DSA private key encoding in a patch release.**
+3.5.6 writes the 54-byte seed form, 3.5.7 the 4098-byte expanded form. FIPS 204
+allows either and this package still writes the seed form, which 3.5.7 continues
+to accept. The conformance test compared our bytes against whatever OpenSSL
+preferred, so it began failing on a change that was not ours. It now holds the
+byte-identity claim where OpenSSL writes seeds, and asserts that OpenSSL parses
+our seed form to the same seed and public key where it does not.
+
+**The dependency audit failed on its own regex**, matching an import specifier
+inside a string in an error message and reporting an unresolvable module named
+`priv`. Same 39 files from 12 entry points, same verdicts, no false failure.
+
 ## 1.6.0
 
 Additive. No existing export changes shape in a way a caller can observe, no
