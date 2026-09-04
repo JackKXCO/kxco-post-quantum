@@ -36,20 +36,18 @@ on:
     types: [published]
   workflow_dispatch:
 
+# Read-only by default. The one job that needs to write raises exactly what
+# it needs, so a compromised action in any other step cannot reach further
+# than reading the checkout.
 permissions:
-  # contents: write is needed to attach the bundle to the GitHub Release.
-  # An Actions artifact is not published evidence: it expires on the retention
-  # window and needs an authenticated GitHub session to fetch, so an outside
-  # assessor cannot read it at all. A release asset is a permanent
-  # unauthenticated URL, which is the thing being claimed.
-  contents: write
-  # Both are for the SLSA attestation attached below: OIDC proves which
-  # workflow built the bundle, and attestations: write records it.
-  id-token: write
-  attestations: write
+  contents: read
 
 jobs:
   evidence:
+    permissions:
+      contents: write
+      id-token: write
+      attestations: write
     runs-on: ubuntu-latest
     # FIPS 205 is capped rather than uncapped precisely so this stays bounded,
     # but SLH-DSA is slow enough that 45 was tight even without it.
