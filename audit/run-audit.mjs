@@ -78,7 +78,50 @@ for (const [path, entry] of Object.entries(lock.packages ?? {})) {
 // answer is the union of the Node and browser paths. That is the safe direction
 // to be wrong in: it can only over-report what is reachable.
 
-const SPECIFIER = /(?:from\s*|import\s*|import\(\s*|require\(\s*)['"]([^'"\n]+)['"]/g
+// Import specifiers are read from code only. A plain regex over the whole file
+// also matches inside comments and strings, and it did: src/seed.js throws
+// `the public key derived from 'priv' does not match 'pub'`, so the scanner
+// reported an unresolvable module named "priv" and failed the audit. A false
+// FAIL in the dependency job is worse than no job, because it teaches everyone
+// to ignore a red supply-chain check.
+//
+// This walks the source once tracking comment and string state, and treats a
+// quote as a specifier only when the code before it ends in `from`, `import(`
+// or `require(`.
+function specifiersOf(src) {
+  const out = []
+  // Not preceded by a dot: `Buffer.from('020100', 'hex')` is a method call,
+  // not an import, and matching it reported a module named "020100".
+  const KEY = /(?<![.\w$])(?:from|import|require)\s*\(?\s*$/
+  let i = 0
+  while (i < src.length) {
+    const c = src[i]
+    if (c === '/' && src[i + 1] === '/') {
+      const nl = src.indexOf('\n', i)
+      if (nl === -1) break
+      i = nl
+      continue
+    }
+    if (c === '/' && src[i + 1] === '*') {
+      const end = src.indexOf('*/', i + 2)
+      i = end === -1 ? src.length : end + 2
+      continue
+    }
+    if (c === '"' || c === "'" || c === '`') {
+      const start = i
+      i += 1
+      while (i < src.length && src[i] !== c) {
+        if (src.charCodeAt(i) === 92) i += 1 // backslash escape
+        i += 1
+      }
+      if (KEY.test(src.slice(0, start))) out.push(src.slice(start + 1, i))
+      i += 1
+      continue
+    }
+    i += 1
+  }
+  return out
+}
 
 function walkReachable() {
   const roots = Object.values(pkg.exports ?? {})
@@ -103,8 +146,7 @@ function walkReachable() {
       continue
     }
 
-    for (const m of text.matchAll(SPECIFIER)) {
-      const spec = m[1]
+    for (const spec of specifiersOf(text)) {
       if (spec.startsWith('node:')) {
         builtins.add(spec)
         continue

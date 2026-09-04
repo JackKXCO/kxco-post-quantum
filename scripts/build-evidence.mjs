@@ -16,7 +16,7 @@
 // Usage: node scripts/build-evidence.mjs [--out dist/evidence] [--full]
 
 import { execFileSync } from 'node:child_process'
-import { mkdirSync, writeFileSync, copyFileSync, readFileSync, existsSync } from 'node:fs'
+import { mkdirSync, writeFileSync, copyFileSync, readFileSync, existsSync, rmSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createHash } from 'node:crypto'
@@ -31,6 +31,12 @@ const args = process.argv.slice(2)
 const outDir = args.includes('--out') ? args[args.indexOf('--out') + 1] : join(ROOT, 'dist', 'evidence')
 const full = args.includes('--full')
 
+// Start from an empty directory. This used to only mkdir, so a file written by
+// an earlier run survived into the next bundle and the manifest hashed it as
+// though it belonged. That shipped a real contradiction to a public release:
+// 02c-fips205-siggen-NOT-IN-THIS-BUNDLE.md, left over from before signature
+// generation was sampled, sitting beside the sigGen results it said were absent.
+rmSync(outDir, { recursive: true, force: true })
 mkdirSync(outDir, { recursive: true })
 
 const steps = []
