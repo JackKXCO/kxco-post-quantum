@@ -43,6 +43,10 @@ permissions:
   # assessor cannot read it at all. A release asset is a permanent
   # unauthenticated URL, which is the thing being claimed.
   contents: write
+  # Both are for the SLSA attestation attached below: OIDC proves which
+  # workflow built the bundle, and attestations: write records it.
+  id-token: write
+  attestations: write
 
 jobs:
   evidence:
@@ -200,3 +204,26 @@ jobs:
           # its evidence, which is the behaviour the README's permanent URL needs.
           # Idempotent: both matrix legs run it and the second is a no-op.
           gh release edit "$TAG" --draft=false
+
+      # Attach SLSA provenance for the bundle, as a file on the release rather
+      # than only in GitHub's attestation store. An assessor reading the release
+      # can then check where the artefact was built without an API call, and
+      # OpenSSF Scorecard's Signed-Releases check reads *.intoto.jsonl from the
+      # assets. Only the node24 leg does this; both legs would race on the same
+      # file names for no benefit.
+      - name: Attest the bundle
+        if: matrix.node == '24.x' && (github.event_name == 'release' || startsWith(github.ref, 'refs/tags/v'))
+        id: attest
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: 'evidence-node*.zip'
+
+      - name: Publish the provenance on the release
+        if: matrix.node == '24.x' && (github.event_name == 'release' || startsWith(github.ref, 'refs/tags/v'))
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BUNDLE: ${{ steps.attest.outputs.bundle-path }}
+        run: |
+          TAG="v$(node -p "require('./package.json').version")"
+          cp "$BUNDLE" evidence.intoto.jsonl
+          gh release upload "$TAG" evidence.intoto.jsonl --clobber
