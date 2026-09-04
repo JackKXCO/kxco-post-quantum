@@ -108,6 +108,12 @@ const PEERS = {
 // -------------------------------------------------------------------- helpers
 
 const hex = (u8) => Buffer.from(u8).toString('hex')
+// A check's detail is read by people, and by machines that never look at `ok`.
+// It has to say what happened. Writing only the failure text meant a passing
+// tamper control published the sentence "peer accepted a tampered signature",
+// which is the exact opposite of the result it was recording.
+const said = (ok, pass, fail) => ({ ok, detail: ok ? pass : fail })
+
 const bytes = (h) => Uint8Array.from(Buffer.from(h ?? '', 'hex'))
 
 // Deterministic, published test material: anyone can recompute these seeds and
@@ -419,19 +425,21 @@ async function runSignatureSet(peerName, peer, set, path) {
       checks[`bytes${suffix}`] = { ok: null, detail: 'peer could not sign' }
     } else {
       const theirSig = bytes(theirSign.signature)
-      checks[`theirs>ours${suffix}`] = {
-        ok: localVerify(set, path, local.publicKey, message, theirSig, ctx) === true,
-        detail: 'we rejected a signature the peer produced',
-      }
+      checks[`theirs>ours${suffix}`] = said(
+        localVerify(set, path, local.publicKey, message, theirSig, ctx) === true,
+        'we verified a signature the peer produced',
+        'we rejected a signature the peer produced',
+      )
       checks[`bytes${suffix}`] =
         path === 'wrapper'
           ? { ok: null, detail: 'not applicable: the wrapper signs hedged, so signatures are not reproducible' }
           : PEERS[peerName].deterministicSigning === false
           ? { ok: null, detail: 'not applicable: the peer signs hedged and exposes no deterministic mode' }
-          : {
-              ok: hex(ourSig) === theirSign.signature,
-              detail: `deterministic signatures differ (ours ${hex(ourSig).slice(0, 20)}, theirs ${theirSign.signature.slice(0, 20)})`,
-            }
+          : said(
+              hex(ourSig) === theirSign.signature,
+              `deterministic signatures match (${hex(ourSig).slice(0, 20)})`,
+              `deterministic signatures differ (ours ${hex(ourSig).slice(0, 20)}, theirs ${theirSign.signature.slice(0, 20)})`,
+            )
     }
 
     // Negative control: the peer must reject a signature we deliberately broke.
@@ -446,7 +454,11 @@ async function runSignatureSet(peerName, peer, set, path) {
       context: hex(ctx),
     })
     checks[`tamper${suffix}`] = theirReject.ok
-      ? { ok: theirReject.valid === false, detail: 'peer accepted a tampered signature' }
+      ? said(
+          theirReject.valid === false,
+          'peer rejected the tampered signature',
+          'peer accepted a tampered signature',
+        )
       : gap(theirReject)
         ? { ok: null, detail: `not applicable: ${theirReject.error}` }
         : { ok: true, detail: `peer rejected with an error: ${theirReject.error}` }
@@ -464,7 +476,11 @@ async function runKemSet(peerName, peer, set, path) {
   const theirs = await peer.request({ op: 'keyDerive', alg: set.alg, seed: hex(seed) })
 
   checks.keys = theirs.ok
-    ? { ok: hex(local.publicKey) === theirs.publicKey, detail: 'derived encapsulation keys differ' }
+    ? said(
+        hex(local.publicKey) === theirs.publicKey,
+        'derived encapsulation keys match',
+        'derived encapsulation keys differ',
+      )
     : gap(theirs)
       ? { ok: null, detail: `not applicable: ${theirs.error}` }
       : { ok: false, detail: theirs.error }
@@ -486,7 +502,11 @@ async function runKemSet(peerName, peer, set, path) {
     ciphertext: hex(ourCt),
   })
   checks['ours>theirs'] = theirDecap.ok
-    ? { ok: theirDecap.sharedSecret === hex(ours.sharedSecret), detail: 'shared secrets differ' }
+    ? said(
+        theirDecap.sharedSecret === hex(ours.sharedSecret),
+        'shared secrets match',
+        'shared secrets differ',
+      )
     : gap(theirDecap)
       ? { ok: null, detail: `not applicable: ${theirDecap.error}` }
       : { ok: false, detail: theirDecap.error }
@@ -507,10 +527,11 @@ async function runKemSet(peerName, peer, set, path) {
       path === 'wrapper'
         ? set.wrapper.decapsulate(bytes(theirEncap.ciphertext), local.secretKey)
         : set.prim.decapsulate(bytes(theirEncap.ciphertext), local.secretKey)
-    checks['theirs>ours'] = {
-      ok: hex(recovered) === theirEncap.sharedSecret,
-      detail: 'we recovered a different shared secret than the peer sent',
-    }
+    checks['theirs>ours'] = said(
+      hex(recovered) === theirEncap.sharedSecret,
+      'we recovered the shared secret the peer sent',
+      'we recovered a different shared secret than the peer sent',
+    )
   }
 
   // Implicit rejection: a corrupted ciphertext must yield a different secret,
@@ -525,10 +546,11 @@ async function runKemSet(peerName, peer, set, path) {
     ciphertext: hex(badCt),
   })
   checks.reject = theirBad.ok
-    ? {
-        ok: theirBad.sharedSecret !== hex(ours.sharedSecret),
-        detail: 'peer returned the real shared secret for a corrupted ciphertext',
-      }
+    ? said(
+        theirBad.sharedSecret !== hex(ours.sharedSecret),
+        'peer did not return the real shared secret for a corrupted ciphertext',
+        'peer returned the real shared secret for a corrupted ciphertext',
+      )
     : gap(theirBad)
       ? { ok: null, detail: `not applicable: ${theirBad.error}` }
       : { ok: true, detail: `peer rejected with an error: ${theirBad.error}` }
