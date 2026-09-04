@@ -31,3 +31,15 @@ jobs:
 
       - run: npm ci
       - run: npm test
+
+      # Fuzz the parsing surfaces. Not the cryptography, which reviewed
+      # implementations and 2,103 ACVP vectors already cover, but everything
+      # that accepts bytes from somewhere else: JWS tokens, JWKs, PKCS#8 blobs,
+      # signatures from a peer. The property is that a parser given arbitrary
+      # bytes returns or throws a typed error, and that verification fails
+      # closed rather than throwing or, worse, returning true.
+      #
+      # Deterministic by seed so a failure is reproducible, and it carries its
+      # own control: if a genuine signature stops verifying, the run fails
+      # rather than reporting a clean sweep it did not earn.
+      - run: npm run fuzz

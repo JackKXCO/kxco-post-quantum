@@ -10,7 +10,12 @@
 # Built and driven by ../run-interop.mjs. Speaks the same one-JSON-object-per-line
 # protocol on stdin/stdout as the other peers.
 
-FROM python:3.12-slim
+# Pinned by digest, not just by tag. This image builds the liboqs peer whose
+# output appears in the published interop matrix, and a floating tag means a
+# rebuild months from now compares against a different peer than the one the
+# evidence describes. A conformance harness that cannot be rebuilt to the same
+# bytes is not reproducible, whatever the README says.
+FROM python:3.12-slim@sha256:78387bc3881b8273120a12ebe6c1ab22b018ccc2c9adf565ae1ac9b536e184ea
 
 ARG LIBOQS_TAG=0.16.0
 ARG LIBOQS_PYTHON_TAG=0.16.0
