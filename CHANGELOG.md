@@ -1,5 +1,18 @@
 # Changelog
 
+## 1.7.1
+
+Release integrity. No source change to the library.
+
+Release assets are now signed with ML-DSA-65 through this package's own signing
+path, and each release carries a SLSA provenance file. Until now the npm tarball
+had provenance and the GitHub release, where the evidence bundle is actually
+downloaded from, had neither a signature nor a statement of where it was built.
+
+The public key is committed as release-signing-key.pub.hex and published with
+each release. The signing script refuses to run if the seed in CI stops deriving
+that key, and verifies every signature immediately after producing it.
+
 ## 1.7.0
 
 Additive. No existing export changes shape, no wire format moves, and the
