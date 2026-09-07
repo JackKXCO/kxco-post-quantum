@@ -109,12 +109,15 @@
     }
   },
   "files": [
+    "AGILITY.md",
     "BENCHMARKS.md",
+    "BOUNDARY.md",
     "CHANGELOG.md",
     "CONFORMANCE.md",
     "DEPENDENCIES.md",
     "LICENCE-PRODUCT.md",
     "LICENSE",
+    "LIFECYCLE.md",
     "MIGRATION.md",
     "README.md",
     "SECURITY.md",
