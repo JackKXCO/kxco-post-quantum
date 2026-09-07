@@ -47,3 +47,14 @@ updates:
     commit-message:
       prefix: ci
       include: scope
+    # One pull request for all action bumps, not one each. On 7 Sep this opened
+    # five separate PRs in a single morning - checkout, setup-node,
+    # setup-python and both codeql-action paths - and every one of them was a
+    # major bump the auto-merge step declines, so five reviews became five red
+    # runs. Actions are pinned to commit SHAs and reviewed together anyway, so
+    # the batch is how they are actually read. Security updates are opened by a
+    # separate Dependabot feature and are not grouped by this.
+    groups:
+      github-actions:
+        patterns:
+          - "*"
