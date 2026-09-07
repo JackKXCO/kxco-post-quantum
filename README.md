@@ -41,6 +41,9 @@ languages are **JavaScript and C** (OpenSSL 3.5 on Node 24+).
 - [THREAT-MODEL.md](./THREAT-MODEL.md): what this defends against and what it does not. Read the side-channel section before deciding where a signing key lives.
 - [MIGRATION.md](./MIGRATION.md): moving an RSA or ECDSA system across, and moving between versions of this package.
 - [SECURITY.md](./SECURITY.md): reporting, release integrity, and the dependency policy.
+- [AGILITY.md](./AGILITY.md): what has to change when the algorithm changes. The replacement plan, the mechanisms that exist today, the transition peers can follow, and the four kinds of agility this package does not give you.
+- [BOUNDARY.md](./BOUNDARY.md): which cryptography this package performs, which it depends on, and which it merely offers to a caller. Release signing is ML-DSA-65; the transport that delivers the release is classical TLS, and that is stated rather than folded into the claim.
+- [LIFECYCLE.md](./LIFECYCLE.md): supported versions, the runtime ceiling, and the one blocking supplier dependency with its mitigations. Read the roadmap beside a maturity claim, not after it.
 - **Every release is reproducible and attested.** The published tarball rebuilds bit-for-bit from its own tag, verified in CI on every run, and each release carries a SLSA provenance attestation plus a CycloneDX SBOM at a permanent unauthenticated URL. A provenance attestation says a build happened in CI; the reproducible build says the artefact is the source. They are different claims and both are checkable without asking us for anything.
 
 ---

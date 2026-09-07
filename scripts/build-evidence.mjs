@@ -222,7 +222,13 @@ if (signatures !== null) write('06-npm-audit-signatures.txt', signatures)
 
 // ── 5. the honest documents ─────────────────────────────────────────────────
 
-const docs = ['AUDIT.md', 'THREAT-MODEL.md', 'SECURITY.md', 'CONFORMANCE.md', 'DEPENDENCIES.md']
+// BOUNDARY, AGILITY and LIFECYCLE are here for the same reason as the rest: an
+// assessor reads the bundle, not the repository. A product boundary that lives
+// only in git is a boundary the assessment cannot cite.
+const docs = [
+  'AUDIT.md', 'THREAT-MODEL.md', 'SECURITY.md', 'CONFORMANCE.md',
+  'DEPENDENCIES.md', 'BOUNDARY.md', 'AGILITY.md', 'LIFECYCLE.md',
+]
 const copied = []
 for (const doc of docs) {
   const from = join(ROOT, doc)

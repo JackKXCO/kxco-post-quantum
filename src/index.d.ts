@@ -16,4 +16,4 @@ export * as webhook from './webhook.js'
 export * as seed from './seed.js'
 /** Compact JWS using the RFC 9964 algorithm names. Format only, no network. */
 export * as jws from './jws.js'
-export { backend, isNative } from './backend.js'
+export { backend, isNative, requireNativeBackend } from './backend.js'

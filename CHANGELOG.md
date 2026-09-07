@@ -1,5 +1,42 @@
 # Changelog
 
+## 1.7.2
+
+Documentation, and one typing fix. No source change to the library and no wire
+format change.
+
+**Three documents the package needed and did not have.** Buyer readiness
+assessments ask what the product boundary is, what cryptographic agility it
+actually has, and what constrains its lifecycle. All three had real answers in
+the code and the evidence. None was written down, and an answer that exists
+only in a maintainer's head is not evidence.
+
+BOUNDARY.md separates what this package performs from what it depends on and
+what it merely offers a caller. Nothing in src/ opens a socket, so the
+operating path has no classical service dependency at all. Release signing is
+ML-DSA-65 with the key committed here; the transport that delivers the release
+is classical TLS, and that is stated rather than folded into the claim.
+
+AGILITY.md separates the three things the term is used for: a replacement plan,
+an implemented mechanism, and an interoperable transition. It also names the
+four kinds of agility this package does not give you, including that a
+parameter set outside the published five needs a release rather than a
+configuration change.
+
+LIFECYCLE.md carries supported versions, the runtime ceiling, and the blocking
+supplier dependency with its mitigations ranked. The end-of-support window is
+marked not yet decided rather than invented.
+
+All three are copied into the evidence bundle. An assessor reads the bundle,
+not the repository.
+
+**requireNativeBackend is now in the typings.** 1.7.0 shipped it, and shipped
+it exported from index.js and documented in the README while declared in
+neither backend.d.ts nor index.d.ts. A TypeScript caller therefore could not
+reach the one control in this package that enforces a no-fallback policy, which
+is precisely the deployment the feature exists for. Runtime behaviour was
+always correct; the type surface hid it.
+
 ## 1.7.1
 
 Release integrity. No source change to the library.
